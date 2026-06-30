@@ -1,36 +1,107 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# KaarYab Afghanistan
 
-## Getting Started
+KaarYab Afghanistan is a modern opportunity finder platform that helps Afghan youth discover jobs, internships, scholarships, remote work, online courses, training programs, and volunteer opportunities in one place.
 
-First, run the development server:
+## Project Description
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+This final project solves a common problem in Afghanistan: opportunity information is scattered across social media groups, websites, and posts, which makes it hard to search and compare. KaarYab centralizes the listings in a clean, responsive Next.js app with search, filters, saved items, dynamic details, a dashboard, and CRUD functionality.
+
+## Problem It Solves
+
+- Opportunity information is scattered and difficult to track
+- Users need one simple platform to browse useful listings
+- Students and job seekers need a clean way to save and revisit opportunities
+- Organizations need a simple submission flow for sharing new opportunities
+
+## Features
+
+- Home page with featured opportunities and category sections
+- Opportunities page with search and multiple filters
+- Dynamic opportunity details page at `/opportunities/[id]`
+- Add opportunity form with validation
+- Edit and delete opportunity actions
+- Saved opportunities page backed by `localStorage`
+- Dashboard with stats and simple charts
+- About page and contact form
+- Dark mode and responsive design
+- Loading, error, and not-found states
+- Demo data clearly labeled for presentation safety
+
+## Technologies Used
+
+- Next.js 16 App Router
+- React 19
+- TypeScript
+- Tailwind CSS 4
+- React Hook Form
+- Zod
+- LocalStorage
+
+## Folder Structure
+
+```text
+app/
+components/
+context/
+data/
+lib/
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## How to Run Locally
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm install
+npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Then open `http://localhost:3000`.
 
-## Learn More
+## Scripts
 
-To learn more about Next.js, take a look at the following resources:
+- `npm run dev` - start development server
+- `npm run build` - create production build
+- `npm run start` - run production server
+- `npm run lint` - run ESLint
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Screenshots
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Add screenshots here before final submission:
 
-## Deploy on Vercel
+- Home page
+- Opportunities page
+- Opportunity details page
+- Add opportunity form
+- Dashboard
+- Saved opportunities
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Live Demo Link
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Replace this with your deployed Vercel URL.
+
+## GitHub Link
+
+Replace this with your GitHub repository URL.
+
+## Future Improvements
+
+- Multi-language support for English, Dari, and Pashto
+- Authentication for admin and organization accounts
+- Real backend API or database
+- Email notifications for new opportunities
+- More advanced charts and analytics
+- Opportunity approval workflow
+
+## Final Presentation Notes
+
+When presenting, explain:
+
+1. The problem the project solves
+2. The target users
+3. The main features and CRUD flow
+4. How search, filters, save, and dashboard work
+5. Which technologies were used
+6. What you learned and what you would improve next
+
+## Demo Data Note
+
+This project uses sample data. The website is safe to demo because no real user accounts or private information are required.

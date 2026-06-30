@@ -1,0 +1,160 @@
+"use client";
+
+import { createContext, useContext, useEffect, useState } from "react";
+import { demoOpportunities } from "@/data/opportunities";
+import {
+  createOpportunityId,
+  type Opportunity,
+  type OpportunityInput,
+} from "@/lib/opportunities";
+
+type ThemeMode = "light" | "dark";
+
+interface AppContextValue {
+  opportunities: Opportunity[];
+  savedIds: string[];
+  theme: ThemeMode;
+  hydrated: boolean;
+  addOpportunity: (input: OpportunityInput) => Opportunity;
+  updateOpportunity: (id: string, input: OpportunityInput) => void;
+  deleteOpportunity: (id: string) => void;
+  toggleSaved: (id: string) => void;
+  clearSaved: () => void;
+  isSaved: (id: string) => boolean;
+  setTheme: (mode: ThemeMode) => void;
+}
+
+const STORAGE_KEYS = {
+  opportunities: "kaaryab-opportunities",
+  savedIds: "kaaryab-saved-opportunities",
+  theme: "kaaryab-theme",
+} as const;
+
+const AppContext = createContext<AppContextValue | null>(null);
+
+function safeParse<T>(value: string | null, fallback: T) {
+  if (!value) return fallback;
+
+  try {
+    return JSON.parse(value) as T;
+  } catch {
+    return fallback;
+  }
+}
+
+export function AppProvider({ children }: { children: React.ReactNode }) {
+  const [opportunities, setOpportunities] = useState<Opportunity[]>(demoOpportunities);
+  const [savedIds, setSavedIds] = useState<string[]>([]);
+  const [theme, setThemeState] = useState<ThemeMode>("light");
+  const [hydrated, setHydrated] = useState(false);
+
+  useEffect(() => {
+    const storedOpportunities = safeParse<Opportunity[]>(
+      window.localStorage.getItem(STORAGE_KEYS.opportunities),
+      demoOpportunities
+    );
+    const storedSavedIds = safeParse<string[]>(
+      window.localStorage.getItem(STORAGE_KEYS.savedIds),
+      []
+    );
+    const storedTheme = window.localStorage.getItem(STORAGE_KEYS.theme) as ThemeMode | null;
+
+    // We intentionally sync persisted client state after mount.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setOpportunities(storedOpportunities.length > 0 ? storedOpportunities : demoOpportunities);
+    setSavedIds(storedSavedIds);
+    setThemeState(storedTheme === "dark" ? "dark" : "light");
+    setHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    if (!hydrated) return;
+
+    window.localStorage.setItem(STORAGE_KEYS.opportunities, JSON.stringify(opportunities));
+  }, [hydrated, opportunities]);
+
+  useEffect(() => {
+    if (!hydrated) return;
+
+    window.localStorage.setItem(STORAGE_KEYS.savedIds, JSON.stringify(savedIds));
+  }, [hydrated, savedIds]);
+
+  useEffect(() => {
+    if (!hydrated) return;
+
+    window.localStorage.setItem(STORAGE_KEYS.theme, theme);
+    document.documentElement.classList.toggle("dark", theme === "dark");
+    document.documentElement.style.colorScheme = theme;
+  }, [hydrated, theme]);
+
+  const addOpportunity = (input: OpportunityInput) => {
+    const opportunity: Opportunity = {
+      ...input,
+      id: createOpportunityId(),
+      submittedAt: new Date().toISOString(),
+    };
+
+    setOpportunities((current) => [opportunity, ...current]);
+    return opportunity;
+  };
+
+  const updateOpportunity = (id: string, input: OpportunityInput) => {
+    setOpportunities((current) =>
+      current.map((opportunity) =>
+        opportunity.id === id
+          ? {
+              ...opportunity,
+              ...input,
+            }
+          : opportunity
+      )
+    );
+  };
+
+  const deleteOpportunity = (id: string) => {
+    setOpportunities((current) => current.filter((opportunity) => opportunity.id !== id));
+    setSavedIds((current) => current.filter((savedId) => savedId !== id));
+  };
+
+  const toggleSaved = (id: string) => {
+    setSavedIds((current) =>
+      current.includes(id) ? current.filter((item) => item !== id) : [id, ...current]
+    );
+  };
+
+  const clearSaved = () => setSavedIds([]);
+
+  const isSaved = (id: string) => savedIds.includes(id);
+
+  const setTheme = (mode: ThemeMode) => setThemeState(mode);
+
+  return (
+    <AppContext.Provider
+      value={{
+        opportunities,
+        savedIds,
+        theme,
+        hydrated,
+        addOpportunity,
+        updateOpportunity,
+        deleteOpportunity,
+        toggleSaved,
+        clearSaved,
+        isSaved,
+        setTheme,
+      }}
+    >
+      {children}
+    </AppContext.Provider>
+  );
+}
+
+export function useAppData() {
+  const value = useContext(AppContext);
+
+  if (!value) {
+    throw new Error("useAppData must be used within AppProvider");
+  }
+
+  return value;
+}
