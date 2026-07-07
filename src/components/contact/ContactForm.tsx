@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import FormField from "@/components/common/FormField";
 import { contactFormSchema, type ContactFormValues } from "@/lib/schemas";
 
 export default function ContactForm() {
@@ -28,28 +29,37 @@ export default function ContactForm() {
         setSubmitted(true);
         reset();
       })}
-      className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-white/[0.04] sm:p-8"
+      className="ds-card rounded-[1.5rem] p-6 sm:p-8"
     >
+      <div className="mb-6 rounded-[1.25rem] border border-[color:var(--accent-soft)] bg-[color:var(--accent-soft)]/60 px-4 py-3">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[color:var(--accent-strong)]">
+          Demo form
+        </p>
+        <p className="mt-1 text-sm text-[color:var(--foreground-muted)]">
+          Messages stay local in this version so you can test it safely.
+        </p>
+      </div>
+
       <div className="grid gap-5 md:grid-cols-2">
-        <Field label="Name" error={errors.name?.message}>
-          <input {...register("name")} className="form-input" placeholder="Your name" />
-        </Field>
-        <Field label="Email" error={errors.email?.message}>
-          <input {...register("email")} type="email" className="form-input" placeholder="you@example.com" />
-        </Field>
+        <FormField label="Name" error={errors.name?.message}>
+          <input {...register("name")} className="ds-input" placeholder="Your name" />
+        </FormField>
+        <FormField label="Email" error={errors.email?.message}>
+          <input {...register("email")} type="email" className="ds-input" placeholder="you@example.com" />
+        </FormField>
       </div>
 
       <div className="mt-5 grid gap-5">
-        <Field label="Subject" error={errors.subject?.message}>
-          <input {...register("subject")} className="form-input" placeholder="Opportunity suggestion" />
-        </Field>
-        <Field label="Message" error={errors.message?.message}>
-          <textarea {...register("message")} className="form-input min-h-40" placeholder="Tell us what should be added or improved." />
-        </Field>
+        <FormField label="Subject" error={errors.subject?.message}>
+          <input {...register("subject")} className="ds-input" placeholder="Opportunity suggestion" />
+        </FormField>
+        <FormField label="Message" error={errors.message?.message}>
+          <textarea {...register("message")} className="ds-input min-h-40" placeholder="Tell us what should be added or improved." />
+        </FormField>
       </div>
 
       {submitted ? (
-        <div className="mt-5 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-300">
+        <div className="mt-5 rounded-2xl border border-[color:var(--success-soft)] bg-[color:var(--success-soft)] px-4 py-3 text-sm font-medium text-[color:var(--success)]">
           Thanks. Your message has been captured for the demo version of the project.
         </div>
       ) : null}
@@ -57,53 +67,10 @@ export default function ContactForm() {
       <button
         type="submit"
         disabled={isSubmitting}
-        className="mt-6 inline-flex w-full items-center justify-center rounded-full bg-slate-950 px-5 py-3.5 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-70 dark:bg-white dark:text-slate-950 dark:hover:bg-slate-200"
+        className="ds-button-primary mt-6 inline-flex w-full items-center justify-center rounded-full px-5 py-3.5 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-70"
       >
-        Send message
+      Send message
       </button>
-
-      <style jsx global>{`
-        .form-input {
-          width: 100%;
-          border-radius: 1rem;
-          border: 1px solid rgb(226 232 240);
-          background: rgb(248 250 252);
-          padding: 0.875rem 1rem;
-          font-size: 0.95rem;
-          color: rgb(15 23 42);
-          outline: none;
-          transition: border-color 150ms ease, box-shadow 150ms ease;
-        }
-
-        .dark .form-input {
-          border-color: rgba(255, 255, 255, 0.1);
-          background: rgba(255, 255, 255, 0.05);
-          color: rgb(248 250 252);
-        }
-
-        .form-input:focus {
-          border-color: rgb(34 211 238);
-          box-shadow: 0 0 0 4px rgba(34, 211, 238, 0.18);
-        }
-      `}</style>
     </form>
-  );
-}
-
-function Field({
-  label,
-  error,
-  children,
-}: {
-  label: string;
-  error?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <label className="block">
-      <span className="mb-2 block text-sm font-semibold text-slate-800 dark:text-slate-100">{label}</span>
-      {children}
-      {error ? <p className="mt-2 text-sm text-rose-500">{error}</p> : null}
-    </label>
   );
 }

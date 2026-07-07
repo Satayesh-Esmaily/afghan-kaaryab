@@ -30,16 +30,16 @@ export default function AboutPage() {
             body: "Students, graduates, job seekers, women seeking remote work, and organizations that share opportunities.",
           },
         ].map((item) => (
-          <div key={item.title} className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-white/[0.04]">
+          <div key={item.title} className="ds-card rounded-[1.5rem] p-6">
             <Badge tone="info">{item.title}</Badge>
-            <p className="mt-4 text-sm leading-7 text-slate-600 dark:text-slate-300">{item.body}</p>
+            <p className="ds-muted mt-4 text-sm leading-7">{item.body}</p>
           </div>
         ))}
       </section>
 
-      <section className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-white/[0.04] sm:p-8">
-        <h2 className="text-2xl font-semibold text-slate-950 dark:text-white">Built with the final project rubric in mind</h2>
-        <p className="mt-4 max-w-3xl text-base leading-7 text-slate-600 dark:text-slate-300">
+      <section className="ds-card rounded-[1.5rem] p-6 sm:p-8">
+        <h2 className="ds-title text-2xl font-semibold">Built with the final project rubric in mind</h2>
+        <p className="ds-muted mt-4 max-w-3xl text-base leading-7">
           The application includes responsive layouts, dynamic routes, localStorage persistence,
           a full add/edit/delete workflow, dark mode, and reusable components so it demonstrates
           both product thinking and technical skill.

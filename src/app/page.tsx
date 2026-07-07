@@ -18,7 +18,7 @@ export default function HomePage() {
   return (
     <div className="space-y-8">
       <section className="grid gap-5 xl:grid-cols-[1.45fr_0.85fr]">
-        <div className="rounded-[2rem] accent-panel p-6 sm:p-8 lg:p-10">
+        <div className="rounded-[1.5rem] accent-panel p-6 sm:p-8 lg:p-10">
           <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-center">
             <div className="space-y-4">
               <Badge tone="default">Demo Data</Badge>
@@ -45,7 +45,7 @@ export default function HomePage() {
               </div>
             </div>
 
-            <div className="hidden rounded-[2rem] border border-white/15 bg-white/10 p-5 lg:block">
+            <div className="hidden rounded-[1.5rem] border border-white/15 bg-white/10 p-5 lg:block">
               <p className="text-xs uppercase tracking-[0.22em] text-white/70">What is included</p>
               <div className="mt-4 grid gap-3">
                 {[
@@ -64,8 +64,8 @@ export default function HomePage() {
         </div>
 
         <div className="grid gap-5">
-          <div className="rounded-[2rem] panel p-6">
-            <p className="text-sm font-semibold uppercase tracking-[0.22em] text-[color:var(--muted)]">
+          <div className="rounded-[1.5rem] panel p-6">
+            <p className="text-sm font-semibold uppercase tracking-[0.22em] text-[color:var(--foreground-muted)]">
               Quick stats
             </p>
             <div className="mt-5 grid grid-cols-2 gap-4">
@@ -76,7 +76,7 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="rounded-[2rem] panel-soft p-6">
+          <div className="rounded-[1.5rem] panel-soft p-6">
             <p className="text-sm font-semibold uppercase tracking-[0.22em] section-kicker">
               Target users
             </p>
@@ -96,12 +96,9 @@ export default function HomePage() {
           ["Scholarship", "Study support and funding options."],
           ["Remote work", "Flexible work and online roles."],
         ].map(([title, desc]) => (
-          <div
-            key={title}
-            className="rounded-[2rem] panel p-5"
-          >
-            <p className="text-lg font-semibold text-slate-950 dark:text-white">{title}</p>
-            <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">{desc}</p>
+          <div key={title} className="rounded-[1.5rem] panel p-5">
+            <p className="ds-title text-lg font-semibold">{title}</p>
+            <p className="ds-muted mt-2 text-sm leading-6">{desc}</p>
           </div>
         ))}
       </section>
@@ -112,11 +109,11 @@ export default function HomePage() {
             <p className="text-sm font-semibold uppercase tracking-[0.22em] section-kicker">
               Featured
             </p>
-            <h2 className="mt-2 text-2xl font-semibold tracking-tight text-slate-950 dark:text-white sm:text-3xl">
+            <h2 className="ds-title mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">
               Highlighted opportunities
             </h2>
           </div>
-          <Link href="/opportunities" className="text-sm font-medium text-slate-500 dark:text-slate-400">
+          <Link href="/opportunities" className="text-sm font-medium text-[color:var(--foreground-muted)]">
             See all
           </Link>
         </div>
@@ -127,16 +124,16 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="rounded-[2rem] panel p-6 sm:p-8">
+      <section className="rounded-[1.5rem] panel p-6 sm:p-8">
         <div className="grid gap-6 lg:grid-cols-[1fr_auto] lg:items-center">
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.22em] section-kicker">
               Ready for demo
             </p>
-            <h2 className="mt-2 text-3xl font-semibold tracking-tight text-slate-950 dark:text-white">
+            <h2 className="ds-title mt-2 text-3xl font-semibold tracking-tight">
               A polished final project with real product feel.
             </h2>
-            <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600 dark:text-slate-300">
+            <p className="ds-muted mt-3 max-w-2xl text-sm leading-7">
               This build includes responsive layouts, dark mode, localStorage persistence, dynamic
               routes, CRUD actions, and a dashboard that makes the project easier to present.
             </p>
@@ -156,8 +153,8 @@ export default function HomePage() {
 function QuickStat({ label, value }: { label: string; value: number | string }) {
   return (
     <div className="rounded-[1.5rem] panel-soft px-4 py-4">
-      <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">{label}</p>
-      <p className="mt-2 text-2xl font-semibold text-slate-950 dark:text-white">{value}</p>
+      <p className="text-xs uppercase tracking-[0.2em] text-[color:var(--foreground-muted)]">{label}</p>
+      <p className="ds-title mt-2 text-2xl font-semibold">{value}</p>
     </div>
   );
 }

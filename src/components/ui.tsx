@@ -73,7 +73,7 @@ export function StatCard({
   };
 
   return (
-    <div className={`ds-card rounded-3xl bg-gradient-to-br p-5 ${accents[tone]}`}>
+    <div className={`ds-card rounded-2xl bg-gradient-to-br p-5 ${accents[tone]}`}>
       <p className="ds-muted text-sm font-medium">{label}</p>
       <p className="ds-title mt-2 text-3xl font-semibold tracking-tight">
         {value}
@@ -95,7 +95,7 @@ export function EmptyState({
   actionLabel?: string;
   }) {
   return (
-    <div className="ds-card rounded-[2rem] border-dashed border-[color:var(--border-strong)] bg-[color:var(--surface)]/70 p-10 text-center">
+    <div className="ds-card rounded-[1.5rem] border-dashed border-[color:var(--border-strong)] bg-[color:var(--surface)]/70 p-10 text-center">
       <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-[color:var(--accent-soft)] text-2xl text-[color:var(--accent-strong)]">
         !
       </div>
@@ -138,7 +138,7 @@ export function ConfirmDialog({
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/55 p-4 backdrop-blur-sm">
-      <div className="ds-card w-full max-w-lg rounded-[2rem] bg-[color:var(--surface)] p-6">
+      <div className="ds-card w-full max-w-lg rounded-[1.5rem] bg-[color:var(--surface)] p-6">
         <h3 className="ds-title text-xl font-semibold">{title}</h3>
         <p className="ds-muted mt-3 text-sm leading-6">{description}</p>
         <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">

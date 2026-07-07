@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import FormField from "@/components/common/FormField";
 import { opportunityFormSchema, type OpportunityFormValues } from "@/lib/schemas";
 import {
   opportunityCategories,
@@ -89,75 +90,75 @@ export default function OpportunityForm({
           featured: values.featured,
         })
       )}
-      className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-white/[0.04] sm:p-8"
+      className="ds-card rounded-[1.5rem] p-6 sm:p-8"
     >
       <div className="grid gap-5 md:grid-cols-2">
-        <Field label="Title" error={errors.title?.message}>
-          <input {...register("title")} className="input-field" placeholder="Frontend Developer Intern" />
-        </Field>
-        <Field label="Organization" error={errors.organization?.message}>
-          <input {...register("organization")} className="input-field" placeholder="Kabul Tech Community" />
-        </Field>
-        <Field label="Category" error={errors.category?.message}>
-          <select {...register("category")} className="input-field">
+        <FormField label="Title" error={errors.title?.message}>
+          <input {...register("title")} className="ds-input" placeholder="Frontend Developer Intern" />
+        </FormField>
+        <FormField label="Organization" error={errors.organization?.message}>
+          <input {...register("organization")} className="ds-input" placeholder="Kabul Tech Community" />
+        </FormField>
+        <FormField label="Category" error={errors.category?.message}>
+          <select {...register("category")} className="ds-input">
             {opportunityCategories.map((category) => (
               <option key={category} value={category}>
                 {category}
               </option>
             ))}
           </select>
-        </Field>
-        <Field label="Opportunity type" error={errors.type?.message}>
-          <select {...register("type")} className="input-field">
+        </FormField>
+        <FormField label="Opportunity type" error={errors.type?.message}>
+          <select {...register("type")} className="ds-input">
             {opportunityTypes.map((type) => (
               <option key={type} value={type}>
                 {type}
               </option>
             ))}
           </select>
-        </Field>
-        <Field label="Location" error={errors.location?.message}>
-          <input {...register("location")} className="input-field" placeholder="Kabul" />
-        </Field>
-        <Field label="Deadline" error={errors.deadline?.message}>
-          <input {...register("deadline")} type="date" className="input-field" />
-        </Field>
+        </FormField>
+        <FormField label="Location" error={errors.location?.message}>
+          <input {...register("location")} className="ds-input" placeholder="Kabul" />
+        </FormField>
+        <FormField label="Deadline" error={errors.deadline?.message}>
+          <input {...register("deadline")} type="date" className="ds-input" />
+        </FormField>
       </div>
 
       <div className="mt-5 grid gap-5">
-        <Field label="Description" error={errors.description?.message}>
+        <FormField label="Description" error={errors.description?.message}>
           <textarea
             {...register("description")}
-            className="input-field min-h-32"
+            className="ds-input min-h-32"
             placeholder="Describe the opportunity, audience, and main value."
           />
-        </Field>
-        <Field
+        </FormField>
+        <FormField
           label="Requirements"
           hint="Use one requirement per line or separate them with commas."
           error={errors.requirementsText?.message}
         >
           <textarea
             {...register("requirementsText")}
-            className="input-field min-h-28"
+            className="ds-input min-h-28"
             placeholder="Basic React
 HTML/CSS
 GitHub"
           />
-        </Field>
-        <Field label="Apply link" error={errors.applyLink?.message}>
-          <input {...register("applyLink")} className="input-field" placeholder="https://example.com/apply" />
-        </Field>
-        <Field label="Tags" hint="Comma separated, like React, Remote, Internship." error={errors.tagsText?.message}>
-          <input {...register("tagsText")} className="input-field" placeholder="React, Remote, Internship" />
-        </Field>
+        </FormField>
+        <FormField label="Apply link" error={errors.applyLink?.message}>
+          <input {...register("applyLink")} className="ds-input" placeholder="https://example.com/apply" />
+        </FormField>
+        <FormField label="Tags" hint="Comma separated, like React, Remote, Internship." error={errors.tagsText?.message}>
+          <input {...register("tagsText")} className="ds-input" placeholder="React, Remote, Internship" />
+        </FormField>
       </div>
 
-      <label className="mt-5 flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-700 dark:border-white/10 dark:bg-white/5 dark:text-slate-200">
+      <label className="mt-5 flex items-center gap-3 rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface-soft)] px-4 py-3 text-sm font-medium text-[color:var(--foreground)]">
         <input
           type="checkbox"
           {...register("featured")}
-          className="h-4 w-4 rounded border-slate-300 text-cyan-600 focus:ring-cyan-500"
+          className="h-4 w-4 rounded border-[color:var(--border-strong)] text-[color:var(--accent)] focus:ring-[color:var(--accent)]"
         />
         Mark as featured
       </label>
@@ -165,63 +166,10 @@ GitHub"
       <button
         type="submit"
         disabled={isSubmitting}
-        className="mt-6 inline-flex w-full items-center justify-center rounded-full bg-[linear-gradient(135deg,#0f172a,#2563eb)] px-5 py-3.5 text-sm font-semibold text-white shadow-lg shadow-slate-950/20 transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-70 dark:bg-[linear-gradient(135deg,#e2e8f0,#ffffff)] dark:text-slate-950"
+        className="ds-button-primary mt-6 inline-flex w-full items-center justify-center rounded-full px-5 py-3.5 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-70"
       >
         {isSubmitting ? "Saving..." : submitLabel}
       </button>
-
-      <style jsx global>{`
-        .input-field {
-          width: 100%;
-          border-radius: 1rem;
-          border: 1px solid rgb(226 232 240);
-          background: rgb(248 250 252);
-          padding: 0.875rem 1rem;
-          font-size: 0.95rem;
-          color: rgb(15 23 42);
-          outline: none;
-          transition: border-color 150ms ease, box-shadow 150ms ease, background 150ms ease;
-        }
-
-        .dark .input-field {
-          border-color: rgba(255, 255, 255, 0.1);
-          background: rgba(255, 255, 255, 0.05);
-          color: rgb(248 250 252);
-        }
-
-        .input-field:focus {
-          border-color: rgb(34 211 238);
-          box-shadow: 0 0 0 4px rgba(34, 211, 238, 0.18);
-          background: white;
-        }
-
-        .dark .input-field:focus {
-          background: rgba(255, 255, 255, 0.07);
-        }
-      `}</style>
     </form>
-  );
-}
-
-function Field({
-  label,
-  hint,
-  error,
-  children,
-}: {
-  label: string;
-  hint?: string;
-  error?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <label className="block">
-      <div className="mb-2 flex items-end justify-between gap-4">
-        <span className="text-sm font-semibold text-slate-800 dark:text-slate-100">{label}</span>
-        {hint ? <span className="text-xs text-slate-500 dark:text-slate-400">{hint}</span> : null}
-      </div>
-      {children}
-      {error ? <p className="mt-2 text-sm text-rose-500">{error}</p> : null}
-    </label>
   );
 }

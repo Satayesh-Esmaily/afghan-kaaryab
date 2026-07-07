@@ -76,12 +76,12 @@ export default function OpportunityBrowser({ opportunities }: { opportunities: O
             </div>
           </div>
 
-          <div className="relative overflow-hidden rounded-[2rem] panel px-5 py-5">
+          <div className="relative overflow-hidden rounded-[1.5rem] panel px-5 py-5">
             <div className="absolute -right-8 -top-8 h-28 w-28 rounded-full bg-white/10" />
-            <div className="absolute -bottom-10 left-0 h-32 w-32 rounded-full bg-black/10" />
+            <div className="absolute -bottom-10 left-0 h-32 w-32 rounded-full bg-[color:var(--foreground)]/10" />
             <div className="relative space-y-4">
               <div className="rounded-[1.5rem] panel px-4 py-4 text-[color:var(--foreground)]">
-                <p className="text-xs uppercase tracking-[0.22em] text-[color:var(--muted)]">What users can do</p>
+                <p className="text-xs uppercase tracking-[0.22em] text-[color:var(--foreground-muted)]">What users can do</p>
                 <ul className="mt-3 space-y-2 text-sm text-[color:var(--foreground)]">
                   <li>Search by title, organization, or tag</li>
                   <li>Filter by category, location, type, and deadline</li>
@@ -89,8 +89,8 @@ export default function OpportunityBrowser({ opportunities }: { opportunities: O
                 </ul>
               </div>
               <div className="rounded-[1.5rem] panel px-4 py-4">
-                <p className="text-xs uppercase tracking-[0.22em] text-[color:var(--muted)]">Presentation tip</p>
-                <p className="mt-2 text-sm leading-6 text-[color:var(--muted)]">
+                <p className="text-xs uppercase tracking-[0.22em] text-[color:var(--foreground-muted)]">Presentation tip</p>
+                <p className="mt-2 text-sm leading-6 text-[color:var(--foreground-muted)]">
                   Mention that this is a demo-friendly platform with localStorage persistence and
                   full CRUD actions.
                 </p>
@@ -111,28 +111,28 @@ export default function OpportunityBrowser({ opportunities }: { opportunities: O
         ))}
       </div>
 
-      <section className="rounded-[2rem] panel p-5 sm:p-6">
-        <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr_0.8fr]">
+      <section className="rounded-[1.5rem] panel p-5 sm:p-6">
+          <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr_0.8fr]">
           <label className="block">
-            <span className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-200">
+            <span className="mb-2 block text-sm font-semibold text-[color:var(--foreground-strong)]">
               Search
             </span>
             <input
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Search opportunities..."
-              className="soft-input"
+              className="ds-input"
             />
           </label>
 
           <label className="block">
-            <span className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-200">
+            <span className="mb-2 block text-sm font-semibold text-[color:var(--foreground-strong)]">
               Location
             </span>
             <select
               value={location}
               onChange={(event) => setLocation(event.target.value)}
-              className="soft-input"
+              className="ds-input"
             >
               {locationOptions.map((item) => (
                 <option key={item} value={item}>
@@ -143,13 +143,13 @@ export default function OpportunityBrowser({ opportunities }: { opportunities: O
           </label>
 
           <label className="block">
-            <span className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-200">
+            <span className="mb-2 block text-sm font-semibold text-[color:var(--foreground-strong)]">
               Opportunity type
             </span>
             <select
               value={type}
               onChange={(event) => setType(event.target.value as typeof type)}
-              className="soft-input"
+              className="ds-input"
             >
               <option value="All">All</option>
               {opportunityTypes.map((item) => (
@@ -162,7 +162,7 @@ export default function OpportunityBrowser({ opportunities }: { opportunities: O
         </div>
 
         <div className="mt-4 flex flex-wrap items-center gap-2">
-          <span className="text-sm font-semibold text-slate-600 dark:text-slate-300">Deadline</span>
+          <span className="text-sm font-semibold text-[color:var(--foreground-muted)]">Deadline</span>
           {deadlineFilters.map((item) => (
             <button
               key={item.value}
@@ -170,7 +170,7 @@ export default function OpportunityBrowser({ opportunities }: { opportunities: O
               onClick={() => setDeadline(item.value)}
               className={[
                 "rounded-full px-4 py-2 text-sm font-medium transition",
-                deadline === item.value ? "active-pill" : "inactive-pill hover:bg-slate-100 dark:hover:bg-white/5",
+                deadline === item.value ? "active-pill" : "inactive-pill hover:bg-[color:var(--surface-soft)]",
               ].join(" ")}
             >
               {item.label}
@@ -182,7 +182,7 @@ export default function OpportunityBrowser({ opportunities }: { opportunities: O
             <button
               type="button"
               onClick={clearFilters}
-              className="rounded-full panel px-4 py-2 text-sm font-medium text-[color:var(--muted)] transition hover:bg-slate-100 dark:hover:bg-white/10"
+              className="rounded-full panel px-4 py-2 text-sm font-medium text-[color:var(--foreground-muted)] transition hover:bg-[color:var(--surface-soft)]"
             >
               Clear filters
             </button>
@@ -233,7 +233,7 @@ function CategoryPill({
       onClick={onClick}
       className={[
         "whitespace-nowrap rounded-full px-5 py-3 text-sm font-medium transition",
-        active ? "active-pill" : "inactive-pill hover:bg-slate-100 dark:hover:bg-white/5",
+        active ? "active-pill" : "inactive-pill hover:bg-[color:var(--surface-soft)]",
       ].join(" ")}
     >
       {children}

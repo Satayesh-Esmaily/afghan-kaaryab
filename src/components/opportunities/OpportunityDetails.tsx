@@ -31,7 +31,7 @@ export default function OpportunityDetails() {
 
   return (
     <div className="space-y-8">
-      <section className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-white/[0.04] sm:p-8">
+      <section className="ds-card rounded-[1.5rem] p-6 sm:p-8">
         <div className="flex flex-wrap gap-2">
           <Badge tone="info">{opportunity.category}</Badge>
           <Badge tone={isExpiringSoon(opportunity.deadline) ? "warning" : "default"}>
@@ -43,7 +43,7 @@ export default function OpportunityDetails() {
         <div className="mt-5 flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
           <div className="max-w-3xl space-y-4">
             <SectionHeading title={opportunity.title} description={opportunity.organization} />
-            <p className="text-base leading-7 text-slate-600 dark:text-slate-300">
+            <p className="ds-muted text-base leading-7">
               {opportunity.description}
             </p>
           </div>
@@ -52,20 +52,20 @@ export default function OpportunityDetails() {
             <button
               type="button"
               onClick={() => toggleSaved(opportunity.id)}
-              className="rounded-full border border-slate-200 px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-white/10 dark:text-slate-200 dark:hover:bg-white/10"
+              className="ds-button-secondary rounded-full px-5 py-3 text-sm font-semibold transition"
             >
               {saved ? "Remove saved" : "Save opportunity"}
             </button>
             <Link
               href={`/opportunities/${opportunity.id}/edit`}
-              className="rounded-full bg-slate-950 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 dark:bg-white dark:text-slate-950 dark:hover:bg-slate-200"
+              className="ds-button-primary rounded-full px-5 py-3 text-sm font-semibold transition"
             >
               Edit
             </Link>
             <button
               type="button"
               onClick={() => setDeleteOpen(true)}
-              className="rounded-full border border-rose-200 bg-rose-50 px-5 py-3 text-sm font-semibold text-rose-700 transition hover:bg-rose-100 dark:border-rose-500/20 dark:bg-rose-500/10 dark:text-rose-300"
+              className="rounded-full border border-transparent bg-[color:var(--danger-soft)] px-5 py-3 text-sm font-semibold text-[color:var(--danger)] transition hover:opacity-90"
             >
               Delete
             </button>
@@ -74,15 +74,15 @@ export default function OpportunityDetails() {
       </section>
 
       <section className="grid gap-5 lg:grid-cols-[1.4fr_0.9fr]">
-        <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-white/[0.04]">
-          <h2 className="text-xl font-semibold text-slate-950 dark:text-white">Requirements</h2>
+        <div className="ds-card rounded-[1.5rem] p-6">
+          <h2 className="ds-title text-xl font-semibold">Requirements</h2>
           <ul className="mt-4 space-y-3">
             {opportunity.requirements.map((requirement) => (
               <li
                 key={requirement}
-                className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700 dark:border-white/10 dark:bg-white/5 dark:text-slate-200"
+                className="flex items-start gap-3 rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface-soft)] px-4 py-3 text-sm text-[color:var(--foreground)]"
               >
-                <span className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500/15 text-xs font-bold text-emerald-600 dark:text-emerald-300">
+                <span className="mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-[color:var(--success-soft)] text-xs font-bold text-[color:var(--success)]">
                   OK
                 </span>
                 <span>{requirement}</span>
@@ -92,8 +92,8 @@ export default function OpportunityDetails() {
         </div>
 
         <div className="space-y-5">
-          <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-white/[0.04]">
-            <h2 className="text-xl font-semibold text-slate-950 dark:text-white">Opportunity Details</h2>
+          <div className="ds-card rounded-[1.5rem] p-6">
+            <h2 className="ds-title text-xl font-semibold">Opportunity Details</h2>
             <dl className="mt-4 space-y-4 text-sm">
               <DetailRow label="Organization" value={opportunity.organization} />
               <DetailRow label="Location" value={opportunity.location} />
@@ -103,8 +103,8 @@ export default function OpportunityDetails() {
             </dl>
           </div>
 
-          <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-white/[0.04]">
-            <h2 className="text-xl font-semibold text-slate-950 dark:text-white">Tags</h2>
+          <div className="ds-card rounded-[1.5rem] p-6">
+            <h2 className="ds-title text-xl font-semibold">Tags</h2>
             <div className="mt-4 flex flex-wrap gap-2">
               {opportunity.tags.map((tag) => (
                 <Badge key={tag}>{tag}</Badge>
@@ -115,7 +115,7 @@ export default function OpportunityDetails() {
                 href={opportunity.applyLink}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex flex-1 items-center justify-center rounded-full bg-slate-950 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 dark:bg-white dark:text-slate-950 dark:hover:bg-slate-200"
+                className="ds-button-primary inline-flex flex-1 items-center justify-center rounded-full px-5 py-3 text-sm font-semibold transition"
               >
                 Open apply page
               </a>
@@ -151,15 +151,15 @@ function DetailRow({
   link?: boolean;
 }) {
   return (
-    <div className="flex items-start justify-between gap-4 border-b border-slate-200 pb-3 last:border-b-0 last:pb-0 dark:border-white/10">
-      <dt className="font-medium text-slate-500 dark:text-slate-400">{label}</dt>
-      <dd className="max-w-[65%] text-right font-semibold text-slate-950 dark:text-white">
+    <div className="flex items-start justify-between gap-4 border-b border-[color:var(--border)] pb-3 last:border-b-0 last:pb-0">
+      <dt className="font-medium text-[color:var(--foreground-muted)]">{label}</dt>
+      <dd className="max-w-[65%] text-right font-semibold text-[color:var(--foreground-strong)]">
         {link ? (
           <a
             href={value}
             target="_blank"
             rel="noreferrer"
-            className="break-all text-cyan-700 underline-offset-4 hover:underline dark:text-cyan-300"
+            className="break-all text-[color:var(--accent-strong)] underline-offset-4 hover:underline"
           >
             {value}
           </a>
