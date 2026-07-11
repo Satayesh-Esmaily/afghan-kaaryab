@@ -12,6 +12,7 @@ export const authCopy = {
   emailPlaceholder: "samira@example.com",
   passwordPlaceholder: "Enter your password",
   submitLabel: "Sign in",
+  loginButtonLabel: "Login",
   loadingText: "Loading your session...",
   welcomeLabel: "Welcome back",
   signOutLabel: "Logout",

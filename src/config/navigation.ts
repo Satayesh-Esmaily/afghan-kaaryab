@@ -6,6 +6,7 @@ export type NavItem = {
 export const sidebarItems: NavItem[] = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/opportunities", label: "Discover" },
+  { href: "/organizations", label: "Directory" },
   { href: "/saved", label: "Saved" },
   { href: "/add-opportunity", label: "Add Opportunity" },
   { href: "/about", label: "About" },
@@ -17,6 +18,7 @@ export const pageHeaders: Record<string, { title: string; subtitle: string }> = 
   "/": { title: "Discover", subtitle: "Browse opportunities, save favorites, and keep track of deadlines." },
   "/dashboard": { title: "Dashboard", subtitle: "See the platform stats and recent submissions at a glance." },
   "/opportunities": { title: "Discover", subtitle: "Search, filter, and explore opportunities in one place." },
+  "/organizations": { title: "Directory", subtitle: "Review organizations, countries, and institutions in the demo data." },
   "/saved": { title: "Saved", subtitle: "Return to the opportunities you bookmarked for later." },
   "/add-opportunity": { title: "Add Opportunity", subtitle: "Share a new listing with the community." },
   "/about": { title: "About", subtitle: "Learn what the platform solves and who it helps." },
@@ -28,6 +30,7 @@ export const pageTones: Record<string, { dot: string; title: string }> = {
   "/": { dot: "bg-[color:var(--accent)]", title: "text-[color:var(--accent-strong)]" },
   "/dashboard": { dot: "bg-[color:var(--success)]", title: "text-[color:var(--success)]" },
   "/opportunities": { dot: "bg-[color:var(--warning)]", title: "text-[color:var(--warning)]" },
+  "/organizations": { dot: "bg-[color:var(--accent)]", title: "text-[color:var(--accent)]" },
   "/saved": { dot: "bg-[color:var(--accent-strong)]", title: "text-[color:var(--accent-strong)]" },
   "/add-opportunity": { dot: "bg-[color:var(--accent)]", title: "text-[color:var(--accent)]" },
   "/about": { dot: "bg-[color:var(--success)]", title: "text-[color:var(--success)]" },

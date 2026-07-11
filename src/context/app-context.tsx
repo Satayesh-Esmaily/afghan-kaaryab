@@ -17,6 +17,7 @@ type AuthUser = {
 interface AppContextValue {
   opportunities: Opportunity[];
   savedIds: string[];
+  followedOrganizationSlugs: string[];
   theme: ThemeMode;
   hydrated: boolean;
   user: AuthUser | null;
@@ -27,6 +28,8 @@ interface AppContextValue {
   toggleSaved: (id: string) => void;
   clearSaved: () => void;
   isSaved: (id: string) => boolean;
+  toggleFollowOrganization: (slug: string) => void;
+  isFollowingOrganization: (slug: string) => boolean;
   setTheme: (mode: ThemeMode) => void;
   login: (input: { email: string; password: string }) => void;
   logout: () => void;
@@ -35,6 +38,7 @@ interface AppContextValue {
 const STORAGE_KEYS = {
   opportunities: "kaaryab-opportunities",
   savedIds: "kaaryab-saved-opportunities",
+  followedOrganizationSlugs: "kaaryab-followed-organizations",
   theme: "kaaryab-theme",
   user: "kaaryab-session-user",
 } as const;
@@ -69,6 +73,7 @@ function getDisplayName(email: string) {
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [opportunities, setOpportunities] = useState<Opportunity[]>(demoOpportunities);
   const [savedIds, setSavedIds] = useState<string[]>([]);
+  const [followedOrganizationSlugs, setFollowedOrganizationSlugs] = useState<string[]>([]);
   const [theme, setThemeState] = useState<ThemeMode>("light");
   const [user, setUser] = useState<AuthUser | null>(null);
   const [hydrated, setHydrated] = useState(false);
@@ -82,6 +87,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       window.localStorage.getItem(STORAGE_KEYS.savedIds),
       []
     );
+    const storedFollowedOrganizationSlugs = safeParse<string[]>(
+      window.localStorage.getItem(STORAGE_KEYS.followedOrganizationSlugs),
+      []
+    );
     const storedTheme = window.localStorage.getItem(STORAGE_KEYS.theme) as ThemeMode | null;
     const storedUser = safeParse<AuthUser | null>(
       window.localStorage.getItem(STORAGE_KEYS.user),
@@ -92,6 +101,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setOpportunities(storedOpportunities.length > 0 ? storedOpportunities : demoOpportunities);
     setSavedIds(storedSavedIds);
+    setFollowedOrganizationSlugs(storedFollowedOrganizationSlugs);
     setThemeState(storedTheme === "dark" ? "dark" : "light");
     setUser(storedUser);
     setHydrated(true);
@@ -108,6 +118,15 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
     window.localStorage.setItem(STORAGE_KEYS.savedIds, JSON.stringify(savedIds));
   }, [hydrated, savedIds]);
+
+  useEffect(() => {
+    if (!hydrated) return;
+
+    window.localStorage.setItem(
+      STORAGE_KEYS.followedOrganizationSlugs,
+      JSON.stringify(followedOrganizationSlugs)
+    );
+  }, [hydrated, followedOrganizationSlugs]);
 
   useEffect(() => {
     if (!hydrated) return;
@@ -166,6 +185,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const isSaved = (id: string) => savedIds.includes(id);
 
+  const toggleFollowOrganization = (slug: string) => {
+    setFollowedOrganizationSlugs((current) =>
+      current.includes(slug) ? current.filter((item) => item !== slug) : [slug, ...current]
+    );
+  };
+
+  const isFollowingOrganization = (slug: string) => followedOrganizationSlugs.includes(slug);
+
   const setTheme = (mode: ThemeMode) => setThemeState(mode);
   const login = ({ email }: { email: string; password: string }) => {
     setUser({ email, displayName: getDisplayName(email) });
@@ -179,6 +206,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       value={{
         opportunities,
         savedIds,
+        followedOrganizationSlugs,
         theme,
         hydrated,
         user,
@@ -189,6 +217,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         toggleSaved,
         clearSaved,
         isSaved,
+        toggleFollowOrganization,
+        isFollowingOrganization,
         setTheme,
         login,
         logout,

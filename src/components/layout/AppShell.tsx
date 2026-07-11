@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useAppData } from "@/context/app-context";
 import { authCopy } from "@/config/auth";
 import Footer from "@/components/layout/Footer";
@@ -12,7 +12,7 @@ import { brand, pageHeaders, pageTones, sidebarItems } from "@/config/navigation
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { savedIds, theme, setTheme, user, authenticated, hydrated, logout } = useAppData();
+  const { savedIds, theme, setTheme, user, authenticated, logout } = useAppData();
   const [mobileOpen, setMobileOpen] = useState(false);
   const savedCount = savedIds.length;
   const isLoginRoute = pathname === "/login";
@@ -23,28 +23,6 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const page = pageHeaders[activePath ?? "/opportunities"];
   const pageTone = pageTones[activePath ?? "/opportunities"] ?? pageTones["/opportunities"];
 
-  useEffect(() => {
-    if (!hydrated) return;
-
-    if (!authenticated && !isLoginRoute) {
-      router.replace("/login");
-      return;
-    }
-
-    if (authenticated && isLoginRoute) {
-      router.replace("/dashboard");
-      return;
-    }
-
-    if (authenticated && pathname === "/") {
-      router.replace("/dashboard");
-    }
-  }, [authenticated, hydrated, isLoginRoute, pathname, router]);
-
-  if (!hydrated && !isLoginRoute) {
-    return <AppLoadingState />;
-  }
-
   if (isLoginRoute) {
     return (
       <div className="min-h-screen bg-[color:var(--background)] text-[color:var(--foreground)]">
@@ -53,10 +31,6 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         </main>
       </div>
     );
-  }
-
-  if (!authenticated) {
-    return <AppLoadingState />;
   }
 
   return (
@@ -134,7 +108,6 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             type="button"
             onClick={() => {
               logout();
-              router.replace("/login");
             }}
             className="w-full rounded-[1rem] border border-[color:var(--border)] bg-[color:var(--surface)] px-3 py-2.5 text-left text-sm font-medium text-[color:var(--foreground)] transition hover:bg-[color:var(--surface-soft)]"
           >
@@ -165,23 +138,19 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             </div>
 
             <div className="flex items-center gap-3">
-              <div className="hidden items-center gap-2 rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] px-3 py-2 sm:inline-flex">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full accent-panel text-xs font-semibold text-white">
-                  {getInitials(user?.displayName)}
-                </div>
-                <div className="min-w-0">
-                  <p className="truncate text-xs font-semibold text-[color:var(--foreground)]">
-                    {user?.displayName ?? authCopy.guestLabel}
-                  </p>
-                </div>
-              </div>
               <button
                 type="button"
-                onClick={() => setMobileOpen((value) => !value)}
-                className="rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] px-3.5 py-2 text-sm font-semibold text-[color:var(--foreground)] lg:hidden"
-                aria-label="Open navigation"
+                onClick={() => {
+                  if (authenticated) {
+                    logout();
+                    return;
+                  }
+
+                  router.push("/login");
+                }}
+                className="rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] px-3.5 py-2 text-sm font-semibold text-[color:var(--foreground)]"
               >
-                Menu
+                {authenticated ? authCopy.signOutLabel : authCopy.loginButtonLabel}
               </button>
               <button
                 type="button"
@@ -190,6 +159,14 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                 aria-label="Toggle theme"
               >
                 {theme === "dark" ? "Light mode" : "Dark mode"}
+              </button>
+              <button
+                type="button"
+                onClick={() => setMobileOpen((value) => !value)}
+                className="rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] px-3.5 py-2 text-sm font-semibold text-[color:var(--foreground)] lg:hidden"
+                aria-label="Open navigation"
+              >
+                Menu
               </button>
             </div>
           </div>
@@ -237,7 +214,6 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                 onClick={() => {
                   logout();
                   setMobileOpen(false);
-                  router.replace("/login");
                 }}
                 className="w-full rounded-[1rem] border border-[color:var(--border)] bg-[color:var(--surface)] px-3 py-2.5 text-left text-sm font-medium text-[color:var(--foreground)] transition hover:bg-[color:var(--surface-soft)]"
               >
@@ -261,25 +237,4 @@ function isActiveLink(pathname: string | null, href: string) {
   if (!pathname) return false;
 
   return pathname === href || (href === "/opportunities" && pathname === "/") || pathname.startsWith(href);
-}
-
-function getInitials(name?: string | null) {
-  if (!name) return "U";
-
-  return name
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part.charAt(0).toUpperCase())
-    .join("");
-}
-
-function AppLoadingState() {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-[color:var(--background)] px-4">
-      <div className="rounded-[1.5rem] border border-[color:var(--border)] bg-[color:var(--surface)] px-6 py-4 text-sm font-medium text-[color:var(--foreground-muted)] shadow-sm">
-        {authCopy.loadingText}
-      </div>
-    </div>
-  );
 }
