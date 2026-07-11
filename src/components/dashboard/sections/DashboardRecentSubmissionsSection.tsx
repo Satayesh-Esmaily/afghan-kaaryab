@@ -1,4 +1,5 @@
 import { formatDeadline } from "@/lib/opportunities";
+import { dashboardCopy } from "@/config/dashboard";
 
 export default function DashboardRecentSubmissionsSection({
   recent,
@@ -13,7 +14,7 @@ export default function DashboardRecentSubmissionsSection({
   return (
     <div className="rounded-[1.5rem] panel p-6">
       <div className="flex items-center justify-between">
-        <h3 className="text-xl font-semibold text-[color:var(--foreground)]">Recent submissions</h3>
+        <h3 className="text-xl font-semibold text-[color:var(--foreground)]">{dashboardCopy.recentTitle}</h3>
         <button className="inline-flex h-11 w-11 items-center justify-center rounded-full accent-button">
           +
         </button>

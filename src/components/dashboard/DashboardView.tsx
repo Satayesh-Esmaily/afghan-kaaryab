@@ -2,6 +2,7 @@
 
 import { useAppData } from "@/context/app-context";
 import { getDashboardStats } from "@/lib/opportunities";
+import { dashboardTasks } from "@/config/dashboard";
 import DashboardHeroSection from "@/components/dashboard/sections/DashboardHeroSection";
 import DashboardCalendarSection from "@/components/dashboard/sections/DashboardCalendarSection";
 import DashboardOpportunityStatsSection from "@/components/dashboard/sections/DashboardOpportunityStatsSection";
@@ -9,12 +10,6 @@ import DashboardCategoryBreakdownSection from "@/components/dashboard/sections/D
 import DashboardTodayTasksSection from "@/components/dashboard/sections/DashboardTodayTasksSection";
 import DashboardRecentSubmissionsSection from "@/components/dashboard/sections/DashboardRecentSubmissionsSection";
 import DashboardQuickInsightSection from "@/components/dashboard/sections/DashboardQuickInsightSection";
-
-const todayTasks = [
-  "Review expiring opportunities",
-  "Edit or delete one outdated listing",
-  "Prepare a demo talk track",
-];
 
 export default function DashboardView() {
   const { opportunities } = useAppData();
@@ -32,7 +27,7 @@ export default function DashboardView() {
         <div className="space-y-5">
           <DashboardOpportunityStatsSection stats={stats} />
           <DashboardCategoryBreakdownSection categories={stats.categories} />
-          <DashboardTodayTasksSection tasks={todayTasks} />
+          <DashboardTodayTasksSection tasks={dashboardTasks} />
         </div>
 
         <div className="space-y-5">

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { dashboardCopy } from "@/config/dashboard";
 
 export default function DashboardCalendarSection() {
   const today = new Date();
@@ -26,7 +27,7 @@ export default function DashboardCalendarSection() {
         </button>
         <div className="text-center">
           <p className="text-lg font-semibold text-[color:var(--foreground-strong)]">{monthLabel}</p>
-          <p className="text-sm text-[color:var(--foreground-muted)]">Deadline calendar</p>
+          <p className="text-sm text-[color:var(--foreground-muted)]">{dashboardCopy.calendarSubtitle}</p>
         </div>
         <button
           type="button"

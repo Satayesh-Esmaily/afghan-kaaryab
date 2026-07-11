@@ -11,6 +11,7 @@ import {
   type Opportunity,
   type OpportunityInput,
 } from "@/lib/opportunities";
+import { opportunityFormCopy } from "@/config/opportunities";
 
 type FormSubmitValue = OpportunityInput;
 
@@ -94,10 +95,14 @@ export default function OpportunityForm({
     >
       <div className="grid gap-5 md:grid-cols-2">
         <FormField label="Title" error={errors.title?.message}>
-          <input {...register("title")} className="ds-input" placeholder="Frontend Developer Intern" />
+          <input {...register("title")} className="ds-input" placeholder={opportunityFormCopy.titlePlaceholder} />
         </FormField>
         <FormField label="Organization" error={errors.organization?.message}>
-          <input {...register("organization")} className="ds-input" placeholder="Kabul Tech Community" />
+          <input
+            {...register("organization")}
+            className="ds-input"
+            placeholder={opportunityFormCopy.organizationPlaceholder}
+          />
         </FormField>
         <FormField label="Category" error={errors.category?.message}>
           <select {...register("category")} className="ds-input">
@@ -118,7 +123,7 @@ export default function OpportunityForm({
           </select>
         </FormField>
         <FormField label="Location" error={errors.location?.message}>
-          <input {...register("location")} className="ds-input" placeholder="Kabul" />
+          <input {...register("location")} className="ds-input" placeholder={opportunityFormCopy.locationPlaceholder} />
         </FormField>
         <FormField label="Deadline" error={errors.deadline?.message}>
           <input {...register("deadline")} type="date" className="ds-input" />
@@ -130,27 +135,29 @@ export default function OpportunityForm({
           <textarea
             {...register("description")}
             className="ds-input min-h-32"
-            placeholder="Describe the opportunity, audience, and main value."
+            placeholder={opportunityFormCopy.descriptionPlaceholder}
           />
         </FormField>
         <FormField
           label="Requirements"
-          hint="Use one requirement per line or separate them with commas."
+          hint={opportunityFormCopy.requirementsHint}
           error={errors.requirementsText?.message}
         >
           <textarea
             {...register("requirementsText")}
             className="ds-input min-h-28"
-            placeholder="Basic React
-HTML/CSS
-GitHub"
+            placeholder={opportunityFormCopy.requirementsPlaceholder}
           />
         </FormField>
         <FormField label="Apply link" error={errors.applyLink?.message}>
-          <input {...register("applyLink")} className="ds-input" placeholder="https://example.com/apply" />
+          <input
+            {...register("applyLink")}
+            className="ds-input"
+            placeholder={opportunityFormCopy.applyLinkPlaceholder}
+          />
         </FormField>
-        <FormField label="Tags" hint="Comma separated, like React, Remote, Internship." error={errors.tagsText?.message}>
-          <input {...register("tagsText")} className="ds-input" placeholder="React, Remote, Internship" />
+        <FormField label="Tags" hint={opportunityFormCopy.tagsHint} error={errors.tagsText?.message}>
+          <input {...register("tagsText")} className="ds-input" placeholder={opportunityFormCopy.tagsPlaceholder} />
         </FormField>
       </div>
 
@@ -160,7 +167,7 @@ GitHub"
           {...register("featured")}
           className="h-4 w-4 rounded border-[color:var(--border-strong)] text-[color:var(--accent)] focus:ring-[color:var(--accent)]"
         />
-        Mark as featured
+        {opportunityFormCopy.featuredLabel}
       </label>
 
       <button
@@ -168,7 +175,7 @@ GitHub"
         disabled={isSubmitting}
         className="ds-button-primary mt-6 inline-flex w-full items-center justify-center rounded-full px-5 py-3.5 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-70"
       >
-        {isSubmitting ? "Saving..." : submitLabel}
+        {isSubmitting ? opportunityFormCopy.savingLabel : submitLabel}
       </button>
     </form>
   );

@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import OpportunityForm from "@/components/opportunities/OpportunityForm";
 import { SectionHeading } from "@/components/ui";
 import { useAppData } from "@/context/app-context";
+import { opportunityPageCopy } from "@/config/opportunities";
 
 export default function AddOpportunityView() {
   const router = useRouter();
@@ -12,13 +13,13 @@ export default function AddOpportunityView() {
   return (
     <div className="space-y-8">
       <SectionHeading
-        eyebrow="Submit"
-        title="Add a new opportunity"
-        description="Use this form to submit jobs, internships, scholarships, and other useful opportunities for Afghan youth."
+        eyebrow={opportunityPageCopy.addEyebrow}
+        title={opportunityPageCopy.addTitle}
+        description={opportunityPageCopy.addDescription}
       />
 
       <OpportunityForm
-        submitLabel="Publish opportunity"
+        submitLabel={opportunityPageCopy.addSubmitLabel}
         onSubmit={(values) => {
           const created = addOpportunity(values);
           router.push(`/opportunities/${created.id}`);

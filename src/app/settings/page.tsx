@@ -1,53 +1,34 @@
 import type { Metadata } from "next";
 import { Badge, SectionHeading } from "@/components/ui";
+import { displayRows, preferenceRows, settingsCopy } from "@/config/settings";
 
 export const metadata: Metadata = {
   title: "Settings",
-  description: "Adjust your preferences for KaarYab Afghanistan.",
+  description: settingsCopy.pageDescription,
 };
-
-const preferenceRows = [
-  {
-    title: "Email notifications",
-    description: "Receive occasional updates about saved opportunities and new listings.",
-    checked: true,
-  },
-  {
-    title: "Weekly summary",
-    description: "Get a short recap of new items and deadline changes every week.",
-    checked: false,
-  },
-  {
-    title: "Public profile",
-    description: "Allow your profile to be discoverable inside the demo platform.",
-    checked: false,
-  },
-];
 
 export default function SettingsPage() {
   return (
     <div className="space-y-8">
       <SectionHeading
-        eyebrow="Settings"
-        title="Tune your experience"
-        description="Manage the small details that make the platform feel more personal, clear, and ready for demo use."
+        eyebrow={settingsCopy.pageEyebrow}
+        title={settingsCopy.pageTitle}
+        description={settingsCopy.pageDescription}
       />
 
       <section className="grid gap-5 lg:grid-cols-[1.15fr_0.85fr]">
         <div className="ds-card rounded-[1.5rem] p-6 sm:p-8">
           <div className="flex items-center justify-between gap-4">
             <div>
-              <Badge tone="accent">Preferences</Badge>
-              <h2 className="ds-title mt-4 text-2xl font-semibold">Appearance and notifications</h2>
-              <p className="ds-muted mt-2 max-w-2xl text-sm leading-7">
-                Keep the interface clean, control updates, and make the demo easier to present.
-              </p>
+              <Badge tone="accent">{settingsCopy.preferencesBadge}</Badge>
+              <h2 className="ds-title mt-4 text-2xl font-semibold">{settingsCopy.preferencesTitle}</h2>
+              <p className="ds-muted mt-2 max-w-2xl text-sm leading-7">{settingsCopy.preferencesBody}</p>
             </div>
             <div className="hidden rounded-[1.25rem] bg-[linear-gradient(135deg,var(--accent-soft),var(--surface-soft))] px-4 py-3 text-right sm:block">
               <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[color:var(--foreground-muted)]">
-                Current mode
+                {settingsCopy.currentModeLabel}
               </p>
-              <p className="mt-1 text-sm font-semibold text-[color:var(--foreground-strong)]">Balanced</p>
+              <p className="mt-1 text-sm font-semibold text-[color:var(--foreground-strong)]">{settingsCopy.currentModeValue}</p>
             </div>
           </div>
 
@@ -81,14 +62,10 @@ export default function SettingsPage() {
 
         <div className="space-y-5">
           <div className="ds-card rounded-[1.5rem] p-6">
-            <Badge tone="success">Display</Badge>
-            <h2 className="ds-title mt-4 text-xl font-semibold">Visual style</h2>
+            <Badge tone="success">{settingsCopy.displayBadge}</Badge>
+            <h2 className="ds-title mt-4 text-xl font-semibold">{settingsCopy.displayTitle}</h2>
             <div className="mt-4 space-y-3">
-              {[
-                ["Theme", "Dark / Light toggle in the header"],
-                ["Density", "Comfortable spacing"],
-                ["Motion", "Soft transitions only"],
-              ].map(([label, value]) => (
+              {displayRows.map(([label, value]) => (
                 <div key={label} className="flex items-center justify-between gap-4 rounded-2xl bg-[color:var(--surface-soft)] px-4 py-3">
                   <span className="text-sm font-medium text-[color:var(--foreground)]">{label}</span>
                   <span className="text-sm text-[color:var(--foreground-muted)]">{value}</span>
@@ -98,17 +75,15 @@ export default function SettingsPage() {
           </div>
 
           <div className="ds-card rounded-[1.5rem] p-6">
-            <Badge tone="warning">Data</Badge>
-            <h2 className="ds-title mt-4 text-xl font-semibold">Local demo controls</h2>
-            <p className="ds-muted mt-2 text-sm leading-7">
-              These actions are safe for the demo version and keep the experience simple.
-            </p>
+            <Badge tone="warning">{settingsCopy.dataBadge}</Badge>
+            <h2 className="ds-title mt-4 text-xl font-semibold">{settingsCopy.dataTitle}</h2>
+            <p className="ds-muted mt-2 text-sm leading-7">{settingsCopy.dataBody}</p>
             <div className="mt-5 space-y-3">
               <button type="button" className="ds-button-secondary w-full rounded-2xl px-4 py-3 text-sm font-semibold transition">
-                Export local data
+                {settingsCopy.exportLabel}
               </button>
               <button type="button" className="ds-button-primary w-full rounded-2xl px-4 py-3 text-sm font-semibold transition">
-                Save settings
+                {settingsCopy.saveLabel}
               </button>
             </div>
           </div>

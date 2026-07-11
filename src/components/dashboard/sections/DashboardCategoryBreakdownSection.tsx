@@ -1,4 +1,5 @@
 import { Badge } from "@/components/ui";
+import { dashboardCopy } from "@/config/dashboard";
 
 export default function DashboardCategoryBreakdownSection({
   categories,
@@ -11,10 +12,12 @@ export default function DashboardCategoryBreakdownSection({
     <div className="rounded-[1.75rem] border border-[color:var(--border)] bg-[linear-gradient(180deg,var(--surface),var(--surface-soft))] p-6 shadow-sm dark:border-white/10 dark:bg-[linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.02))]">
       <div className="flex items-center justify-between gap-4">
         <div>
-          <h3 className="text-xl font-semibold text-[color:var(--foreground)]">Category Breakdown</h3>
-          <p className="mt-1 text-sm text-[color:var(--foreground-muted)]">Live overview</p>
+          <h3 className="text-xl font-semibold text-[color:var(--foreground)]">{dashboardCopy.categoryTitle}</h3>
+          <p className="mt-1 text-sm text-[color:var(--foreground-muted)]">{dashboardCopy.categorySubtitle}</p>
         </div>
-        <Badge tone="info">{categories.length} categories</Badge>
+        <Badge tone="info">
+          {categories.length} {dashboardCopy.categoryBadgeSuffix}
+        </Badge>
       </div>
       <div className="mt-6 space-y-4">
         {categories.map((item) => (

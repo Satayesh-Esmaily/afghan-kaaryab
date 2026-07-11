@@ -6,43 +6,7 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { useAppData } from "@/context/app-context";
 import Footer from "@/components/layout/Footer";
-
-type NavItem = {
-  href: string;
-  label: string;
-};
-
-const sidebarItems: NavItem[] = [
-  { href: "/dashboard", label: "Dashboard" },
-  { href: "/opportunities", label: "Discover" },
-  { href: "/saved", label: "Saved" },
-  { href: "/add-opportunity", label: "Add Opportunity" },
-  { href: "/about", label: "About" },
-  { href: "/contact", label: "Contact" },
-  { href: "/settings", label: "Settings" },
-];
-
-const pageTitles: Record<string, { title: string; subtitle: string }> = {
-  "/": { title: "Discover", subtitle: "Browse opportunities, save favorites, and keep track of deadlines." },
-  "/dashboard": { title: "Dashboard", subtitle: "See the platform stats and recent submissions at a glance." },
-  "/opportunities": { title: "Discover", subtitle: "Search, filter, and explore opportunities in one place." },
-  "/saved": { title: "Saved", subtitle: "Return to the opportunities you bookmarked for later." },
-  "/add-opportunity": { title: "Add Opportunity", subtitle: "Share a new listing with the community." },
-  "/about": { title: "About", subtitle: "Learn what the platform solves and who it helps." },
-  "/contact": { title: "Contact", subtitle: "Send suggestions or report an issue." },
-  "/settings": { title: "Settings", subtitle: "Adjust your personal preferences and platform behavior." },
-};
-
-const pageTones: Record<string, { dot: string; title: string }> = {
-  "/": { dot: "bg-[color:var(--accent)]", title: "text-[color:var(--accent-strong)]" },
-  "/dashboard": { dot: "bg-[color:var(--success)]", title: "text-[color:var(--success)]" },
-  "/opportunities": { dot: "bg-[color:var(--warning)]", title: "text-[color:var(--warning)]" },
-  "/saved": { dot: "bg-[color:var(--accent-strong)]", title: "text-[color:var(--accent-strong)]" },
-  "/add-opportunity": { dot: "bg-[color:var(--accent)]", title: "text-[color:var(--accent)]" },
-  "/about": { dot: "bg-[color:var(--success)]", title: "text-[color:var(--success)]" },
-  "/contact": { dot: "bg-[color:var(--danger)]", title: "text-[color:var(--danger)]" },
-  "/settings": { dot: "bg-[color:var(--accent-strong)]", title: "text-[color:var(--accent-strong)]" },
-};
+import { brand, pageHeaders, pageTones, sidebarItems } from "@/config/navigation";
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -50,10 +14,10 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const savedCount = savedIds.length;
 
-  const activePath = Object.keys(pageTitles).find((path) =>
+  const activePath = Object.keys(pageHeaders).find((path) =>
     path === "/" ? pathname === "/" : pathname?.startsWith(path)
   );
-  const page = pageTitles[activePath ?? "/opportunities"];
+  const page = pageHeaders[activePath ?? "/opportunities"];
   const pageTone = pageTones[activePath ?? "/opportunities"] ?? pageTones["/opportunities"];
 
   return (
@@ -63,8 +27,8 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           <div className="flex items-center gap-3">
             <span className="relative flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-[1rem] accent-panel shadow-lg">
               <Image
-                src="/Kaaryab%20assets/kaaryab-logo.png"
-                alt="KaarYab Afghanistan logo"
+                src={brand.logoSrc}
+                alt={brand.logoAlt}
                 fill
                 sizes="44px"
                 className="object-cover"
@@ -73,7 +37,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             </span>
             <div className="min-w-0">
               <h2 className="whitespace-nowrap text-[0.98rem] font-semibold tracking-tight text-[color:var(--foreground)]">
-                KaarYab Afghanistan
+                {brand.name}
               </h2>
             </div>
           </div>
@@ -124,14 +88,19 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           <div className="mx-auto flex max-w-[1600px] items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
             <div className="inline-flex items-center gap-3 rounded-[1.35rem] border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-3 shadow-sm">
               <span className={["h-2.5 w-2.5 rounded-full", pageTone.dot].join(" ")} />
-              <h1
-                className={[
-                  "text-[1.05rem] font-semibold tracking-tight sm:text-[1.25rem]",
-                  pageTone.title,
-                ].join(" ")}
-              >
-                {page.title}
-              </h1>
+              <div className="min-w-0">
+                <h1
+                  className={[
+                    "text-[1.05rem] font-semibold tracking-tight sm:text-[1.25rem]",
+                    pageTone.title,
+                  ].join(" ")}
+                >
+                  {page.title}
+                </h1>
+                <p className="mt-0.5 max-w-[42ch] truncate text-xs text-[color:var(--foreground-muted)] sm:text-sm">
+                  {page.subtitle}
+                </p>
+              </div>
             </div>
 
             <div className="flex items-center gap-3">

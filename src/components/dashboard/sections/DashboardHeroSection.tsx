@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Badge } from "@/components/ui";
+import { dashboardCopy } from "@/config/dashboard";
 
 export default function DashboardHeroSection({
   stats,
@@ -16,14 +17,11 @@ export default function DashboardHeroSection({
     <div className="rounded-[1.5rem] accent-panel p-6 sm:p-8 lg:p-10">
       <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-center">
         <div className="space-y-4">
-          <Badge tone="accent">Welcome Back</Badge>
+          <Badge tone="accent">{dashboardCopy.heroBadge}</Badge>
           <div>
-            <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-              Unlock opportunity access
-            </h2>
+            <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">{dashboardCopy.heroTitle}</h2>
             <p className="mt-3 max-w-2xl text-sm leading-7 text-white/85 sm:text-base">
-              Track opportunities, monitor upcoming deadlines, and keep your platform data
-              organized for the final presentation.
+              {dashboardCopy.heroDescription}
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
@@ -31,13 +29,13 @@ export default function DashboardHeroSection({
               href="/add-opportunity"
               className="inline-flex items-center justify-center rounded-2xl bg-white px-5 py-3 text-sm font-semibold text-[color:var(--accent)] transition hover:bg-white/90"
             >
-              Add opportunity
+              {dashboardCopy.heroPrimaryAction}
             </Link>
             <Link
               href="/opportunities"
               className="inline-flex items-center justify-center rounded-2xl border border-white/15 bg-white/10 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/20"
             >
-              Discover listings
+              {dashboardCopy.heroSecondaryAction}
             </Link>
           </div>
         </div>
@@ -45,9 +43,9 @@ export default function DashboardHeroSection({
         <div className="hidden rounded-[1.5rem] panel p-5 text-[color:var(--foreground)] lg:block">
           <div className="flex items-center justify-between gap-3">
             <p className="text-xs uppercase tracking-[0.22em] text-[color:var(--foreground-muted)]">
-              Snapshot
+              {dashboardCopy.snapshotLabel}
             </p>
-            <Badge tone="success">Live</Badge>
+            <Badge tone="success">{dashboardCopy.snapshotStatus}</Badge>
           </div>
           <div className="mt-4 grid grid-cols-2 gap-3">
             <SnapshotItem label="Total" value={stats.total} tone="accent" />

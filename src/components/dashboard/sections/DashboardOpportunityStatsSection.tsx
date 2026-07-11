@@ -1,4 +1,5 @@
 import { Badge } from "@/components/ui";
+import { dashboardCopy } from "@/config/dashboard";
 
 export default function DashboardOpportunityStatsSection({
   stats,
@@ -13,8 +14,8 @@ export default function DashboardOpportunityStatsSection({
   return (
     <div>
       <div className="flex items-center justify-between">
-        <h3 className="text-xl font-semibold text-[color:var(--foreground)]">My Opportunities</h3>
-        <Badge tone="info">Overview</Badge>
+        <h3 className="text-xl font-semibold text-[color:var(--foreground)]">{dashboardCopy.opportunitiesTitle}</h3>
+        <Badge tone="info">{dashboardCopy.opportunitiesBadge}</Badge>
       </div>
 
       <div className="mt-4 grid gap-4 md:grid-cols-2">

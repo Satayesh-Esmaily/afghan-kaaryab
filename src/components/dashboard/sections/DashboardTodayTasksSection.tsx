@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Badge } from "@/components/ui";
+import { dashboardCopy } from "@/config/dashboard";
 
 export default function DashboardTodayTasksSection({
   tasks,
@@ -9,9 +10,9 @@ export default function DashboardTodayTasksSection({
   return (
     <div className="rounded-[1.5rem] panel p-6">
       <div className="flex items-center justify-between">
-        <h3 className="text-xl font-semibold text-[color:var(--foreground)]">Today&apos;s Tasks</h3>
+        <h3 className="text-xl font-semibold text-[color:var(--foreground)]">{dashboardCopy.tasksTitle}</h3>
         <Link href="/saved" className="text-sm font-medium text-[color:var(--foreground-muted)]">
-          See all
+          {dashboardCopy.tasksSeeAll}
         </Link>
       </div>
       <div className="mt-5 space-y-4">
