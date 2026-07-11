@@ -2,17 +2,20 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useRouter, usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import { useAppData } from "@/context/app-context";
+import { authCopy } from "@/config/auth";
 import Footer from "@/components/layout/Footer";
 import { brand, pageHeaders, pageTones, sidebarItems } from "@/config/navigation";
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const { savedIds, theme, setTheme } = useAppData();
+  const router = useRouter();
+  const { savedIds, theme, setTheme, user, authenticated, hydrated, logout } = useAppData();
   const [mobileOpen, setMobileOpen] = useState(false);
   const savedCount = savedIds.length;
+  const isLoginRoute = pathname === "/login";
 
   const activePath = Object.keys(pageHeaders).find((path) =>
     path === "/" ? pathname === "/" : pathname?.startsWith(path)
@@ -20,12 +23,48 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const page = pageHeaders[activePath ?? "/opportunities"];
   const pageTone = pageTones[activePath ?? "/opportunities"] ?? pageTones["/opportunities"];
 
+  useEffect(() => {
+    if (!hydrated) return;
+
+    if (!authenticated && !isLoginRoute) {
+      router.replace("/login");
+      return;
+    }
+
+    if (authenticated && isLoginRoute) {
+      router.replace("/dashboard");
+      return;
+    }
+
+    if (authenticated && pathname === "/") {
+      router.replace("/dashboard");
+    }
+  }, [authenticated, hydrated, isLoginRoute, pathname, router]);
+
+  if (!hydrated && !isLoginRoute) {
+    return <AppLoadingState />;
+  }
+
+  if (isLoginRoute) {
+    return (
+      <div className="min-h-screen bg-[color:var(--background)] text-[color:var(--foreground)]">
+        <main className="mx-auto flex min-h-screen w-full max-w-[1600px] items-center px-4 py-8 sm:px-6 lg:px-8">
+          {children}
+        </main>
+      </div>
+    );
+  }
+
+  if (!authenticated) {
+    return <AppLoadingState />;
+  }
+
   return (
     <div className="min-h-screen bg-[color:var(--background)] text-[color:var(--foreground)]">
       <aside className="fixed inset-y-0 left-0 hidden w-[276px] flex-col border-r border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-4 lg:flex">
         <Link href="/" className="panel group rounded-[1.25rem] px-3.5 py-3.5 transition hover:-translate-y-0.5 hover:shadow-xl">
           <div className="flex items-center gap-3">
-            <span className="relative flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-[1rem] accent-panel shadow-lg">
+            <span className="relative flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-[1rem] border border-[color:var(--border)] bg-[color:var(--surface)] shadow-sm">
               <Image
                 src={brand.logoSrc}
                 alt={brand.logoAlt}
@@ -81,6 +120,28 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           </nav>
         </div>
 
+        <div className="mt-4 space-y-3 border-t border-[color:var(--border)] pt-4">
+          <div className="rounded-[1.25rem] border border-[color:var(--border)] bg-[color:var(--surface-soft)] px-4 py-4">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[color:var(--foreground-muted)]">
+              Signed in as
+            </p>
+            <p className="mt-2 truncate text-sm font-semibold text-[color:var(--foreground-strong)]">
+              {user?.displayName ?? authCopy.guestLabel}
+            </p>
+            <p className="truncate text-xs text-[color:var(--foreground-muted)]">{user?.email ?? ""}</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              logout();
+              router.replace("/login");
+            }}
+            className="w-full rounded-[1rem] border border-[color:var(--border)] bg-[color:var(--surface)] px-3 py-2.5 text-left text-sm font-medium text-[color:var(--foreground)] transition hover:bg-[color:var(--surface-soft)]"
+          >
+            {authCopy.signOutLabel}
+          </button>
+        </div>
+
       </aside>
 
       <div className="lg:pl-[276px]">
@@ -104,6 +165,16 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             </div>
 
             <div className="flex items-center gap-3">
+              <div className="hidden items-center gap-2 rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] px-3 py-2 sm:inline-flex">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full accent-panel text-xs font-semibold text-white">
+                  {getInitials(user?.displayName)}
+                </div>
+                <div className="min-w-0">
+                  <p className="truncate text-xs font-semibold text-[color:var(--foreground)]">
+                    {user?.displayName ?? authCopy.guestLabel}
+                  </p>
+                </div>
+              </div>
               <button
                 type="button"
                 onClick={() => setMobileOpen((value) => !value)}
@@ -152,6 +223,27 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                 );
               })}
             </nav>
+            <div className="mt-4 space-y-3 border-t border-[color:var(--border)] pt-4">
+              <div className="rounded-[1.25rem] bg-[color:var(--surface-soft)] px-4 py-4">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[color:var(--foreground-muted)]">
+                  Signed in as
+                </p>
+                <p className="mt-2 truncate text-sm font-semibold text-[color:var(--foreground-strong)]">
+                  {user?.displayName ?? authCopy.guestLabel}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  logout();
+                  setMobileOpen(false);
+                  router.replace("/login");
+                }}
+                className="w-full rounded-[1rem] border border-[color:var(--border)] bg-[color:var(--surface)] px-3 py-2.5 text-left text-sm font-medium text-[color:var(--foreground)] transition hover:bg-[color:var(--surface-soft)]"
+              >
+                {authCopy.signOutLabel}
+              </button>
+            </div>
           </div>
         ) : null}
 
@@ -169,4 +261,25 @@ function isActiveLink(pathname: string | null, href: string) {
   if (!pathname) return false;
 
   return pathname === href || (href === "/opportunities" && pathname === "/") || pathname.startsWith(href);
+}
+
+function getInitials(name?: string | null) {
+  if (!name) return "U";
+
+  return name
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part.charAt(0).toUpperCase())
+    .join("");
+}
+
+function AppLoadingState() {
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-[color:var(--background)] px-4">
+      <div className="rounded-[1.5rem] border border-[color:var(--border)] bg-[color:var(--surface)] px-6 py-4 text-sm font-medium text-[color:var(--foreground-muted)] shadow-sm">
+        {authCopy.loadingText}
+      </div>
+    </div>
+  );
 }

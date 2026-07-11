@@ -22,9 +22,9 @@ export const metadata: Metadata = {
   description:
     "A modern opportunity finder platform for Afghan youth to browse jobs, internships, scholarships, remote work, and skill-building opportunities.",
   icons: {
-    icon: "/Kaaryab%20assets/kaaryab-logo.png",
-    shortcut: "/Kaaryab%20assets/kaaryab-logo.png",
-    apple: "/Kaaryab%20assets/kaaryab-logo.png",
+    icon: "/logos/kaaryab-logo.png",
+    shortcut: "/logos/kaaryab-logo.png",
+    apple: "/logos/kaaryab-logo.png",
   },
 };
 

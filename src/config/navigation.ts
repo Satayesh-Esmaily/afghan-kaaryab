@@ -38,5 +38,5 @@ export const pageTones: Record<string, { dot: string; title: string }> = {
 export const brand = {
   name: "KaarYab Afghanistan",
   logoAlt: "KaarYab Afghanistan logo",
-  logoSrc: "/Kaaryab%20assets/kaaryab-logo.png",
+  logoSrc: "/logos/kaaryab-logo.png",
 };

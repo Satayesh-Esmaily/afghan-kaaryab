@@ -9,12 +9,18 @@ import {
 } from "@/lib/opportunities";
 
 type ThemeMode = "light" | "dark";
+type AuthUser = {
+  email: string;
+  displayName: string;
+};
 
 interface AppContextValue {
   opportunities: Opportunity[];
   savedIds: string[];
   theme: ThemeMode;
   hydrated: boolean;
+  user: AuthUser | null;
+  authenticated: boolean;
   addOpportunity: (input: OpportunityInput) => Opportunity;
   updateOpportunity: (id: string, input: OpportunityInput) => void;
   deleteOpportunity: (id: string) => void;
@@ -22,12 +28,15 @@ interface AppContextValue {
   clearSaved: () => void;
   isSaved: (id: string) => boolean;
   setTheme: (mode: ThemeMode) => void;
+  login: (input: { email: string; password: string }) => void;
+  logout: () => void;
 }
 
 const STORAGE_KEYS = {
   opportunities: "kaaryab-opportunities",
   savedIds: "kaaryab-saved-opportunities",
   theme: "kaaryab-theme",
+  user: "kaaryab-session-user",
 } as const;
 
 const AppContext = createContext<AppContextValue | null>(null);
@@ -42,10 +51,26 @@ function safeParse<T>(value: string | null, fallback: T) {
   }
 }
 
+function getDisplayName(email: string) {
+  const localPart = email.split("@")[0] ?? "User";
+  const normalized = localPart
+    .replace(/[._-]+/g, " ")
+    .trim()
+    .replace(/\s+/g, " ");
+
+  if (!normalized) return "User";
+
+  return normalized
+    .split(" ")
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [opportunities, setOpportunities] = useState<Opportunity[]>(demoOpportunities);
   const [savedIds, setSavedIds] = useState<string[]>([]);
   const [theme, setThemeState] = useState<ThemeMode>("light");
+  const [user, setUser] = useState<AuthUser | null>(null);
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
@@ -58,12 +83,17 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       []
     );
     const storedTheme = window.localStorage.getItem(STORAGE_KEYS.theme) as ThemeMode | null;
+    const storedUser = safeParse<AuthUser | null>(
+      window.localStorage.getItem(STORAGE_KEYS.user),
+      null
+    );
 
     // We intentionally sync persisted client state after mount.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setOpportunities(storedOpportunities.length > 0 ? storedOpportunities : demoOpportunities);
     setSavedIds(storedSavedIds);
     setThemeState(storedTheme === "dark" ? "dark" : "light");
+    setUser(storedUser);
     setHydrated(true);
   }, []);
 
@@ -86,6 +116,16 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     document.documentElement.classList.toggle("dark", theme === "dark");
     document.documentElement.style.colorScheme = theme;
   }, [hydrated, theme]);
+
+  useEffect(() => {
+    if (!hydrated) return;
+
+    if (user) {
+      window.localStorage.setItem(STORAGE_KEYS.user, JSON.stringify(user));
+    } else {
+      window.localStorage.removeItem(STORAGE_KEYS.user);
+    }
+  }, [hydrated, user]);
 
   const addOpportunity = (input: OpportunityInput) => {
     const opportunity: Opportunity = {
@@ -127,6 +167,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const isSaved = (id: string) => savedIds.includes(id);
 
   const setTheme = (mode: ThemeMode) => setThemeState(mode);
+  const login = ({ email }: { email: string; password: string }) => {
+    setUser({ email, displayName: getDisplayName(email) });
+  };
+  const logout = () => {
+    setUser(null);
+  };
 
   return (
     <AppContext.Provider
@@ -135,6 +181,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         savedIds,
         theme,
         hydrated,
+        user,
+        authenticated: Boolean(user),
         addOpportunity,
         updateOpportunity,
         deleteOpportunity,
@@ -142,6 +190,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         clearSaved,
         isSaved,
         setTheme,
+        login,
+        logout,
       }}
     >
       {children}
