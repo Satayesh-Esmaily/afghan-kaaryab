@@ -9,9 +9,11 @@ export const opportunityCategories = [
 ] as const;
 
 export const opportunityTypes = ["Remote", "On-site", "Hybrid", "Online"] as const;
+export const opportunityLevels = ["Entry level", "Mid level", "Senior level", "Internship"] as const;
 
 export type OpportunityCategory = (typeof opportunityCategories)[number];
 export type OpportunityType = (typeof opportunityTypes)[number];
+export type OpportunityLevel = (typeof opportunityLevels)[number];
 
 export interface Opportunity {
   id: string;
@@ -20,9 +22,16 @@ export interface Opportunity {
   category: OpportunityCategory;
   location: string;
   type: OpportunityType;
+  publishedAt?: string;
+  gender?: "Male" | "Female" | "Open to all";
+  level?: OpportunityLevel;
   deadline: string;
   description: string;
+  responsibilities?: string[];
   requirements: string[];
+  skills?: string[];
+  documentsRequired?: string[];
+  companySummary?: string;
   applyLink: string;
   tags: string[];
   featured?: boolean;
@@ -53,6 +62,16 @@ export function formatDeadline(value: string) {
   }).format(new Date(value));
 }
 
+export function formatPublishedDate(value?: string) {
+  if (!value) return "Not specified";
+
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  }).format(new Date(value));
+}
+
 export function daysUntilDeadline(value: string) {
   const target = new Date(value);
   const today = new Date();
@@ -72,6 +91,13 @@ export function matchesDeadlineFilter(value: string, filter: DeadlineFilter) {
   if (filter === "all") return true;
   if (filter === "expired") return days < 0;
   return days >= 0 && days <= Number(filter);
+}
+
+export function matchesPublishedAfterFilter(value: string | undefined, filter: string) {
+  if (!filter) return true;
+  if (!value) return false;
+
+  return value.slice(0, 10) >= filter;
 }
 
 export function isRemoteOpportunity(opportunity: Opportunity) {

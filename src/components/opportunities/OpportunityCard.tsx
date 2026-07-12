@@ -3,7 +3,12 @@
 import Link from "next/link";
 import { useAppData } from "@/context/app-context";
 import { Badge } from "@/components/ui";
-import { formatDeadline, isExpiringSoon, type Opportunity } from "@/lib/opportunities";
+import {
+  formatDeadline,
+  formatPublishedDate,
+  isExpiringSoon,
+  type Opportunity,
+} from "@/lib/opportunities";
 
 function colorForCategory(category: Opportunity["category"]) {
   switch (category) {
@@ -67,9 +72,10 @@ export default function OpportunityCard({
             </p>
           </div>
 
-          <div className="grid grid-cols-3 gap-2.5 text-center text-white">
+          <div className="grid grid-cols-2 gap-2.5 text-center text-white sm:grid-cols-4">
+            <Metric label="Company" value={opportunity.organization} />
             <Metric label="Location" value={opportunity.location} />
-            <Metric label="Type" value={opportunity.type} />
+            <Metric label="Published" value={formatPublishedDate(opportunity.publishedAt ?? opportunity.submittedAt)} />
             <Metric label="Deadline" value={formatDeadline(opportunity.deadline)} />
           </div>
         </div>
@@ -92,6 +98,8 @@ export default function OpportunityCard({
         <div className="flex flex-wrap items-center gap-2">
           {isExpiringSoon(opportunity.deadline) ? <Badge tone="warning">Expiring soon</Badge> : null}
           {opportunity.type === "Remote" ? <Badge tone="success">Remote</Badge> : null}
+          {opportunity.level ? <Badge tone="info">{opportunity.level}</Badge> : null}
+          {opportunity.gender ? <Badge tone="default">{opportunity.gender}</Badge> : null}
         </div>
 
         <div className="flex flex-wrap gap-2">

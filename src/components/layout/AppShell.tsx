@@ -59,6 +59,10 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         <div className="mt-4 flex-1 overflow-y-auto pr-1">
           <nav className="space-y-1.5">
             {sidebarItems.map((item) => {
+              if (item.authOnly && !authenticated) {
+                return null;
+              }
+
               const active = isActiveLink(pathname, item.href);
 
               return (
@@ -176,6 +180,10 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           <div className="mx-4 mt-3 panel rounded-[1.25rem] p-3.5 sm:mx-6 lg:hidden">
             <nav className="space-y-1.5">
               {sidebarItems.map((item) => {
+                if (item.authOnly && !authenticated) {
+                  return null;
+                }
+
                 const active = isActiveLink(pathname, item.href);
 
                 return (

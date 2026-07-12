@@ -1,5 +1,8 @@
 import { z } from "zod";
+import type { ResumeTemplateId } from "@/context/app-context";
 import { opportunityCategories, opportunityTypes } from "@/lib/opportunities";
+
+const resumeTemplates = ["classic", "modern", "compact"] as const satisfies readonly ResumeTemplateId[];
 
 const listText = z
   .string()
@@ -41,3 +44,23 @@ export const loginFormSchema = z.object({
 });
 
 export type LoginFormValues = z.infer<typeof loginFormSchema>;
+
+export const profileFormSchema = z.object({
+  fullName: z.string().trim().min(2, "Full name is required."),
+  headline: z.string().trim().min(3, "Headline is required."),
+  avatarUrl: z.string().trim().optional().default(""),
+  resumeUrl: z.string().trim().optional().default(""),
+  skills: z.string().trim().min(2, "Skills are required."),
+  experience: z.string().trim().min(10, "Experience is required."),
+  education: z.string().trim().min(10, "Education is required."),
+  languages: z.string().trim().min(2, "Languages are required."),
+  documents: z.string().trim().min(2, "Documents are required."),
+  portfolioUrl: z.string().trim().optional().default(""),
+  introVideoUrl: z.string().trim().optional().default(""),
+  location: z.string().trim().min(2, "Location is required."),
+  phone: z.string().trim().optional().default(""),
+  bio: z.string().trim().min(10, "Bio is required."),
+  resumeTemplate: z.enum(resumeTemplates).default("modern"),
+});
+
+export type ProfileFormValues = z.infer<typeof profileFormSchema>;

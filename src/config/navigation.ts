@@ -1,10 +1,13 @@
 export type NavItem = {
   href: string;
   label: string;
+  authOnly?: boolean;
 };
 
 export const sidebarItems: NavItem[] = [
   { href: "/dashboard", label: "Dashboard" },
+  { href: "/profile", label: "Profile", authOnly: true },
+  { href: "/resume-builder", label: "Resume Builder", authOnly: true },
   { href: "/opportunities", label: "Discover" },
   { href: "/organizations", label: "Directory" },
   { href: "/saved", label: "Saved" },
@@ -17,6 +20,8 @@ export const sidebarItems: NavItem[] = [
 export const pageHeaders: Record<string, { title: string; subtitle: string }> = {
   "/": { title: "Discover", subtitle: "Browse opportunities, save favorites, and keep track of deadlines." },
   "/dashboard": { title: "Dashboard", subtitle: "See the platform stats and recent submissions at a glance." },
+  "/profile": { title: "Profile", subtitle: "Manage your resume, skills, and job-seeking details." },
+  "/resume-builder": { title: "Resume Builder", subtitle: "Create a job-ready resume and export it as PDF." },
   "/opportunities": { title: "Discover", subtitle: "Search, filter, and explore opportunities in one place." },
   "/organizations": { title: "Directory", subtitle: "Review organizations, countries, and institutions behind active opportunities." },
   "/saved": { title: "Saved", subtitle: "Return to the opportunities you bookmarked for later." },
@@ -29,6 +34,8 @@ export const pageHeaders: Record<string, { title: string; subtitle: string }> = 
 export const pageTones: Record<string, { dot: string; title: string }> = {
   "/": { dot: "bg-[color:var(--accent)]", title: "text-[color:var(--accent-strong)]" },
   "/dashboard": { dot: "bg-[color:var(--success)]", title: "text-[color:var(--success)]" },
+  "/profile": { dot: "bg-[color:var(--accent)]", title: "text-[color:var(--accent)]" },
+  "/resume-builder": { dot: "bg-[color:var(--success)]", title: "text-[color:var(--success)]" },
   "/opportunities": { dot: "bg-[color:var(--warning)]", title: "text-[color:var(--warning)]" },
   "/organizations": { dot: "bg-[color:var(--accent)]", title: "text-[color:var(--accent)]" },
   "/saved": { dot: "bg-[color:var(--accent-strong)]", title: "text-[color:var(--accent-strong)]" },

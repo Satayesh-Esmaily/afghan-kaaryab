@@ -2,119 +2,115 @@
 
 import { useMemo, useState } from "react";
 import OpportunityCard from "@/components/opportunities/OpportunityCard";
-import { EmptyState, Badge } from "@/components/ui";
+import { Badge, EmptyState } from "@/components/ui";
 import { useAppData } from "@/context/app-context";
 import {
-  deadlineFilters,
   matchesDeadlineFilter,
+  matchesPublishedAfterFilter,
   opportunityCategories,
+  opportunityLevels,
   opportunityTypes,
   type DeadlineFilter,
   type Opportunity,
 } from "@/lib/opportunities";
+
+type GenderFilter = "Any" | "Male" | "Female" | "Open to all";
+type LevelFilter = "Any" | (typeof opportunityLevels)[number];
 
 export default function OpportunityBrowser({ opportunities }: { opportunities: Opportunity[] }) {
   const { savedIds } = useAppData();
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<(typeof opportunityCategories)[number] | "All">("All");
   const [location, setLocation] = useState("All");
+  const [company, setCompany] = useState("All");
   const [type, setType] = useState<(typeof opportunityTypes)[number] | "All">("All");
+  const [publishedAfter, setPublishedAfter] = useState("");
+  const [gender, setGender] = useState<GenderFilter>("Any");
+  const [level, setLevel] = useState<LevelFilter>("Any");
   const [deadline, setDeadline] = useState<DeadlineFilter>("all");
 
   const locationOptions = useMemo(
     () => ["All", ...new Set(opportunities.map((item) => item.location))],
     [opportunities]
   );
+  const companyOptions = useMemo(
+    () => ["All", ...new Set(opportunities.map((item) => item.organization))],
+    [opportunities]
+  );
 
-  const filtered = opportunities.filter((opportunity) => {
-    const searchTarget = [
-      opportunity.title,
-      opportunity.organization,
-      opportunity.description,
-      opportunity.tags.join(" "),
-    ]
-      .join(" ")
-      .toLowerCase();
+  const filtered = opportunities
+    .filter((opportunity) => {
+      const searchTarget = [
+        opportunity.title,
+        opportunity.organization,
+        opportunity.location,
+        opportunity.description,
+        opportunity.tags.join(" "),
+      ]
+        .join(" ")
+        .toLowerCase();
 
-    const matchesQuery = searchTarget.includes(query.trim().toLowerCase());
-    const matchesCategory = category === "All" || opportunity.category === category;
-    const matchesLocation = location === "All" || opportunity.location === location;
-    const matchesType = type === "All" || opportunity.type === type;
-    const matchesDeadline = matchesDeadlineFilter(opportunity.deadline, deadline);
+      const matchesQuery = searchTarget.includes(query.trim().toLowerCase());
+      const matchesCategory = category === "All" || opportunity.category === category;
+      const matchesLocation = location === "All" || opportunity.location === location;
+      const matchesCompany = company === "All" || opportunity.organization === company;
+      const matchesType = type === "All" || opportunity.type === type;
+      const matchesDeadline = matchesDeadlineFilter(opportunity.deadline, deadline);
+      const matchesPublished = matchesPublishedAfterFilter(
+        opportunity.publishedAt ?? opportunity.submittedAt,
+        publishedAfter
+      );
+      const matchesGender =
+        gender === "Any" || opportunity.gender === gender || (gender === "Open to all" && !opportunity.gender);
+      const matchesLevel = level === "Any" || opportunity.level === level;
 
-    return matchesQuery && matchesCategory && matchesLocation && matchesType && matchesDeadline;
-  });
+      return (
+        matchesQuery &&
+        matchesCategory &&
+        matchesLocation &&
+        matchesCompany &&
+        matchesType &&
+        matchesDeadline &&
+        matchesPublished &&
+        matchesGender &&
+        matchesLevel
+      );
+    })
+    .sort((a, b) => {
+      const aDate = new Date(a.publishedAt ?? a.submittedAt ?? a.deadline).getTime();
+      const bDate = new Date(b.publishedAt ?? b.submittedAt ?? b.deadline).getTime();
+      return bDate - aDate;
+    });
 
   const clearFilters = () => {
     setQuery("");
     setCategory("All");
     setLocation("All");
+    setCompany("All");
     setType("All");
+    setPublishedAfter("");
+    setGender("Any");
+    setLevel("Any");
     setDeadline("all");
   };
 
   return (
-    <div className="space-y-8">
-      <section className="rounded-[2.25rem] accent-panel p-6 sm:p-8 lg:p-10">
-        <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
-          <div className="space-y-5">
-            <Badge tone="default">Live listings</Badge>
-            <div className="space-y-3">
-              <h2 className="max-w-2xl text-3xl font-semibold tracking-tight sm:text-4xl">
-                Explore opportunities that move your career forward
-              </h2>
-              <p className="max-w-2xl text-sm leading-7 text-white/85 sm:text-base">
-                Search jobs, internships, scholarships, remote roles, and skill-building
-                opportunities in a clean discover experience built for Afghan job seekers.
-              </p>
-            </div>
-
-            <div className="grid gap-3 sm:grid-cols-3">
-              <HeroStat label="Listings" value={opportunities.length} />
-              <HeroStat label="Saved" value={savedIds.length} />
-              <HeroStat label="Categories" value={opportunityCategories.length} />
-            </div>
-          </div>
-
-          <div className="relative overflow-hidden rounded-[1.5rem] panel px-5 py-5">
-            <div className="absolute -right-8 -top-8 h-28 w-28 rounded-full bg-white/10" />
-            <div className="absolute -bottom-10 left-0 h-32 w-32 rounded-full bg-[color:var(--foreground)]/10" />
-            <div className="relative space-y-4">
-              <div className="rounded-[1.5rem] panel px-4 py-4 text-[color:var(--foreground)]">
-                <p className="text-xs uppercase tracking-[0.22em] text-[color:var(--foreground-muted)]">How to use it</p>
-                <ul className="mt-3 space-y-2 text-sm text-[color:var(--foreground)]">
-                  <li>Search by title, organization, or tag</li>
-                  <li>Filter by category, location, type, and deadline</li>
-                  <li>Save opportunities and return to them later</li>
-                </ul>
-              </div>
-              <div className="rounded-[1.5rem] panel px-4 py-4">
-                <p className="text-xs uppercase tracking-[0.22em] text-[color:var(--foreground-muted)]">Platform tip</p>
-                <p className="mt-2 text-sm leading-6 text-[color:var(--foreground-muted)]">
-                  Keep listings current so job seekers always see relevant opportunities first.
-                </p>
-              </div>
-            </div>
-          </div>
+    <div className="grid gap-6 xl:grid-cols-[320px_1fr]">
+      <aside className="space-y-5 rounded-[1.5rem] panel p-5 sm:p-6 xl:sticky xl:top-24 xl:h-fit">
+        <div className="space-y-2">
+          <Badge tone="default">Search filters</Badge>
+          <h2 className="text-2xl font-semibold tracking-tight text-[color:var(--foreground-strong)]">
+            Find the right job faster
+          </h2>
+          <p className="text-sm leading-7 text-[color:var(--foreground-muted)]">
+            Search by title, province, company, contract type, publication date, gender, and level.
+          </p>
         </div>
-      </section>
 
-      <div className="flex items-center gap-3 overflow-x-auto pb-1">
-        <CategoryPill active={category === "All"} onClick={() => setCategory("All")}>
-          All
-        </CategoryPill>
-        {opportunityCategories.map((item) => (
-          <CategoryPill key={item} active={category === item} onClick={() => setCategory(item)}>
-            {item}
-          </CategoryPill>
-        ))}
-      </div>
-
-      <section className="rounded-[1.5rem] panel p-5 sm:p-6">
-          <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr_0.8fr]">
+        <div className="grid gap-4">
           <label className="block">
             <span className="mb-2 block text-sm font-semibold text-[color:var(--foreground-strong)]">
-              Search
+              Search title
             </span>
             <input
               value={query}
@@ -126,13 +122,9 @@ export default function OpportunityBrowser({ opportunities }: { opportunities: O
 
           <label className="block">
             <span className="mb-2 block text-sm font-semibold text-[color:var(--foreground-strong)]">
-              Location
+              Province
             </span>
-            <select
-              value={location}
-              onChange={(event) => setLocation(event.target.value)}
-              className="ds-input"
-            >
+            <select value={location} onChange={(event) => setLocation(event.target.value)} className="ds-input">
               {locationOptions.map((item) => (
                 <option key={item} value={item}>
                   {item}
@@ -143,13 +135,22 @@ export default function OpportunityBrowser({ opportunities }: { opportunities: O
 
           <label className="block">
             <span className="mb-2 block text-sm font-semibold text-[color:var(--foreground-strong)]">
-              Opportunity type
+              Company
             </span>
-            <select
-              value={type}
-              onChange={(event) => setType(event.target.value as typeof type)}
-              className="ds-input"
-            >
+            <select value={company} onChange={(event) => setCompany(event.target.value)} className="ds-input">
+              {companyOptions.map((item) => (
+                <option key={item} value={item}>
+                  {item}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label className="block">
+            <span className="mb-2 block text-sm font-semibold text-[color:var(--foreground-strong)]">
+              Contract type
+            </span>
+            <select value={type} onChange={(event) => setType(event.target.value as typeof type)} className="ds-input">
               <option value="All">All</option>
               {opportunityTypes.map((item) => (
                 <option key={item} value={item}>
@@ -158,84 +159,118 @@ export default function OpportunityBrowser({ opportunities }: { opportunities: O
               ))}
             </select>
           </label>
+
+          <label className="block">
+            <span className="mb-2 block text-sm font-semibold text-[color:var(--foreground-strong)]">
+              Published after
+            </span>
+            <input
+              type="date"
+              value={publishedAfter}
+              onChange={(event) => setPublishedAfter(event.target.value)}
+              className="ds-input"
+            />
+          </label>
+
+          <label className="block">
+            <span className="mb-2 block text-sm font-semibold text-[color:var(--foreground-strong)]">
+              Gender
+            </span>
+            <select value={gender} onChange={(event) => setGender(event.target.value as GenderFilter)} className="ds-input">
+              <option value="Any">Any</option>
+              <option value="Open to all">Open to all</option>
+              <option value="Female">Female</option>
+              <option value="Male">Male</option>
+            </select>
+          </label>
+
+          <label className="block">
+            <span className="mb-2 block text-sm font-semibold text-[color:var(--foreground-strong)]">
+              Job level
+            </span>
+            <select value={level} onChange={(event) => setLevel(event.target.value as LevelFilter)} className="ds-input">
+              <option value="Any">Any</option>
+              {opportunityLevels.map((item) => (
+                <option key={item} value={item}>
+                  {item}
+                </option>
+              ))}
+            </select>
+          </label>
         </div>
 
-        <div className="mt-4 flex flex-wrap items-center gap-2">
-          <span className="text-sm font-semibold text-[color:var(--foreground-muted)]">Deadline</span>
-          {deadlineFilters.map((item) => (
-            <button
-              key={item.value}
-              type="button"
-              onClick={() => setDeadline(item.value)}
-              className={[
-                "rounded-full px-4 py-2 text-sm font-medium transition",
-                deadline === item.value ? "active-pill" : "inactive-pill hover:bg-[color:var(--surface-soft)]",
-              ].join(" ")}
-            >
-              {item.label}
-            </button>
-          ))}
+        <div className="space-y-4 border-t border-[color:var(--border)] pt-4">
+          <div className="flex items-center justify-between gap-3 text-sm">
+            <span className="font-semibold text-[color:var(--foreground-muted)]">Deadline</span>
+            <Badge tone="info">{filtered.length} results</Badge>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {[
+              { value: "all", label: "Any" },
+              { value: "7", label: "7 days" },
+              { value: "14", label: "14 days" },
+              { value: "30", label: "30 days" },
+              { value: "expired", label: "Expired" },
+            ].map((item) => (
+              <button
+                key={item.value}
+                type="button"
+                onClick={() => setDeadline(item.value as DeadlineFilter)}
+                className={[
+                  "rounded-full px-3 py-2 text-xs font-semibold transition",
+                  deadline === item.value
+                    ? "active-pill"
+                    : "inactive-pill hover:bg-[color:var(--surface-soft)]",
+                ].join(" ")}
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
+          <button
+            type="button"
+            onClick={clearFilters}
+            className="w-full rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-3 text-sm font-semibold text-[color:var(--foreground)] transition hover:bg-[color:var(--surface-soft)]"
+          >
+            Clear filters
+          </button>
+        </div>
+      </aside>
 
-          <div className="ml-auto flex items-center gap-2">
-            <Badge tone="success">{filtered.length} results</Badge>
-            <button
-              type="button"
-              onClick={clearFilters}
-              className="rounded-full panel px-4 py-2 text-sm font-medium text-[color:var(--foreground-muted)] transition hover:bg-[color:var(--surface-soft)]"
-            >
-              Clear filters
-            </button>
+      <section className="space-y-5">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.22em] section-kicker">
+              Opportunity search
+            </p>
+            <h2 className="ds-title mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">
+              {filtered.length} opportunities
+            </h2>
+            <p className="ds-muted mt-2 text-sm leading-6">
+              Browse the latest listings with a clean layout and useful filters.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Badge tone="default">{savedIds.length} saved</Badge>
+            <Badge tone="success">{opportunities.length} total</Badge>
           </div>
         </div>
+
+        {filtered.length > 0 ? (
+          <div className="grid gap-5 xl:grid-cols-2">
+            {filtered.map((opportunity) => (
+              <OpportunityCard key={opportunity.id} opportunity={opportunity} />
+            ))}
+          </div>
+        ) : (
+          <EmptyState
+            title="No opportunities match your filters"
+            description="Try a different company, widen the date range, or clear the filters to see more results."
+            actionHref="/add-opportunity"
+            actionLabel="Submit a new opportunity"
+          />
+        )}
       </section>
-
-      {filtered.length > 0 ? (
-        <div className="grid gap-5 xl:grid-cols-2">
-          {filtered.map((opportunity) => (
-            <OpportunityCard key={opportunity.id} opportunity={opportunity} />
-          ))}
-        </div>
-      ) : (
-        <EmptyState
-          title="No opportunities match your filters"
-          description="Try a broader keyword, switch the category, or clear the deadline filter to find more opportunities."
-          actionHref="/add-opportunity"
-          actionLabel="Submit a new opportunity"
-        />
-      )}
-
     </div>
-  );
-}
-
-function HeroStat({ label, value }: { label: string; value: number }) {
-  return (
-    <div className="rounded-[1.5rem] border border-white/15 bg-white/10 px-4 py-4 text-white">
-      <p className="text-xs uppercase tracking-[0.2em] text-white/70">{label}</p>
-      <p className="mt-2 text-2xl font-semibold">{value}</p>
-    </div>
-  );
-}
-
-function CategoryPill({
-  children,
-  active,
-  onClick,
-}: {
-  children: React.ReactNode;
-  active: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={[
-        "whitespace-nowrap rounded-full px-5 py-3 text-sm font-medium transition",
-        active ? "active-pill" : "inactive-pill hover:bg-[color:var(--surface-soft)]",
-      ].join(" ")}
-    >
-      {children}
-    </button>
   );
 }

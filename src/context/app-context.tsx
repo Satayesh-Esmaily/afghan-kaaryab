@@ -9,15 +9,35 @@ import {
 } from "@/lib/opportunities";
 
 type ThemeMode = "light" | "dark";
+export type ResumeTemplateId = "classic" | "modern" | "compact";
 type AuthUser = {
   email: string;
   displayName: string;
+};
+
+export type JobSeekerProfile = {
+  fullName: string;
+  headline: string;
+  avatarUrl: string;
+  resumeUrl: string;
+  skills: string;
+  experience: string;
+  education: string;
+  languages: string;
+  documents: string;
+  portfolioUrl: string;
+  introVideoUrl: string;
+  location: string;
+  phone: string;
+  bio: string;
+  resumeTemplate: ResumeTemplateId;
 };
 
 interface AppContextValue {
   opportunities: Opportunity[];
   savedIds: string[];
   followedOrganizationSlugs: string[];
+  profile: JobSeekerProfile;
   theme: ThemeMode;
   hydrated: boolean;
   user: AuthUser | null;
@@ -30,6 +50,7 @@ interface AppContextValue {
   isSaved: (id: string) => boolean;
   toggleFollowOrganization: (slug: string) => void;
   isFollowingOrganization: (slug: string) => boolean;
+  updateProfile: (input: Partial<JobSeekerProfile>) => void;
   setTheme: (mode: ThemeMode) => void;
   login: (input: { email: string; password: string }) => void;
   logout: () => void;
@@ -39,6 +60,7 @@ const STORAGE_KEYS = {
   opportunities: "kaaryab-opportunities",
   savedIds: "kaaryab-saved-opportunities",
   followedOrganizationSlugs: "kaaryab-followed-organizations",
+  profile: "kaaryab-jobseeker-profile",
   theme: "kaaryab-theme",
   user: "kaaryab-session-user",
 } as const;
@@ -70,10 +92,31 @@ function getDisplayName(email: string) {
     .join(" ");
 }
 
+function createDefaultProfile(user: AuthUser | null): JobSeekerProfile {
+  return {
+    fullName: user?.displayName ?? "Your name",
+    headline: "Job seeker in Afghanistan",
+    avatarUrl: "",
+    resumeUrl: "",
+    skills: "Communication, Microsoft Office, Teamwork",
+    experience: "Add your latest work experience here.",
+    education: "Add your education background here.",
+    languages: "Dari, Pashto, English",
+    documents: "CV, national ID, certificates",
+    portfolioUrl: "",
+    introVideoUrl: "",
+    location: "Kabul",
+    phone: "",
+    bio: "Use this profile to highlight your background, skills, and documents.",
+    resumeTemplate: "modern",
+  };
+}
+
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [opportunities, setOpportunities] = useState<Opportunity[]>(demoOpportunities);
   const [savedIds, setSavedIds] = useState<string[]>([]);
   const [followedOrganizationSlugs, setFollowedOrganizationSlugs] = useState<string[]>([]);
+  const [profile, setProfile] = useState<JobSeekerProfile>(createDefaultProfile(null));
   const [theme, setThemeState] = useState<ThemeMode>("light");
   const [user, setUser] = useState<AuthUser | null>(null);
   const [hydrated, setHydrated] = useState(false);
@@ -91,6 +134,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       window.localStorage.getItem(STORAGE_KEYS.followedOrganizationSlugs),
       []
     );
+    const storedProfile = safeParse<JobSeekerProfile | null>(
+      window.localStorage.getItem(STORAGE_KEYS.profile),
+      null
+    );
     const storedTheme = window.localStorage.getItem(STORAGE_KEYS.theme) as ThemeMode | null;
     const storedUser = safeParse<AuthUser | null>(
       window.localStorage.getItem(STORAGE_KEYS.user),
@@ -102,6 +149,16 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setOpportunities(storedOpportunities.length > 0 ? storedOpportunities : demoOpportunities);
     setSavedIds(storedSavedIds);
     setFollowedOrganizationSlugs(storedFollowedOrganizationSlugs);
+    const defaultProfile = createDefaultProfile(storedUser);
+    setProfile(
+      storedProfile
+        ? {
+            ...defaultProfile,
+            ...storedProfile,
+            resumeTemplate: storedProfile.resumeTemplate ?? defaultProfile.resumeTemplate,
+          }
+        : defaultProfile
+    );
     setThemeState(storedTheme === "dark" ? "dark" : "light");
     setUser(storedUser);
     setHydrated(true);
@@ -135,6 +192,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     document.documentElement.classList.toggle("dark", theme === "dark");
     document.documentElement.style.colorScheme = theme;
   }, [hydrated, theme]);
+
+  useEffect(() => {
+    if (!hydrated) return;
+
+    window.localStorage.setItem(STORAGE_KEYS.profile, JSON.stringify(profile));
+  }, [hydrated, profile]);
 
   useEffect(() => {
     if (!hydrated) return;
@@ -194,8 +257,22 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const isFollowingOrganization = (slug: string) => followedOrganizationSlugs.includes(slug);
 
   const setTheme = (mode: ThemeMode) => setThemeState(mode);
+  const updateProfile = (input: Partial<JobSeekerProfile>) => {
+    setProfile((current) => ({
+      ...current,
+      ...input,
+    }));
+  };
   const login = ({ email }: { email: string; password: string }) => {
-    setUser({ email, displayName: getDisplayName(email) });
+    const nextUser = { email, displayName: getDisplayName(email) };
+    setUser(nextUser);
+    setProfile((current) => {
+      if (current.fullName && current.fullName !== "Your name") {
+        return current;
+      }
+
+      return createDefaultProfile(nextUser);
+    });
   };
   const logout = () => {
     setUser(null);
@@ -207,6 +284,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         opportunities,
         savedIds,
         followedOrganizationSlugs,
+        profile,
         theme,
         hydrated,
         user,
@@ -219,6 +297,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         isSaved,
         toggleFollowOrganization,
         isFollowingOrganization,
+        updateProfile,
         setTheme,
         login,
         logout,
