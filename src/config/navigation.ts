@@ -18,7 +18,7 @@ export const pageHeaders: Record<string, { title: string; subtitle: string }> = 
   "/": { title: "Discover", subtitle: "Browse opportunities, save favorites, and keep track of deadlines." },
   "/dashboard": { title: "Dashboard", subtitle: "See the platform stats and recent submissions at a glance." },
   "/opportunities": { title: "Discover", subtitle: "Search, filter, and explore opportunities in one place." },
-  "/organizations": { title: "Directory", subtitle: "Review organizations, countries, and institutions in the demo data." },
+  "/organizations": { title: "Directory", subtitle: "Review organizations, countries, and institutions behind active opportunities." },
   "/saved": { title: "Saved", subtitle: "Return to the opportunities you bookmarked for later." },
   "/add-opportunity": { title: "Add Opportunity", subtitle: "Share a new listing with the community." },
   "/about": { title: "About", subtitle: "Learn what the platform solves and who it helps." },

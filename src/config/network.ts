@@ -2,8 +2,8 @@ export const networkPageCopy = {
   eyebrow: "Directory",
   title: "Organizations, countries, and institutions",
   description:
-    "A demo directory built from the current opportunity data so you can review the platform ecosystem at a glance.",
-  organizationsBadge: "Live from demo data",
+    "Explore the organizations, countries, and institutions behind the latest opportunities on KaarYab.",
+  organizationsBadge: "Live network",
   organizationsTitle: "Organizations",
   countriesTitle: "Countries & reach",
   institutionsTitle: "Institutions",

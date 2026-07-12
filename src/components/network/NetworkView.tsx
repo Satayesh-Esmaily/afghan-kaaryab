@@ -37,7 +37,7 @@ export default function NetworkView() {
             <div>
               <h2 className="ds-title text-2xl font-semibold">{networkPageCopy.organizationsTitle}</h2>
               <p className="ds-muted mt-2 text-sm leading-7">
-                Organizations currently represented inside the opportunity data.
+                Organizations currently active on the platform and connected to available listings.
               </p>
             </div>
             <Badge tone="info">{networkPageCopy.organizationsBadge}</Badge>
@@ -70,7 +70,7 @@ export default function NetworkView() {
               <div>
                 <h2 className="ds-title text-2xl font-semibold">{networkPageCopy.countriesTitle}</h2>
                 <p className="ds-muted mt-2 text-sm leading-7">
-                  The current demo is centered in Afghanistan with remote reach.
+                  Afghan opportunities first, with remote roles and regional reach where available.
                 </p>
               </div>
               <Badge tone="success">{networkPageCopy.countriesBadge}</Badge>

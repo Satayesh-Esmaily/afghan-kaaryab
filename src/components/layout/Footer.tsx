@@ -14,7 +14,7 @@ export default function Footer() {
         <div className="space-y-3">
           <p className="ds-title text-lg font-semibold">KaarYab Afghanistan</p>
           <p className="ds-muted max-w-md text-sm leading-6">
-            A modern opportunity finder for Afghan youth, built for jobs, internships,
+            A modern opportunity finder for Afghan job seekers, built for jobs, internships,
             scholarships, remote work, and skill-building opportunities.
           </p>
         </div>
@@ -32,11 +32,8 @@ export default function Footer() {
         </div>
 
         <div className="space-y-2 text-sm text-[color:var(--foreground)]">
-          <p className="ds-title font-semibold">Demo Data</p>
-          <p>
-            This project uses sample opportunities so the platform is safe to preview,
-            submit to, and present during your final demo.
-          </p>
+          <p className="ds-title font-semibold">Platform focus</p>
+          <p>Built to help Afghan communities discover and share trusted opportunities.</p>
           <p>© {new Date().getFullYear()} KaarYab Afghanistan</p>
         </div>
       </div>

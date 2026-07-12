@@ -19,7 +19,7 @@ export default function OrganizationDetailsView({
       <SectionHeading
         eyebrow="Organization"
         title={organization.name}
-        description="Review the organization profile, the opportunities it currently has in the platform, and follow it for later."
+        description="Review the organization profile, see its current opportunities, and follow it for later updates."
       />
 
       <section className="grid gap-4 md:grid-cols-3">
@@ -63,8 +63,7 @@ export default function OrganizationDetailsView({
             <div className="rounded-[1.35rem] border border-[color:var(--border)] bg-[color:var(--surface-soft)] px-4 py-4">
               <p className="text-sm font-semibold text-[color:var(--foreground)]">About this organization</p>
               <p className="mt-2 text-sm leading-7 text-[color:var(--foreground-muted)]">
-                This profile is generated from the current demo opportunity data. You can use it to
-                explain the organization during the demo and later replace it with real organization data.
+                This profile helps job seekers learn more about the organization before applying.
               </p>
             </div>
 
@@ -91,7 +90,7 @@ export default function OrganizationDetailsView({
                   className="flex items-center justify-between rounded-[1.25rem] bg-[color:var(--surface-soft)] px-4 py-4"
                 >
                   <span className="font-medium text-[color:var(--foreground)]">{location}</span>
-                  <Badge tone="default">Live</Badge>
+                  <Badge tone="default">Active</Badge>
                 </div>
               ))}
             </div>
@@ -101,9 +100,9 @@ export default function OrganizationDetailsView({
             <p className="text-sm font-semibold uppercase tracking-[0.2em] text-white/75">
               Quick action
             </p>
-            <h3 className="mt-3 text-2xl font-semibold">Share this organization in your presentation.</h3>
+            <h3 className="mt-3 text-2xl font-semibold">Keep this organization on your radar.</h3>
             <p className="mt-3 text-sm leading-7 text-white/85">
-              Following the organization keeps it available for the next time you review the demo.
+              Following the organization keeps it easy to revisit when new opportunities are posted.
             </p>
             <Link
               href="/organizations"

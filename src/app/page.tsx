@@ -21,13 +21,13 @@ export default function HomePage() {
         <div className="rounded-[1.5rem] accent-panel p-6 sm:p-8 lg:p-10">
           <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-center">
             <div className="space-y-4">
-              <Badge tone="default">Demo Data</Badge>
+              <Badge tone="default">Live opportunities</Badge>
               <h1 className="max-w-2xl text-4xl font-semibold tracking-tight sm:text-5xl">
-                Discover opportunities for Afghan youth in one clean place.
+                Discover opportunities for Afghan job seekers in one clean place.
               </h1>
               <p className="max-w-xl text-sm leading-7 text-white/85 sm:text-base">
                 Browse jobs, internships, scholarships, remote work, and training programs with
-                search, filters, saved items, and a polished presentation-ready interface.
+                search, filters, saved items, and a focused experience built for Afghan users.
               </p>
               <div className="flex flex-wrap gap-3 pt-2">
                 <Link
@@ -65,7 +65,7 @@ export default function HomePage() {
 
         <div className="grid gap-5">
           <div className="rounded-[1.5rem] panel p-6">
-            <p className="text-sm font-semibold uppercase tracking-[0.22em] text-[color:var(--foreground-muted)]">
+              <p className="text-sm font-semibold uppercase tracking-[0.22em] text-[color:var(--foreground-muted)]">
               Quick stats
             </p>
             <div className="mt-5 grid grid-cols-2 gap-4">
@@ -77,8 +77,8 @@ export default function HomePage() {
           </div>
 
           <div className="rounded-[1.5rem] panel-soft p-6">
-            <p className="text-sm font-semibold uppercase tracking-[0.22em] section-kicker">
-              Target users
+              <p className="text-sm font-semibold uppercase tracking-[0.22em] section-kicker">
+              Who it helps
             </p>
             <div className="mt-4 flex flex-wrap gap-2">
               {["Students", "Job seekers", "Fresh graduates", "Women", "Organizations"].map((item) => (
@@ -128,14 +128,14 @@ export default function HomePage() {
         <div className="grid gap-6 lg:grid-cols-[1fr_auto] lg:items-center">
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.22em] section-kicker">
-              Ready for demo
+              Built for real use
             </p>
             <h2 className="ds-title mt-2 text-3xl font-semibold tracking-tight">
-              A polished final project with real product feel.
+              A practical job platform for Afghan communities.
             </h2>
             <p className="ds-muted mt-3 max-w-2xl text-sm leading-7">
-              This build includes responsive layouts, dark mode, localStorage persistence, dynamic
-              routes, CRUD actions, and a dashboard that makes the project easier to present.
+              This build includes responsive layouts, dark mode, saved opportunities, dynamic
+              routes, CRUD actions, and organization pages that make job discovery easier.
             </p>
           </div>
           <Link

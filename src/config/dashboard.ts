@@ -1,29 +1,29 @@
 export const dashboardCopy = {
-  heroBadge: "Welcome Back",
-  heroTitle: "Unlock opportunity access",
+  heroBadge: "Your dashboard",
+  heroTitle: "Keep your job search organized in one place",
   heroDescription:
-    "Track opportunities, monitor upcoming deadlines, and keep your platform data organized for the final presentation.",
+    "Track saved opportunities, review deadlines, and follow the listings and organizations that matter to you most.",
   heroPrimaryAction: "Add opportunity",
   heroSecondaryAction: "Discover listings",
   snapshotLabel: "Snapshot",
   snapshotStatus: "Live",
-  opportunitiesTitle: "My Opportunities",
+  opportunitiesTitle: "Opportunity overview",
   opportunitiesBadge: "Overview",
   categoryTitle: "Category Breakdown",
   categorySubtitle: "Live overview",
   categoryBadgeSuffix: "categories",
-  tasksTitle: "Today's Tasks",
+  tasksTitle: "Today's priorities",
   tasksSeeAll: "See all",
-  recentTitle: "Recent submissions",
+  recentTitle: "Recent opportunities",
   quickInsightKicker: "Quick insight",
-  quickInsightTitle: "Always keep the dashboard updated.",
+  quickInsightTitle: "Keep fresh listings at the top of the page.",
   quickInsightBody:
-    "Show the teacher that you can create useful product analytics from simple local data.",
+    "Update deadlines, highlight active opportunities, and keep the dashboard useful for job seekers.",
   calendarSubtitle: "Deadline calendar",
 };
 
 export const dashboardTasks = [
-  "Review expiring opportunities",
-  "Edit or delete one outdated listing",
-  "Prepare a demo talk track",
+  "Review opportunities that expire soon",
+  "Update or remove outdated listings",
+  "Add a new listing for your audience",
 ];

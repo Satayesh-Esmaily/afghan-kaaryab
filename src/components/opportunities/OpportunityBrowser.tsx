@@ -58,14 +58,14 @@ export default function OpportunityBrowser({ opportunities }: { opportunities: O
       <section className="rounded-[2.25rem] accent-panel p-6 sm:p-8 lg:p-10">
         <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
           <div className="space-y-5">
-            <Badge tone="default">Demo Data</Badge>
+            <Badge tone="default">Live listings</Badge>
             <div className="space-y-3">
               <h2 className="max-w-2xl text-3xl font-semibold tracking-tight sm:text-4xl">
                 Explore opportunities that move your career forward
               </h2>
               <p className="max-w-2xl text-sm leading-7 text-white/85 sm:text-base">
                 Search jobs, internships, scholarships, remote roles, and skill-building
-                opportunities in a clean discover experience built for Afghan youth.
+                opportunities in a clean discover experience built for Afghan job seekers.
               </p>
             </div>
 
@@ -81,18 +81,17 @@ export default function OpportunityBrowser({ opportunities }: { opportunities: O
             <div className="absolute -bottom-10 left-0 h-32 w-32 rounded-full bg-[color:var(--foreground)]/10" />
             <div className="relative space-y-4">
               <div className="rounded-[1.5rem] panel px-4 py-4 text-[color:var(--foreground)]">
-                <p className="text-xs uppercase tracking-[0.22em] text-[color:var(--foreground-muted)]">What users can do</p>
+                <p className="text-xs uppercase tracking-[0.22em] text-[color:var(--foreground-muted)]">How to use it</p>
                 <ul className="mt-3 space-y-2 text-sm text-[color:var(--foreground)]">
                   <li>Search by title, organization, or tag</li>
                   <li>Filter by category, location, type, and deadline</li>
-                  <li>Save opportunities for later review</li>
+                  <li>Save opportunities and return to them later</li>
                 </ul>
               </div>
               <div className="rounded-[1.5rem] panel px-4 py-4">
-                <p className="text-xs uppercase tracking-[0.22em] text-[color:var(--foreground-muted)]">Presentation tip</p>
+                <p className="text-xs uppercase tracking-[0.22em] text-[color:var(--foreground-muted)]">Platform tip</p>
                 <p className="mt-2 text-sm leading-6 text-[color:var(--foreground-muted)]">
-                  Mention that this is a demo-friendly platform with localStorage persistence and
-                  full CRUD actions.
+                  Keep listings current so job seekers always see relevant opportunities first.
                 </p>
               </div>
             </div>

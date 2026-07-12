@@ -12,22 +12,22 @@ export default function AboutPage() {
       <SectionHeading
         eyebrow="About"
         title="Why KaarYab Afghanistan exists"
-        description="This final project solves a common real-world problem by organizing scattered opportunity information into one easy-to-use platform."
+        description="KaarYab helps Afghan job seekers find trusted opportunities in one organized platform."
       />
 
       <section className="grid gap-5 lg:grid-cols-3">
         {[
           {
             title: "Problem",
-            body: "Young people often search across social media, groups, and different websites to find jobs and scholarships.",
+            body: "Opportunities are often scattered across social media, groups, and different websites.",
           },
           {
             title: "Solution",
-            body: "KaarYab centralizes opportunities with search, filters, saved items, and a simple dashboard.",
+            body: "KaarYab centralizes opportunities with search, filters, saved items, and organization pages.",
           },
           {
             title: "Audience",
-            body: "Students, graduates, job seekers, women seeking remote work, and organizations that share opportunities.",
+            body: "Students, graduates, job seekers, women seeking remote work, and organizations sharing listings.",
           },
         ].map((item) => (
           <div key={item.title} className="ds-card rounded-[1.5rem] p-6">
@@ -38,11 +38,11 @@ export default function AboutPage() {
       </section>
 
       <section className="ds-card rounded-[1.5rem] p-6 sm:p-8">
-        <h2 className="ds-title text-2xl font-semibold">Built with the final project rubric in mind</h2>
+        <h2 className="ds-title text-2xl font-semibold">Built as a practical job platform</h2>
         <p className="ds-muted mt-4 max-w-3xl text-base leading-7">
-          The application includes responsive layouts, dynamic routes, localStorage persistence,
-          a full add/edit/delete workflow, dark mode, and reusable components so it demonstrates
-          both product thinking and technical skill.
+          The application includes responsive layouts, dynamic routes, saved opportunities,
+          organization profiles, a full add/edit/delete workflow, dark mode, and reusable
+          components so it feels ready for everyday use.
         </p>
       </section>
     </div>

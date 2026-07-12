@@ -2,17 +2,17 @@ export const settingsCopy = {
   pageEyebrow: "Settings",
   pageTitle: "Tune your experience",
   pageDescription:
-    "Manage the small details that make the platform feel more personal, clear, and ready for demo use.",
+    "Manage the details that shape how KaarYab works for your job search and organization activity.",
   preferencesBadge: "Preferences",
   preferencesTitle: "Appearance and notifications",
-  preferencesBody: "Keep the interface clean, control updates, and make the demo easier to present.",
+  preferencesBody: "Keep the interface clean, control updates, and tailor the platform to your routine.",
   currentModeLabel: "Current mode",
   currentModeValue: "Balanced",
   displayBadge: "Display",
   displayTitle: "Visual style",
   dataBadge: "Data",
-  dataTitle: "Local demo controls",
-  dataBody: "These actions are safe for the demo version and keep the experience simple.",
+  dataTitle: "Data controls",
+  dataBody: "These actions help you manage your saved opportunities and account data.",
   exportLabel: "Export local data",
   saveLabel: "Save settings",
 };
@@ -30,7 +30,7 @@ export const preferenceRows = [
   },
   {
     title: "Public profile",
-    description: "Allow your profile to be discoverable inside the demo platform.",
+    description: "Allow your profile to be discoverable across the platform.",
     checked: false,
   },
 ];

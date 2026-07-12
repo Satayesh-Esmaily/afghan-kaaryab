@@ -2,7 +2,7 @@ export const opportunityPageCopy = {
   addEyebrow: "Submit",
   addTitle: "Add a new opportunity",
   addDescription:
-    "Use this form to submit jobs, internships, scholarships, and other useful opportunities for Afghan youth.",
+    "Share jobs, internships, scholarships, training programs, and remote roles for Afghan job seekers.",
   addSubmitLabel: "Publish opportunity",
 };
 

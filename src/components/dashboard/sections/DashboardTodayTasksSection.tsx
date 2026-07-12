@@ -24,7 +24,7 @@ export default function DashboardTodayTasksSection({
               </div>
               <div>
                 <p className="font-medium text-[color:var(--foreground)]">{task}</p>
-                <p className="text-sm text-[color:var(--foreground-muted)]">Final project presentation</p>
+                <p className="text-sm text-[color:var(--foreground-muted)]">Keep the listing board up to date</p>
               </div>
             </div>
             <Badge tone="info">Done</Badge>

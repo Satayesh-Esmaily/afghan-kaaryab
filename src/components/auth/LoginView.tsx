@@ -16,10 +16,10 @@ export default function LoginView() {
 
         <div className="mt-8 grid gap-4 sm:grid-cols-2">
           {[
-            ["Dashboard", "Personalized overview after login"],
+            ["Dashboard", "Personalized overview after sign in"],
             ["Saved items", "Keep track of opportunities you bookmarked"],
-            ["Forms", "Add or edit listings with reusable inputs"],
-            ["Settings", "Adjust the demo experience as needed"],
+            ["Organizations", "Follow employers and institutions you trust"],
+            ["Settings", "Adjust your account and display preferences"],
           ].map(([title, description]) => (
             <div key={title} className="rounded-[1.25rem] border border-white/12 bg-white/10 px-4 py-4">
               <p className="text-sm font-semibold">{title}</p>

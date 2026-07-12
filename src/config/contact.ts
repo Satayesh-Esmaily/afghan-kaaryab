@@ -1,17 +1,17 @@
 export const contactCopy = {
   pageEyebrow: "Contact",
-  pageTitle: "Send feedback or a new opportunity",
+  pageTitle: "Send feedback or share an opportunity",
   pageDescription:
-    "Use this form if you want to suggest a feature, report a problem, or share an opportunity idea.",
+    "Use this form to contact the KaarYab team, suggest improvements, or submit an opportunity idea.",
   detailsTitle: "Contact details",
   detailsDescription:
-    "This project version is a demo, so the form is intentionally local and safe to use during presentations.",
+    "We review every message and use your input to improve the platform for Afghan job seekers.",
   email: "hello@kaaryab.af",
   location: "Afghanistan",
-  purpose: "opportunity discovery for youth and communities",
-  formBadge: "Demo form",
-  formBody: "Messages stay local in this version so you can test it safely.",
-  successMessage: "Thanks. Your message has been captured for the demo version of the project.",
+  purpose: "helping Afghan job seekers and organizations connect",
+  formBadge: "Support form",
+  formBody: "Share questions, suggestions, or opportunities that should be added to the platform.",
+  successMessage: "Thanks. Your message has been sent to the KaarYab team.",
   submitLabel: "Send message",
 };
 
