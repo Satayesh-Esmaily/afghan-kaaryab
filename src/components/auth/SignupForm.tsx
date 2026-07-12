@@ -7,31 +7,42 @@ import FormField from "@/components/common/FormField";
 import PasswordField from "@/components/common/PasswordField";
 import { authCopy } from "@/config/auth";
 import { useAppData } from "@/context/app-context";
-import { loginFormSchema, type LoginFormValues } from "@/lib/schemas";
+import { signupFormSchema, type SignupFormValues } from "@/lib/schemas";
 
-export default function LoginForm() {
+export default function SignupForm() {
   const router = useRouter();
-  const { login } = useAppData();
+  const { signup } = useAppData();
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<LoginFormValues>({
-    resolver: zodResolver(loginFormSchema),
+  } = useForm<SignupFormValues>({
+    resolver: zodResolver(signupFormSchema),
     defaultValues: {
+      fullName: "",
       email: "",
       password: "",
+      confirmPassword: "",
     },
   });
 
   return (
     <form
       onSubmit={handleSubmit(async (values) => {
-        login(values);
-        router.replace("/dashboard");
+        signup(values);
+        router.replace("/profile");
       })}
       className="space-y-5"
     >
+      <FormField label={authCopy.fullNameLabel} error={errors.fullName?.message}>
+        <input
+          {...register("fullName")}
+          className="ds-input"
+          placeholder={authCopy.fullNamePlaceholder}
+          autoComplete="name"
+        />
+      </FormField>
+
       <FormField label={authCopy.emailLabel} error={errors.email?.message}>
         <input
           {...register("email")}
@@ -46,8 +57,16 @@ export default function LoginForm() {
         label={authCopy.passwordLabel}
         error={errors.password?.message}
         placeholder={authCopy.passwordPlaceholder}
-        autoComplete="current-password"
+        autoComplete="new-password"
         registration={register("password")}
+      />
+
+      <PasswordField
+        label={authCopy.confirmPasswordLabel}
+        error={errors.confirmPassword?.message}
+        placeholder={authCopy.confirmPasswordPlaceholder}
+        autoComplete="new-password"
+        registration={register("confirmPassword")}
       />
 
       <button
@@ -55,7 +74,7 @@ export default function LoginForm() {
         disabled={isSubmitting}
         className="ds-button-primary inline-flex w-full items-center justify-center rounded-2xl px-5 py-3 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-70"
       >
-        {authCopy.loginSubmitLabel}
+        {authCopy.signupSubmitLabel}
       </button>
     </form>
   );

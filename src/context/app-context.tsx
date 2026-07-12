@@ -53,6 +53,7 @@ interface AppContextValue {
   updateProfile: (input: Partial<JobSeekerProfile>) => void;
   setTheme: (mode: ThemeMode) => void;
   login: (input: { email: string; password: string }) => void;
+  signup: (input: { fullName: string; email: string; password: string }) => void;
   logout: () => void;
 }
 
@@ -274,6 +275,18 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       return createDefaultProfile(nextUser);
     });
   };
+  const signup = ({ fullName, email }: { fullName: string; email: string; password: string }) => {
+    const nextUser = {
+      email,
+      displayName: fullName.trim() || getDisplayName(email),
+    };
+    setUser(nextUser);
+    setProfile((current) => ({
+      ...createDefaultProfile(nextUser),
+      ...current,
+      fullName: nextUser.displayName,
+    }));
+  };
   const logout = () => {
     setUser(null);
   };
@@ -300,6 +313,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         updateProfile,
         setTheme,
         login,
+        signup,
         logout,
       }}
     >

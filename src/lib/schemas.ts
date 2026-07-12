@@ -45,6 +45,20 @@ export const loginFormSchema = z.object({
 
 export type LoginFormValues = z.infer<typeof loginFormSchema>;
 
+export const signupFormSchema = z
+  .object({
+    fullName: z.string().trim().min(2, "Full name is required."),
+    email: z.string().email("Enter a valid email."),
+    password: z.string().min(8, "Password must be at least 8 characters."),
+    confirmPassword: z.string().min(1, "Please confirm your password."),
+  })
+  .refine((values) => values.password === values.confirmPassword, {
+    message: "Passwords do not match.",
+    path: ["confirmPassword"],
+  });
+
+export type SignupFormValues = z.infer<typeof signupFormSchema>;
+
 export const profileFormSchema = z.object({
   fullName: z.string().trim().min(2, "Full name is required."),
   headline: z.string().trim().min(3, "Headline is required."),

@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
 import LoginView from "@/components/auth/LoginView";
-import { authCopy } from "@/config/auth";
 
 export const metadata: Metadata = {
   title: "Login",
-  description: authCopy.loginDescription,
+  description: "Sign in to your KaarYab Afghanistan account.",
 };
 
 export default function LoginPage() {

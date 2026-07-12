@@ -15,7 +15,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const { savedIds, theme, setTheme, user, authenticated, logout } = useAppData();
   const [mobileOpen, setMobileOpen] = useState(false);
   const savedCount = savedIds.length;
-  const isLoginRoute = pathname === "/login";
+  const isAuthRoute = pathname === "/login" || pathname === "/signup";
 
   const activePath = Object.keys(pageHeaders).find((path) =>
     path === "/" ? pathname === "/" : pathname?.startsWith(path)
@@ -23,10 +23,10 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const page = pageHeaders[activePath ?? "/opportunities"];
   const pageTone = pageTones[activePath ?? "/opportunities"] ?? pageTones["/opportunities"];
 
-  if (isLoginRoute) {
+  if (isAuthRoute) {
     return (
       <div className="min-h-screen bg-[color:var(--background)] text-[color:var(--foreground)]">
-        <main className="mx-auto flex min-h-screen w-full max-w-[1600px] items-center px-4 py-8 sm:px-6 lg:px-8">
+        <main className="mx-auto flex min-h-screen w-full max-w-[1600px] items-center justify-center px-4 py-8 sm:px-6 lg:px-8">
           {children}
         </main>
       </div>
