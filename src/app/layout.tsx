@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Spline_Sans, Spline_Sans_Mono } from "next/font/google";
 import Providers from "@/components/layout/Providers";
 import AppShell from "@/components/layout/AppShell";
@@ -21,11 +21,16 @@ export const metadata: Metadata = {
   },
   description:
     "A modern opportunity finder platform for Afghan youth to browse jobs, internships, scholarships, remote work, and skill-building opportunities.",
+  manifest: "/manifest.webmanifest",
   icons: {
-    icon: "/logos/kaaryab-logo.png",
-    shortcut: "/logos/kaaryab-logo.png",
-    apple: "/logos/kaaryab-logo.png",
+    icon: "/icon.png",
+    shortcut: "/icon.png",
+    apple: "/apple-icon.png",
   },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#6E5BFF",
 };
 
 export default function RootLayout({

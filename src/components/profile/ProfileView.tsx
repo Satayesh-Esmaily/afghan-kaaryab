@@ -55,7 +55,7 @@ export default function ProfileView() {
         <StatCard label="Account" value={user?.displayName ?? profile.fullName} tone="info" />
         <StatCard label="Resume" value={profile.resumeUrl ? "Added" : "Missing"} tone="accent" />
         <StatCard label="Skills" value={profile.skills ? "Ready" : "Add more"} tone="success" />
-        <StatCard label="Video intro" value={profile.introVideoUrl ? "Added" : "Optional"} tone="warning" />
+        <StatCard label="Video intro" value={profile.introVideoUrl ? "Added" : "Optional"} tone="info" />
         <StatCard label="Template" value={profile.resumeTemplate} tone="info" />
       </div>
 

@@ -62,19 +62,19 @@ export type SignupFormValues = z.infer<typeof signupFormSchema>;
 export const profileFormSchema = z.object({
   fullName: z.string().trim().min(2, "Full name is required."),
   headline: z.string().trim().min(3, "Headline is required."),
-  avatarUrl: z.string().trim().optional().default(""),
-  resumeUrl: z.string().trim().optional().default(""),
+  avatarUrl: z.string().trim(),
+  resumeUrl: z.string().trim(),
   skills: z.string().trim().min(2, "Skills are required."),
   experience: z.string().trim().min(10, "Experience is required."),
   education: z.string().trim().min(10, "Education is required."),
   languages: z.string().trim().min(2, "Languages are required."),
   documents: z.string().trim().min(2, "Documents are required."),
-  portfolioUrl: z.string().trim().optional().default(""),
-  introVideoUrl: z.string().trim().optional().default(""),
+  portfolioUrl: z.string().trim(),
+  introVideoUrl: z.string().trim(),
   location: z.string().trim().min(2, "Location is required."),
-  phone: z.string().trim().optional().default(""),
+  phone: z.string().trim(),
   bio: z.string().trim().min(10, "Bio is required."),
-  resumeTemplate: z.enum(resumeTemplates).default("modern"),
+  resumeTemplate: z.enum(resumeTemplates),
 });
 
 export type ProfileFormValues = z.infer<typeof profileFormSchema>;
