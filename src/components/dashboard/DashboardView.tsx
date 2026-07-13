@@ -2,12 +2,10 @@
 
 import { useAppData } from "@/context/app-context";
 import { getDashboardStats } from "@/lib/opportunities";
-import { dashboardTasks } from "@/config/dashboard";
 import DashboardHeroSection from "@/components/dashboard/sections/DashboardHeroSection";
 import DashboardCalendarSection from "@/components/dashboard/sections/DashboardCalendarSection";
 import DashboardOpportunityStatsSection from "@/components/dashboard/sections/DashboardOpportunityStatsSection";
 import DashboardCategoryBreakdownSection from "@/components/dashboard/sections/DashboardCategoryBreakdownSection";
-import DashboardTodayTasksSection from "@/components/dashboard/sections/DashboardTodayTasksSection";
 import DashboardRecentSubmissionsSection from "@/components/dashboard/sections/DashboardRecentSubmissionsSection";
 import DashboardQuickInsightSection from "@/components/dashboard/sections/DashboardQuickInsightSection";
 
@@ -27,7 +25,6 @@ export default function DashboardView() {
         <div className="space-y-5">
           <DashboardOpportunityStatsSection stats={stats} />
           <DashboardCategoryBreakdownSection categories={stats.categories} />
-          <DashboardTodayTasksSection tasks={dashboardTasks} />
         </div>
 
         <div className="space-y-5">

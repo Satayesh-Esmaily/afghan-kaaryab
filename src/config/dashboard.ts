@@ -12,8 +12,6 @@ export const dashboardCopy = {
   categoryTitle: "Category Breakdown",
   categorySubtitle: "Live overview",
   categoryBadgeSuffix: "categories",
-  tasksTitle: "Today's priorities",
-  tasksSeeAll: "See all",
   recentTitle: "Recent opportunities",
   quickInsightKicker: "Quick insight",
   quickInsightTitle: "Keep fresh listings at the top of the page.",
@@ -21,9 +19,3 @@ export const dashboardCopy = {
     "Update deadlines, highlight active opportunities, and keep the dashboard useful for job seekers.",
   calendarSubtitle: "Deadline calendar",
 };
-
-export const dashboardTasks = [
-  "Review opportunities that expire soon",
-  "Update or remove outdated listings",
-  "Add a new listing for your audience",
-];

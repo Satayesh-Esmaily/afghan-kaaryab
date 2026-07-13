@@ -7,7 +7,7 @@ import { useState } from "react";
 import { useAppData } from "@/context/app-context";
 import { authCopy } from "@/config/auth";
 import Footer from "@/components/layout/Footer";
-import { brand, sidebarItems } from "@/config/navigation";
+import { brand, pageHeaders, pageTones, sidebarItems } from "@/config/navigation";
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -16,6 +16,11 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const savedCount = savedIds.length;
   const isAuthRoute = pathname === "/login" || pathname === "/signup";
+  const activePath = Object.keys(pageHeaders).find((path) =>
+    path === "/" ? pathname === "/" : pathname?.startsWith(path)
+  );
+  const page = pageHeaders[activePath ?? "/opportunities"];
+  const pageTone = pageTones[activePath ?? "/opportunities"] ?? pageTones["/opportunities"];
 
   if (isAuthRoute) {
     return (
@@ -117,8 +122,22 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
       <div className="lg:pl-[276px]">
         <header className="sticky top-0 z-40 bg-[color:var(--background)]">
-          <div className="mx-auto flex max-w-[1600px] items-center justify-end gap-2 px-4 py-3 sm:px-6 lg:px-8">
-            <div className="flex items-center gap-2 sm:gap-3">
+          <div className="mx-auto flex max-w-[1600px] flex-col gap-3 px-4 py-3 sm:px-6 lg:px-8">
+            <div className="inline-flex items-center gap-3 rounded-[1.35rem] border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-3 shadow-sm sm:max-w-[min(100%,22rem)]">
+              <span className={["h-2.5 w-2.5 rounded-full", pageTone.dot].join(" ")} />
+              <div className="min-w-0">
+                <h1
+                  className={[
+                    "truncate text-[1rem] font-semibold tracking-tight sm:text-[1.1rem]",
+                    pageTone.title,
+                  ].join(" ")}
+                >
+                  {page.title}
+                </h1>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-2 sm:gap-3">
               <button
                 type="button"
                 onClick={() => {

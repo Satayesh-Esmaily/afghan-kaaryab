@@ -1,11 +1,11 @@
 import type { Metadata, Viewport } from "next";
-import { Spline_Sans, Spline_Sans_Mono } from "next/font/google";
+import { Manrope, Spline_Sans_Mono } from "next/font/google";
 import Providers from "@/components/layout/Providers";
 import AppShell from "@/components/layout/AppShell";
 import "./globals.css";
 
-const splineSans = Spline_Sans({
-  variable: "--font-spline-sans",
+const manrope = Manrope({
+  variable: "--font-manrope",
   subsets: ["latin"],
 });
 
@@ -42,7 +42,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${splineSans.variable} ${splineMono.variable} h-full antialiased`}
+      className={`${manrope.variable} ${splineMono.variable} h-full antialiased`}
     >
       <body className="min-h-full bg-[color:var(--background)] text-[color:var(--foreground)]">
         <Providers>

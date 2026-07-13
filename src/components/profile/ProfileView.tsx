@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Badge, EmptyState } from "@/components/ui";
@@ -9,20 +9,30 @@ import { authCopy } from "@/config/auth";
 import { useAppData } from "@/context/app-context";
 import { profileFormSchema, type ProfileFormValues } from "@/lib/schemas";
 
+type ProfileTabId = "information" | "resume" | "interview";
+
 const profileTabs: Array<{
-  id: "information" | "resume" | "preferences" | "interview";
+  id: ProfileTabId;
   label: string;
   disabled?: boolean;
 }> = [
   { id: "information", label: "Profile Information" },
   { id: "resume", label: "Resume" },
-  { id: "preferences", label: "Preferences" },
   { id: "interview", label: "AI Interview (Coming Soon)", disabled: true },
-] as const;
+];
+
+const defaultResumeFiles = [
+  "ghazal cv.pdf",
+  "cover letter (2).pdf",
+  "Samira CV, Cover Letter.pdf",
+  "Samira ghazal CV.pdf",
+];
 
 export default function ProfileView() {
   const { authenticated, profile, updateProfile, user } = useAppData();
-  const [activeTab, setActiveTab] = useState<(typeof profileTabs)[number]["id"]>("information");
+  const [activeTab, setActiveTab] = useState<ProfileTabId>("information");
+  const [resumeFiles, setResumeFiles] = useState<string[]>(defaultResumeFiles);
+  const resumeInputRef = useRef<HTMLInputElement | null>(null);
 
   const {
     register,
@@ -106,224 +116,335 @@ export default function ProfileView() {
         ))}
       </div>
 
-      <form
-        onSubmit={handleSubmit(async (values) => {
-          updateProfile(values);
-        })}
-        className="space-y-6"
-      >
-        <ProfileSection
-          title="Personal Details"
-          description="Share your expertise and complete your profile."
+      {activeTab === "resume" ? (
+        <ResumeTab
+          resumeInputRef={resumeInputRef}
+          resumeFiles={resumeFiles}
+          onPickFiles={() => resumeInputRef.current?.click()}
+          onFilesChange={(files) => {
+            setResumeFiles((current) => Array.from(new Set([...files, ...current])));
+          }}
+          onDeleteFile={(fileName) => {
+            setResumeFiles((current) => current.filter((item) => item !== fileName));
+          }}
+        />
+      ) : (
+        <form
+          onSubmit={handleSubmit(async (values) => {
+            updateProfile(values);
+          })}
+          className="space-y-6"
         >
-          <div className="grid gap-8 xl:grid-cols-[260px_1fr]">
-            <aside className="space-y-5">
-              <div className="flex items-center gap-4">
-                <div className="flex h-20 w-20 items-center justify-center rounded-full bg-[color:var(--surface-soft)] text-3xl font-semibold text-[color:var(--foreground-strong)]">
-                  {initials}
+          <ProfileSection title="Personal Details" description="Share your expertise and complete your profile.">
+            <div className="grid gap-8 xl:grid-cols-[260px_1fr]">
+              <aside className="space-y-5">
+                <div className="flex items-center gap-4">
+                  <div className="flex h-20 w-20 items-center justify-center rounded-full bg-[color:var(--surface-soft)] text-3xl font-semibold text-[color:var(--foreground-strong)]">
+                    {initials}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      document.getElementById("avatarUrl")?.focus();
+                    }}
+                    className="ds-button-secondary rounded-full px-4 py-2.5 text-sm font-semibold"
+                  >
+                    Upload Photo
+                  </button>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    document.getElementById("avatarUrl")?.focus();
-                  }}
-                  className="ds-button-secondary rounded-full px-4 py-2.5 text-sm font-semibold"
-                >
-                  Upload Photo
-                </button>
-              </div>
 
-              <div className="rounded-[1.25rem] border border-[color:var(--border)] bg-[color:var(--surface-soft)] p-4">
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[color:var(--foreground-muted)]">
-                  Profile completion
-                </p>
-                <p className="mt-2 text-2xl font-semibold text-[color:var(--foreground-strong)]">
-                  {completion}%
-                </p>
-                <p className="mt-2 text-sm leading-6 text-[color:var(--foreground-muted)]">
-                  Fill the sections below to make your profile stronger for employers.
-                </p>
-              </div>
-            </aside>
+                <div className="rounded-[1.25rem] border border-[color:var(--border)] bg-[color:var(--surface-soft)] p-4">
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[color:var(--foreground-muted)]">
+                    Profile completion
+                  </p>
+                  <p className="mt-2 text-2xl font-semibold text-[color:var(--foreground-strong)]">
+                    {completion}%
+                  </p>
+                  <p className="mt-2 text-sm leading-6 text-[color:var(--foreground-muted)]">
+                    Fill the sections below to make your profile stronger for employers.
+                  </p>
+                </div>
+              </aside>
 
-            <div className="space-y-5">
-              <div className="grid gap-5 md:grid-cols-2">
-                <FormField label="Full Name" error={errors.fullName?.message}>
-                  <input {...register("fullName")} className="ds-input" />
-                </FormField>
-                <FormField label="Professional Expertise" error={errors.headline?.message}>
-                  <input {...register("headline")} className="ds-input" />
-                </FormField>
-                <FormField label="Contact Number" error={errors.phone?.message}>
-                  <input {...register("phone")} className="ds-input" placeholder="+93 79 123 4567" />
-                </FormField>
-                <ProfileValueBox label="Email Address" value={user?.email ?? "Not available"} />
-                <FormField label="Country" error={errors.country?.message}>
-                  <input {...register("country")} className="ds-input" />
-                </FormField>
-                <FormField label="Province" error={errors.province?.message}>
-                  <input {...register("province")} className="ds-input" />
-                </FormField>
-                <FormField label="Nationality" error={errors.nationality?.message}>
-                  <input {...register("nationality")} className="ds-input" />
-                </FormField>
-                <FormField label="Date of Birth" error={errors.dateOfBirth?.message}>
-                  <input {...register("dateOfBirth")} className="ds-input" placeholder="19 Mar, 1993" />
-                </FormField>
-                <FormField label="Gender" error={errors.gender?.message}>
-                  <input {...register("gender")} className="ds-input" placeholder="Female" />
-                </FormField>
-                <FormField label="Current Address" error={errors.address?.message}>
-                  <input {...register("address")} className="ds-input" placeholder="Taimani, Kabul, Afghanistan" />
-                </FormField>
-                <FormField label="Location" error={errors.location?.message}>
-                  <input {...register("location")} className="ds-input" placeholder="Kabul" />
-                </FormField>
-                <FormField label="Avatar URL" error={errors.avatarUrl?.message}>
-                  <input
-                    id="avatarUrl"
-                    {...register("avatarUrl")}
-                    className="ds-input"
-                    placeholder="https://..."
+              <div className="space-y-5">
+                <div className="grid gap-5 md:grid-cols-2">
+                  <FormField label="Full Name" error={errors.fullName?.message}>
+                    <input {...register("fullName")} className="ds-input" />
+                  </FormField>
+                  <FormField label="Professional Expertise" error={errors.headline?.message}>
+                    <input {...register("headline")} className="ds-input" />
+                  </FormField>
+                  <FormField label="Contact Number" error={errors.phone?.message}>
+                    <input {...register("phone")} className="ds-input" placeholder="+93 79 123 4567" />
+                  </FormField>
+                  <ProfileValueBox label="Email Address" value={user?.email ?? "Not available"} />
+                  <FormField label="Country" error={errors.country?.message}>
+                    <input {...register("country")} className="ds-input" />
+                  </FormField>
+                  <FormField label="Province" error={errors.province?.message}>
+                    <input {...register("province")} className="ds-input" />
+                  </FormField>
+                  <FormField label="Nationality" error={errors.nationality?.message}>
+                    <input {...register("nationality")} className="ds-input" />
+                  </FormField>
+                  <FormField label="Date of Birth" error={errors.dateOfBirth?.message}>
+                    <input {...register("dateOfBirth")} className="ds-input" placeholder="19 Mar, 1993" />
+                  </FormField>
+                  <FormField label="Gender" error={errors.gender?.message}>
+                    <input {...register("gender")} className="ds-input" placeholder="Female" />
+                  </FormField>
+                  <FormField label="Current Address" error={errors.address?.message}>
+                    <input {...register("address")} className="ds-input" placeholder="Taimani, Kabul, Afghanistan" />
+                  </FormField>
+                  <FormField label="Location" error={errors.location?.message}>
+                    <input {...register("location")} className="ds-input" placeholder="Kabul" />
+                  </FormField>
+                  <FormField label="Avatar URL" error={errors.avatarUrl?.message}>
+                    <input
+                      id="avatarUrl"
+                      {...register("avatarUrl")}
+                      className="ds-input"
+                      placeholder="https://..."
+                    />
+                  </FormField>
+                </div>
+
+                <FormField label="Professional Summary" error={errors.summary?.message}>
+                  <textarea
+                    {...register("summary")}
+                    className="ds-input min-h-32"
+                    placeholder="Introduce your background, experience, and strengths."
                   />
                 </FormField>
               </div>
+            </div>
+          </ProfileSection>
 
-              <FormField label="Professional Summary" error={errors.summary?.message}>
-                <textarea
-                  {...register("summary")}
-                  className="ds-input min-h-32"
-                  placeholder="Introduce your background, experience, and strengths."
+          <ProfileSection title="Work Experience" description="List your previous roles and responsibilities.">
+            <FormField label="Experience" error={errors.experience?.message}>
+              <textarea {...register("experience")} className="ds-input min-h-40" />
+            </FormField>
+          </ProfileSection>
+
+          <ProfileSection title="Education" description="Add your educational background.">
+            <FormField label="Education" error={errors.education?.message}>
+              <textarea {...register("education")} className="ds-input min-h-40" />
+            </FormField>
+          </ProfileSection>
+
+          <ProfileSection
+            title="Certifications"
+            description="Showcase certificates and credentials that strengthen your profile."
+          >
+            <FormField label="Certifications" error={errors.certifications?.message}>
+              <textarea
+                {...register("certifications")}
+                className="ds-input min-h-32"
+                placeholder="PMP, Google Career Certificate, etc."
+              />
+            </FormField>
+          </ProfileSection>
+
+          <ProfileSection title="Awards" description="Highlight achievements and recognitions.">
+            <FormField label="Awards" error={errors.awards?.message}>
+              <textarea
+                {...register("awards")}
+                className="ds-input min-h-32"
+                placeholder="List awards, scholarships, or recognitions."
+              />
+            </FormField>
+          </ProfileSection>
+
+          <ProfileSection title="Skills" description="List your professional skills." badge={`${skills.length}/20`}>
+            <div className="rounded-[1.25rem] border border-[color:var(--border)] bg-[color:var(--surface-soft)] p-4">
+              <div className="flex flex-wrap gap-2">
+                {skills.length > 0 ? (
+                  skills.map((skill) => (
+                    <span
+                      key={skill}
+                      className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 text-sm font-medium text-[color:var(--foreground)] shadow-sm"
+                    >
+                      <span className="grid h-4 w-4 place-items-center rounded-full bg-[color:var(--surface-soft)] text-[10px] text-[color:var(--foreground-muted)]">
+                        ×
+                      </span>
+                      {skill}
+                    </span>
+                  ))
+                ) : (
+                  <p className="text-sm text-[color:var(--foreground-muted)]">Add your skills separated by commas.</p>
+                )}
+              </div>
+            </div>
+            <div className="mt-4 grid gap-4 md:grid-cols-[1fr_auto] md:items-end">
+              <FormField label="Type a skill" error={errors.skills?.message} hint="Separate with commas">
+                <input
+                  {...register("skills")}
+                  className="ds-input"
+                  placeholder="AutoCAD, Leadership, Project management"
                 />
               </FormField>
             </div>
-          </div>
-        </ProfileSection>
+          </ProfileSection>
 
-        <ProfileSection title="Work Experience" description="List your previous roles and responsibilities.">
-          <FormField label="Experience" error={errors.experience?.message}>
-            <textarea {...register("experience")} className="ds-input min-h-40" />
-          </FormField>
-        </ProfileSection>
-
-        <ProfileSection title="Education" description="Add your educational background.">
-          <FormField label="Education" error={errors.education?.message}>
-            <textarea {...register("education")} className="ds-input min-h-40" />
-          </FormField>
-        </ProfileSection>
-
-        <ProfileSection title="Certifications" description="Showcase certificates and credentials that strengthen your profile.">
-          <FormField label="Certifications" error={errors.certifications?.message}>
-            <textarea
-              {...register("certifications")}
-              className="ds-input min-h-32"
-              placeholder="PMP, Google Career Certificate, etc."
-            />
-          </FormField>
-        </ProfileSection>
-
-        <ProfileSection title="Awards" description="Highlight achievements and recognitions.">
-          <FormField label="Awards" error={errors.awards?.message}>
-            <textarea
-              {...register("awards")}
-              className="ds-input min-h-32"
-              placeholder="List awards, scholarships, or recognitions."
-            />
-          </FormField>
-        </ProfileSection>
-
-        <ProfileSection title="Skills" description="List your professional skills." badge={`${skills.length}/20`}>
-          <div className="rounded-[1.25rem] border border-[color:var(--border)] bg-[color:var(--surface-soft)] p-4">
-            <div className="flex flex-wrap gap-2">
-              {skills.length > 0 ? (
-                skills.map((skill) => (
-                  <span
-                    key={skill}
-                    className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 text-sm font-medium text-[color:var(--foreground)] shadow-sm"
-                  >
-                    <span className="grid h-4 w-4 place-items-center rounded-full bg-[color:var(--surface-soft)] text-[10px] text-[color:var(--foreground-muted)]">
-                      ×
+          <ProfileSection title="Languages" description="List the languages you speak fluently." badge={`${languages.length}/20`}>
+            <div className="rounded-[1.25rem] border border-[color:var(--border)] bg-[color:var(--surface-soft)] p-4">
+              <div className="flex flex-wrap gap-2">
+                {languages.length > 0 ? (
+                  languages.map((language) => (
+                    <span
+                      key={language}
+                      className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 text-sm font-medium text-[color:var(--foreground)] shadow-sm"
+                    >
+                      <span className="grid h-4 w-4 place-items-center rounded-full bg-[color:var(--surface-soft)] text-[10px] text-[color:var(--foreground-muted)]">
+                        ×
+                      </span>
+                      {language}
                     </span>
-                    {skill}
-                  </span>
-                ))
-              ) : (
-                <p className="text-sm text-[color:var(--foreground-muted)]">Add your skills separated by commas.</p>
-              )}
+                  ))
+                ) : (
+                  <p className="text-sm text-[color:var(--foreground-muted)]">Add the languages you speak.</p>
+                )}
+              </div>
             </div>
-          </div>
-          <div className="mt-4 grid gap-4 md:grid-cols-[1fr_auto] md:items-end">
-            <FormField label="Type a skill" error={errors.skills?.message} hint="Separate with commas">
-              <input {...register("skills")} className="ds-input" placeholder="AutoCAD, Leadership, Project management" />
+            <FormField label="Languages" error={errors.languages?.message} hint="Separate with commas">
+              <input {...register("languages")} className="ds-input" placeholder="Dari, Pashto, English" />
             </FormField>
-          </div>
-        </ProfileSection>
+          </ProfileSection>
 
-        <ProfileSection title="Languages" description="List the languages you speak fluently." badge={`${languages.length}/20`}>
-          <div className="rounded-[1.25rem] border border-[color:var(--border)] bg-[color:var(--surface-soft)] p-4">
-            <div className="flex flex-wrap gap-2">
-              {languages.length > 0 ? (
-                languages.map((language) => (
-                  <span
-                    key={language}
-                    className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 text-sm font-medium text-[color:var(--foreground)] shadow-sm"
-                  >
-                    <span className="grid h-4 w-4 place-items-center rounded-full bg-[color:var(--surface-soft)] text-[10px] text-[color:var(--foreground-muted)]">
-                      ×
-                    </span>
-                    {language}
-                  </span>
-                ))
-              ) : (
-                <p className="text-sm text-[color:var(--foreground-muted)]">Add the languages you speak.</p>
-              )}
+          <ProfileSection title="Social Profiles" description="Add your professional profiles.">
+            <div className="grid gap-5 md:grid-cols-2">
+              <FormField label="Portfolio Link" error={errors.portfolioUrl?.message}>
+                <input {...register("portfolioUrl")} className="ds-input" placeholder="https://" />
+              </FormField>
+              <FormField label="LinkedIn" error={errors.linkedinUrl?.message}>
+                <input {...register("linkedinUrl")} className="ds-input" placeholder="https://linkedin.com/in/username" />
+              </FormField>
+              <FormField label="Github" error={errors.githubUrl?.message}>
+                <input {...register("githubUrl")} className="ds-input" placeholder="https://github.com/username" />
+              </FormField>
+              <FormField label="Twitter" error={errors.twitterUrl?.message}>
+                <input {...register("twitterUrl")} className="ds-input" placeholder="https://x.com/username" />
+              </FormField>
+              <FormField label="Resume URL" error={errors.resumeUrl?.message}>
+                <input {...register("resumeUrl")} className="ds-input" placeholder="Upload link or file URL" />
+              </FormField>
+              <FormField label="Video Intro" error={errors.introVideoUrl?.message}>
+                <input {...register("introVideoUrl")} className="ds-input" placeholder="https://..." />
+              </FormField>
             </div>
+          </ProfileSection>
+
+          <ProfileSection title="Supporting Documents" description="Keep your documents ready for applications.">
+            <FormField label="Required Documents" error={errors.documents?.message}>
+              <input {...register("documents")} className="ds-input" placeholder="CV, national ID, certificates" />
+            </FormField>
+          </ProfileSection>
+
+          <div className="flex justify-end">
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="ds-button-primary inline-flex rounded-full px-6 py-3 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-70"
+            >
+              Save
+            </button>
           </div>
-          <FormField label="Languages" error={errors.languages?.message} hint="Separate with commas">
-            <input {...register("languages")} className="ds-input" placeholder="Dari, Pashto, English" />
-          </FormField>
-        </ProfileSection>
-
-        <ProfileSection title="Social Profiles" description="Add your professional profiles.">
-          <div className="grid gap-5 md:grid-cols-2">
-            <FormField label="Portfolio Link" error={errors.portfolioUrl?.message}>
-              <input {...register("portfolioUrl")} className="ds-input" placeholder="https://" />
-            </FormField>
-            <FormField label="LinkedIn" error={errors.linkedinUrl?.message}>
-              <input {...register("linkedinUrl")} className="ds-input" placeholder="https://linkedin.com/in/username" />
-            </FormField>
-            <FormField label="Github" error={errors.githubUrl?.message}>
-              <input {...register("githubUrl")} className="ds-input" placeholder="https://github.com/username" />
-            </FormField>
-            <FormField label="Twitter" error={errors.twitterUrl?.message}>
-              <input {...register("twitterUrl")} className="ds-input" placeholder="https://x.com/username" />
-            </FormField>
-            <FormField label="Resume URL" error={errors.resumeUrl?.message}>
-              <input {...register("resumeUrl")} className="ds-input" placeholder="Upload link or file URL" />
-            </FormField>
-            <FormField label="Video Intro" error={errors.introVideoUrl?.message}>
-              <input {...register("introVideoUrl")} className="ds-input" placeholder="https://..." />
-            </FormField>
-          </div>
-        </ProfileSection>
-
-        <ProfileSection title="Supporting Documents" description="Keep your documents ready for applications.">
-          <FormField label="Required Documents" error={errors.documents?.message}>
-            <input {...register("documents")} className="ds-input" placeholder="CV, national ID, certificates" />
-          </FormField>
-        </ProfileSection>
-
-        <div className="flex justify-end">
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="ds-button-primary inline-flex rounded-full px-6 py-3 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-70"
-          >
-            Save
-          </button>
-        </div>
-      </form>
+        </form>
+      )}
     </div>
+  );
+}
+
+function ResumeTab({
+  resumeInputRef,
+  resumeFiles,
+  onPickFiles,
+  onFilesChange,
+  onDeleteFile,
+}: {
+  resumeInputRef: React.RefObject<HTMLInputElement | null>;
+  resumeFiles: string[];
+  onPickFiles: () => void;
+  onFilesChange: (files: string[]) => void;
+  onDeleteFile: (fileName: string) => void;
+}) {
+  return (
+    <section className="rounded-[1.75rem] panel p-6 sm:p-8">
+      <div className="grid gap-6 xl:grid-cols-[260px_1fr]">
+        <aside className="space-y-2">
+          <h2 className="text-2xl font-semibold tracking-tight text-[color:var(--foreground)]">Resumes</h2>
+          <p className="text-sm leading-6 text-[color:var(--foreground-muted)]">Add your resume here.</p>
+        </aside>
+
+        <div className="space-y-4">
+          <div className="grid gap-4 rounded-[1.25rem] border border-dashed border-[color:var(--border)] bg-[color:var(--surface)] p-4 sm:grid-cols-[1fr_auto] sm:items-center">
+            <button type="button" onClick={onPickFiles} className="flex items-center gap-3 text-left">
+              <span className="grid h-10 w-10 place-items-center rounded-full bg-[color:var(--surface-soft)] text-[color:var(--foreground-muted)]">
+                <PlusIcon />
+              </span>
+              <span className="text-sm font-medium text-[color:var(--foreground)]">
+                Choose file(s) or drag them here to upload.
+              </span>
+            </button>
+
+            <p className="text-right text-xs font-medium leading-5 text-[color:var(--foreground-muted)]">
+              PDF/ DOC/ DOCX
+              <br />
+              Max 5 MB
+            </p>
+
+            <input
+              ref={resumeInputRef}
+              type="file"
+              multiple
+              accept=".pdf,.doc,.docx"
+              className="hidden"
+              onChange={(event) => {
+                const files = Array.from(event.target.files ?? []).map((file) => file.name);
+                if (files.length > 0) {
+                  onFilesChange(files);
+                }
+                event.currentTarget.value = "";
+              }}
+            />
+          </div>
+
+          <div className="space-y-3">
+            {resumeFiles.map((fileName) => (
+              <div
+                key={fileName}
+                className="flex items-center justify-between gap-4 rounded-[1.25rem] bg-[color:var(--surface-soft)] px-4 py-3.5"
+              >
+                <div className="flex min-w-0 items-center gap-3">
+                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[0.8rem] border border-[color:var(--border)] bg-white text-[10px] font-semibold text-[color:var(--foreground-muted)]">
+                    PDF
+                  </span>
+                  <span className="truncate text-sm font-medium text-[color:var(--foreground)]">{fileName}</span>
+                </div>
+
+                <div className="flex items-center gap-3 text-[color:var(--foreground-muted)]">
+                  <button
+                    type="button"
+                    className="hover:text-[color:var(--foreground)]"
+                    aria-label={`Delete ${fileName}`}
+                    onClick={() => onDeleteFile(fileName)}
+                  >
+                    <TrashIcon />
+                  </button>
+                  <button
+                    type="button"
+                    className="hover:text-[color:var(--foreground)]"
+                    aria-label={`Download ${fileName}`}
+                  >
+                    <DownloadIcon />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -414,4 +535,40 @@ function getProfileCompletion(profile: ProfileFormValues) {
   const filled = fields.filter((field) => profile[field].trim().length > 0).length;
 
   return Math.min(100, Math.round((filled / fields.length) * 100));
+}
+
+function PlusIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" aria-hidden="true">
+      <path d="M12 5V19M5 12H19" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function TrashIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" aria-hidden="true">
+      <path
+        d="M4.5 7h15M9 7V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V7m-7.5 0L8 19h8l.5-12"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function DownloadIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" aria-hidden="true">
+      <path
+        d="M12 4v9m0 0 3.5-3.5M12 13 8.5 9.5M5 16.5V19h14v-2.5"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
 }
