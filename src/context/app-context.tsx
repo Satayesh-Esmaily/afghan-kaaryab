@@ -20,12 +20,24 @@ export type JobSeekerProfile = {
   headline: string;
   avatarUrl: string;
   resumeUrl: string;
+  country: string;
+  province: string;
+  nationality: string;
+  dateOfBirth: string;
+  gender: string;
+  address: string;
+  summary: string;
   skills: string;
   experience: string;
   education: string;
+  certifications: string;
+  awards: string;
   languages: string;
   documents: string;
   portfolioUrl: string;
+  linkedinUrl: string;
+  githubUrl: string;
+  twitterUrl: string;
   introVideoUrl: string;
   location: string;
   phone: string;
@@ -99,12 +111,24 @@ function createDefaultProfile(user: AuthUser | null): JobSeekerProfile {
     headline: "Job seeker in Afghanistan",
     avatarUrl: "",
     resumeUrl: "",
+    country: "Afghanistan",
+    province: "Kabul",
+    nationality: "Afghan",
+    dateOfBirth: "",
+    gender: "Prefer not to say",
+    address: "",
+    summary: "Use this profile to highlight your background, skills, and documents.",
     skills: "Communication, Microsoft Office, Teamwork",
     experience: "Add your latest work experience here.",
     education: "Add your education background here.",
+    certifications: "",
+    awards: "",
     languages: "Dari, Pashto, English",
     documents: "CV, national ID, certificates",
     portfolioUrl: "",
+    linkedinUrl: "",
+    githubUrl: "",
+    twitterUrl: "",
     introVideoUrl: "",
     location: "Kabul",
     phone: "",

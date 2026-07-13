@@ -7,7 +7,7 @@ import { useState } from "react";
 import { useAppData } from "@/context/app-context";
 import { authCopy } from "@/config/auth";
 import Footer from "@/components/layout/Footer";
-import { brand, pageHeaders, pageTones, sidebarItems } from "@/config/navigation";
+import { brand, sidebarItems } from "@/config/navigation";
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -16,12 +16,6 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const savedCount = savedIds.length;
   const isAuthRoute = pathname === "/login" || pathname === "/signup";
-
-  const activePath = Object.keys(pageHeaders).find((path) =>
-    path === "/" ? pathname === "/" : pathname?.startsWith(path)
-  );
-  const page = pageHeaders[activePath ?? "/opportunities"];
-  const pageTone = pageTones[activePath ?? "/opportunities"] ?? pageTones["/opportunities"];
 
   if (isAuthRoute) {
     return (
@@ -123,25 +117,8 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
       <div className="lg:pl-[276px]">
         <header className="sticky top-0 z-40 bg-[color:var(--background)]">
-          <div className="mx-auto flex max-w-[1600px] items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
-            <div className="inline-flex items-center gap-3 rounded-[1.35rem] border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-3 shadow-sm">
-              <span className={["h-2.5 w-2.5 rounded-full", pageTone.dot].join(" ")} />
-              <div className="min-w-0">
-                <h1
-                  className={[
-                    "text-[1.05rem] font-semibold tracking-tight sm:text-[1.25rem]",
-                    pageTone.title,
-                  ].join(" ")}
-                >
-                  {page.title}
-                </h1>
-                <p className="mt-0.5 max-w-[42ch] truncate text-xs text-[color:var(--foreground-muted)] sm:text-sm">
-                  {page.subtitle}
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3">
+          <div className="mx-auto flex max-w-[1600px] items-center justify-end gap-2 px-4 py-3 sm:px-6 lg:px-8">
+            <div className="flex items-center gap-2 sm:gap-3">
               <button
                 type="button"
                 onClick={() => {
@@ -152,25 +129,36 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
                   router.push("/login");
                 }}
-                className="rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] px-3.5 py-2 text-sm font-semibold text-[color:var(--foreground)]"
+                className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] text-[color:var(--foreground)] sm:w-auto sm:px-3.5"
+                aria-label={authenticated ? authCopy.signOutLabel : authCopy.loginButtonLabel}
               >
-                {authenticated ? authCopy.signOutLabel : authCopy.loginButtonLabel}
+                <span className="hidden text-sm font-semibold sm:inline">
+                  {authenticated ? authCopy.signOutLabel : authCopy.loginButtonLabel}
+                </span>
+                <span className="sm:hidden">
+                  <UserIcon />
+                </span>
               </button>
               <button
                 type="button"
                 onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                className="rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] px-3.5 py-2 text-sm font-semibold text-[color:var(--foreground)]"
+                className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] text-[color:var(--foreground)] sm:w-auto sm:px-3.5"
                 aria-label="Toggle theme"
               >
-                {theme === "dark" ? "Light mode" : "Dark mode"}
+                <span className="hidden text-sm font-semibold sm:inline">
+                  {theme === "dark" ? "Light mode" : "Dark mode"}
+                </span>
+                <span className="sm:hidden">
+                  {theme === "dark" ? <SunIcon /> : <MoonIcon />}
+                </span>
               </button>
               <button
                 type="button"
                 onClick={() => setMobileOpen((value) => !value)}
-                className="rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] px-3.5 py-2 text-sm font-semibold text-[color:var(--foreground)] lg:hidden"
-                aria-label="Open navigation"
+                className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] text-[color:var(--foreground)] lg:hidden"
+                aria-label={mobileOpen ? "Close navigation" : "Open navigation"}
               >
-                Menu
+                {mobileOpen ? <CloseIcon /> : <MenuIcon />}
               </button>
             </div>
           </div>
@@ -245,4 +233,70 @@ function isActiveLink(pathname: string | null, href: string) {
   if (!pathname) return false;
 
   return pathname === href || (href === "/opportunities" && pathname === "/") || pathname.startsWith(href);
+}
+
+function MenuIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" aria-hidden="true">
+      <path
+        d="M4 7H20M4 12H20M4 17H20"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+function CloseIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" aria-hidden="true">
+      <path
+        d="M6 6L18 18M18 6L6 18"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+function SunIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" aria-hidden="true">
+      <circle cx="12" cy="12" r="4.2" stroke="currentColor" strokeWidth="1.8" />
+      <path
+        d="M12 2.5V4.8M12 19.2V21.5M2.5 12H4.8M19.2 12H21.5M5.2 5.2L6.8 6.8M17.2 17.2L18.8 18.8M18.8 5.2L17.2 6.8M6.8 17.2L5.2 18.8"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+function MoonIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" aria-hidden="true">
+      <path
+        d="M20.2 15.6A8.5 8.5 0 0 1 8.4 3.8a8.8 8.8 0 1 0 11.8 11.8Z"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function UserIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" aria-hidden="true">
+      <path
+        d="M12 12.2A4.1 4.1 0 1 0 12 4a4.1 4.1 0 0 0 0 8.2ZM4.8 20c1.2-3 3.8-4.7 7.2-4.7s6 1.7 7.2 4.7"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
 }
