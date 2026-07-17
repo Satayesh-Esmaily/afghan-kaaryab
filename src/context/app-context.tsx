@@ -1,49 +1,19 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
-import { demoOpportunities } from "@/data/opportunities";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
+import { createOpportunityId, type Opportunity, type OpportunityInput } from "@/lib/opportunities";
+import { getSupabaseBrowserClient } from "@/lib/supabase-client";
 import {
-  createOpportunityId,
-  type Opportunity,
-  type OpportunityInput,
-} from "@/lib/opportunities";
-
-type ThemeMode = "light" | "dark";
-export type ResumeTemplateId = "classic" | "modern" | "compact";
-type AuthUser = {
-  email: string;
-  displayName: string;
-};
-
-export type JobSeekerProfile = {
-  fullName: string;
-  headline: string;
-  avatarUrl: string;
-  resumeUrl: string;
-  country: string;
-  province: string;
-  nationality: string;
-  dateOfBirth: string;
-  gender: string;
-  address: string;
-  summary: string;
-  skills: string;
-  experience: string;
-  education: string;
-  certifications: string;
-  awards: string;
-  languages: string;
-  documents: string;
-  portfolioUrl: string;
-  linkedinUrl: string;
-  githubUrl: string;
-  twitterUrl: string;
-  introVideoUrl: string;
-  location: string;
-  phone: string;
-  bio: string;
-  resumeTemplate: ResumeTemplateId;
-};
+  createDefaultAppState,
+  createDefaultProfile,
+  getDisplayName,
+  normalizeAppState,
+  type AppStatePayload,
+  type AuthUser,
+  type ResumeTemplateId,
+  type ThemeMode,
+  type JobSeekerProfile,
+} from "@/lib/app-state";
 
 interface AppContextValue {
   opportunities: Opportunity[];
@@ -64,18 +34,13 @@ interface AppContextValue {
   isFollowingOrganization: (slug: string) => boolean;
   updateProfile: (input: Partial<JobSeekerProfile>) => void;
   setTheme: (mode: ThemeMode) => void;
-  login: (input: { email: string; password: string }) => void;
-  signup: (input: { fullName: string; email: string; password: string }) => void;
-  logout: () => void;
+  login: (input: { email: string; password: string }) => Promise<void>;
+  signup: (input: { fullName: string; email: string; password: string }) => Promise<{ needsConfirmation: boolean }>;
+  logout: () => Promise<void>;
 }
 
 const STORAGE_KEYS = {
-  opportunities: "kaaryab-opportunities",
-  savedIds: "kaaryab-saved-opportunities",
-  followedOrganizationSlugs: "kaaryab-followed-organizations",
-  profile: "kaaryab-jobseeker-profile",
-  theme: "kaaryab-theme",
-  user: "kaaryab-session-user",
+  appStatePrefix: "kaaryab-app-state",
 } as const;
 
 const AppContext = createContext<AppContextValue | null>(null);
@@ -90,130 +55,135 @@ function safeParse<T>(value: string | null, fallback: T) {
   }
 }
 
-function getDisplayName(email: string) {
-  const localPart = email.split("@")[0] ?? "User";
-  const normalized = localPart
-    .replace(/[._-]+/g, " ")
-    .trim()
-    .replace(/\s+/g, " ");
-
-  if (!normalized) return "User";
-
-  return normalized
-    .split(" ")
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(" ");
+function getAppStateStorageKey(key: string) {
+  return `${STORAGE_KEYS.appStatePrefix}:${key}`;
 }
 
-function createDefaultProfile(user: AuthUser | null): JobSeekerProfile {
-  return {
-    fullName: user?.displayName ?? "Your name",
-    headline: "Job seeker in Afghanistan",
-    avatarUrl: "",
-    resumeUrl: "",
-    country: "Afghanistan",
-    province: "Kabul",
-    nationality: "Afghan",
-    dateOfBirth: "",
-    gender: "Prefer not to say",
-    address: "",
-    summary: "Use this profile to highlight your background, skills, and documents.",
-    skills: "Communication, Microsoft Office, Teamwork",
-    experience: "Add your latest work experience here.",
-    education: "Add your education background here.",
-    certifications: "",
-    awards: "",
-    languages: "Dari, Pashto, English",
-    documents: "CV, national ID, certificates",
-    portfolioUrl: "",
-    linkedinUrl: "",
-    githubUrl: "",
-    twitterUrl: "",
-    introVideoUrl: "",
-    location: "Kabul",
-    phone: "",
-    bio: "Use this profile to highlight your background, skills, and documents.",
-    resumeTemplate: "modern",
-  };
+function getAppStateKey(user: AuthUser | null) {
+  return user?.email ?? "main";
 }
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
-  const [opportunities, setOpportunities] = useState<Opportunity[]>(demoOpportunities);
-  const [savedIds, setSavedIds] = useState<string[]>([]);
-  const [followedOrganizationSlugs, setFollowedOrganizationSlugs] = useState<string[]>([]);
-  const [profile, setProfile] = useState<JobSeekerProfile>(createDefaultProfile(null));
+  const [opportunities, setOpportunities] = useState<Opportunity[]>(createDefaultAppState().opportunities);
+  const [savedIds, setSavedIds] = useState<string[]>(createDefaultAppState().savedIds);
+  const [followedOrganizationSlugs, setFollowedOrganizationSlugs] = useState<string[]>(
+    createDefaultAppState().followedOrganizationSlugs
+  );
+  const [profile, setProfile] = useState<JobSeekerProfile>(createDefaultAppState().profile);
   const [theme, setThemeState] = useState<ThemeMode>("light");
   const [user, setUser] = useState<AuthUser | null>(null);
   const [hydrated, setHydrated] = useState(false);
+  const [remoteStateSyncEnabled, setRemoteStateSyncEnabled] = useState(true);
+  const saveTimerRef = useRef<number | null>(null);
+  const activeAppStateKey = getAppStateKey(user);
 
   useEffect(() => {
-    const storedOpportunities = safeParse<Opportunity[]>(
-      window.localStorage.getItem(STORAGE_KEYS.opportunities),
-      demoOpportunities
-    );
-    const storedSavedIds = safeParse<string[]>(
-      window.localStorage.getItem(STORAGE_KEYS.savedIds),
-      []
-    );
-    const storedFollowedOrganizationSlugs = safeParse<string[]>(
-      window.localStorage.getItem(STORAGE_KEYS.followedOrganizationSlugs),
-      []
-    );
-    const storedProfile = safeParse<JobSeekerProfile | null>(
-      window.localStorage.getItem(STORAGE_KEYS.profile),
-      null
-    );
-    const storedTheme = window.localStorage.getItem(STORAGE_KEYS.theme) as ThemeMode | null;
-    const storedUser = safeParse<AuthUser | null>(
-      window.localStorage.getItem(STORAGE_KEYS.user),
-      null
-    );
+    const supabase = getSupabaseBrowserClient();
 
-    // We intentionally sync persisted client state after mount.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setOpportunities(storedOpportunities.length > 0 ? storedOpportunities : demoOpportunities);
-    setSavedIds(storedSavedIds);
-    setFollowedOrganizationSlugs(storedFollowedOrganizationSlugs);
-    const defaultProfile = createDefaultProfile(storedUser);
-    setProfile(
-      storedProfile
-        ? {
-            ...defaultProfile,
-            ...storedProfile,
-            resumeTemplate: storedProfile.resumeTemplate ?? defaultProfile.resumeTemplate,
-          }
-        : defaultProfile
-    );
-    setThemeState(storedTheme === "dark" ? "dark" : "light");
-    setUser(storedUser);
-    setHydrated(true);
+    if (!supabase) {
+      return;
+    }
+
+    let cancelled = false;
+
+    supabase.auth.getSession().then(({ data }) => {
+      if (cancelled) return;
+
+      const sessionUser = data.session?.user;
+      if (!sessionUser?.email) {
+        setUser(null);
+        return;
+      }
+
+      setUser({
+        id: sessionUser.id,
+        email: sessionUser.email,
+        displayName:
+          sessionUser.user_metadata?.full_name ??
+          sessionUser.user_metadata?.name ??
+          getDisplayName(sessionUser.email),
+      });
+    });
+
+    const { data } = supabase.auth.onAuthStateChange((_event, session) => {
+      const sessionUser = session?.user;
+
+      if (!sessionUser?.email) {
+        setUser(null);
+        return;
+      }
+
+      setUser({
+        id: sessionUser.id,
+        email: sessionUser.email,
+        displayName:
+          sessionUser.user_metadata?.full_name ??
+          sessionUser.user_metadata?.name ??
+          getDisplayName(sessionUser.email),
+      });
+    });
+
+    return () => {
+      cancelled = true;
+      data.subscription.unsubscribe();
+    };
   }, []);
 
   useEffect(() => {
-    if (!hydrated) return;
+    async function loadState() {
+      const storageKey = getAppStateStorageKey(activeAppStateKey);
+      const cachedState = safeParse<Partial<AppStatePayload> | null>(
+        window.localStorage.getItem(storageKey),
+        null
+      );
 
-    window.localStorage.setItem(STORAGE_KEYS.opportunities, JSON.stringify(opportunities));
-  }, [hydrated, opportunities]);
+      let remoteState: Partial<AppStatePayload> | null = null;
+      const supabase = getSupabaseBrowserClient();
+
+      if (supabase) {
+        try {
+          const { data, error } = await supabase
+            .from("app_state")
+            .select("payload")
+            .eq("id", activeAppStateKey)
+            .maybeSingle();
+
+          if (!error && data?.payload) {
+            remoteState = data.payload as Partial<AppStatePayload>;
+            setRemoteStateSyncEnabled(true);
+          } else if (error) {
+            setRemoteStateSyncEnabled(false);
+          }
+        } catch {
+          remoteState = null;
+          setRemoteStateSyncEnabled(false);
+        }
+      }
+
+      const nextState = normalizeAppState(
+        remoteState ?? cachedState,
+        remoteState?.user ?? cachedState?.user ?? user
+      );
+
+      setOpportunities(nextState.opportunities);
+      setSavedIds(nextState.savedIds);
+      setFollowedOrganizationSlugs(nextState.followedOrganizationSlugs);
+      setProfile(nextState.profile);
+      setThemeState(nextState.theme);
+
+      if (!supabase) {
+        setUser(nextState.user);
+      }
+
+      setHydrated(true);
+    }
+
+    void loadState();
+  }, [activeAppStateKey]);
 
   useEffect(() => {
     if (!hydrated) return;
 
-    window.localStorage.setItem(STORAGE_KEYS.savedIds, JSON.stringify(savedIds));
-  }, [hydrated, savedIds]);
-
-  useEffect(() => {
-    if (!hydrated) return;
-
-    window.localStorage.setItem(
-      STORAGE_KEYS.followedOrganizationSlugs,
-      JSON.stringify(followedOrganizationSlugs)
-    );
-  }, [hydrated, followedOrganizationSlugs]);
-
-  useEffect(() => {
-    if (!hydrated) return;
-
-    window.localStorage.setItem(STORAGE_KEYS.theme, theme);
     document.documentElement.classList.toggle("dark", theme === "dark");
     document.documentElement.style.colorScheme = theme;
   }, [hydrated, theme]);
@@ -221,18 +191,79 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!hydrated) return;
 
-    window.localStorage.setItem(STORAGE_KEYS.profile, JSON.stringify(profile));
-  }, [hydrated, profile]);
+    const storageKey = getAppStateStorageKey(activeAppStateKey);
+    const payload = {
+      opportunities,
+      savedIds,
+      followedOrganizationSlugs,
+      profile,
+      theme,
+      user,
+    };
 
-  useEffect(() => {
-    if (!hydrated) return;
+    try {
+      window.localStorage.setItem(storageKey, JSON.stringify(payload));
+    } catch (error) {
+      if (
+        error instanceof DOMException &&
+        (error.name === "QuotaExceededError" || error.name === "NS_ERROR_DOM_QUOTA_REACHED")
+      ) {
+        const safePayload = {
+          ...payload,
+          profile: {
+            ...payload.profile,
+            avatarUrl: payload.profile.avatarUrl.length > 120_000 ? "" : payload.profile.avatarUrl,
+          },
+        };
 
-    if (user) {
-      window.localStorage.setItem(STORAGE_KEYS.user, JSON.stringify(user));
-    } else {
-      window.localStorage.removeItem(STORAGE_KEYS.user);
+        try {
+          window.localStorage.setItem(storageKey, JSON.stringify(safePayload));
+        } catch {
+          window.localStorage.removeItem(storageKey);
+        }
+      } else {
+        throw error;
+      }
     }
-  }, [hydrated, user]);
+
+    if (saveTimerRef.current) {
+      window.clearTimeout(saveTimerRef.current);
+    }
+
+    const supabase = getSupabaseBrowserClient();
+
+    if (supabase && remoteStateSyncEnabled) {
+      saveTimerRef.current = window.setTimeout(() => {
+        void (async () => {
+          try {
+            await supabase.from("app_state").upsert({
+              id: activeAppStateKey,
+              payload,
+              updated_at: new Date().toISOString(),
+            });
+          } catch {
+            // Ignore persistence errors and keep the UI responsive.
+          }
+        })();
+      }, 250);
+    }
+
+    return () => {
+      if (saveTimerRef.current) {
+        window.clearTimeout(saveTimerRef.current);
+      }
+    };
+  }, [
+    hydrated,
+    opportunities,
+    savedIds,
+    followedOrganizationSlugs,
+    profile,
+    theme,
+    user,
+    activeAppStateKey,
+    remoteStateSyncEnabled,
+  ]);
 
   const addOpportunity = (input: OpportunityInput) => {
     const opportunity: Opportunity = {
@@ -288,31 +319,112 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       ...input,
     }));
   };
-  const login = ({ email }: { email: string; password: string }) => {
-    const nextUser = { email, displayName: getDisplayName(email) };
-    setUser(nextUser);
-    setProfile((current) => {
-      if (current.fullName && current.fullName !== "Your name") {
-        return current;
-      }
 
-      return createDefaultProfile(nextUser);
+  function getFriendlyAuthError(error: unknown, fallback: string) {
+    const message = error instanceof Error ? error.message.toLowerCase() : "";
+
+    if (message.includes("invalid login credentials")) {
+      return "Email or password is incorrect.";
+    }
+
+    if (message.includes("user already registered")) {
+      return "This email is already registered. Please sign in instead.";
+    }
+
+    if (message.includes("email not confirmed")) {
+      return "Please confirm your email before signing in.";
+    }
+
+    if (message.includes("signup disabled")) {
+      return "Account creation is currently unavailable.";
+    }
+
+    return error instanceof Error && error.message ? error.message : fallback;
+  }
+
+  const login = async ({ email, password }: { email: string; password: string }) => {
+    const supabase = getSupabaseBrowserClient();
+
+    if (!supabase) {
+      throw new Error("Authentication is temporarily unavailable.");
+    }
+
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
+    if (error) {
+      throw new Error(getFriendlyAuthError(error, "We could not sign you in."));
+    }
+
+    const signedInUser = data.session?.user ?? data.user;
+
+    if (!signedInUser?.email) {
+      throw new Error("Unable to sign in.");
+    }
+
+    setUser({
+      id: signedInUser.id,
+      email: signedInUser.email,
+      displayName:
+        signedInUser.user_metadata?.full_name ??
+        signedInUser.user_metadata?.name ??
+        getDisplayName(signedInUser.email),
     });
   };
-  const signup = ({ fullName, email }: { fullName: string; email: string; password: string }) => {
-    const nextUser = {
+  const signup = async ({
+    fullName,
+    email,
+    password,
+  }: {
+    fullName: string;
+    email: string;
+    password: string;
+  }) => {
+    const supabase = getSupabaseBrowserClient();
+
+    if (!supabase) {
+      throw new Error("Authentication is temporarily unavailable.");
+    }
+
+    const { data, error } = await supabase.auth.signUp({
       email,
-      displayName: fullName.trim() || getDisplayName(email),
-    };
-    setUser(nextUser);
-    setProfile((current) => ({
-      ...createDefaultProfile(nextUser),
-      ...current,
-      fullName: nextUser.displayName,
-    }));
+      password,
+      options: {
+        data: {
+          full_name: fullName.trim() || getDisplayName(email),
+        },
+      },
+    });
+
+    if (error) {
+      throw new Error(getFriendlyAuthError(error, "We could not create your account."));
+    }
+
+    const signedInUser = data.session?.user;
+
+    if (!signedInUser?.email) {
+      return { needsConfirmation: true };
+    }
+
+    setUser({
+      id: signedInUser.id,
+      email: signedInUser.email,
+      displayName:
+        signedInUser.user_metadata?.full_name ??
+        signedInUser.user_metadata?.name ??
+        (fullName.trim() || getDisplayName(signedInUser.email)),
+    });
+
+    return { needsConfirmation: false };
   };
-  const logout = () => {
+  const logout = async () => {
+    const supabase = getSupabaseBrowserClient();
+
+    if (supabase) {
+      await supabase.auth.signOut();
+    }
+
     setUser(null);
+    setProfile(createDefaultProfile(null));
   };
 
   return (
@@ -355,3 +467,5 @@ export function useAppData() {
 
   return value;
 }
+
+export type { ResumeTemplateId };

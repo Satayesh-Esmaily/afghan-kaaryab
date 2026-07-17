@@ -12,10 +12,17 @@ import {
 } from "@/lib/network";
 
 export default function NetworkView() {
-  const { followedOrganizationSlugs, toggleFollowOrganization, isFollowingOrganization } = useAppData();
-  const organizations = getOrganizationEntries(demoOpportunities);
-  const countries = getCountryEntries(demoOpportunities);
-  const institutions = getInstitutionEntries(demoOpportunities);
+  const {
+    followedOrganizationSlugs,
+    toggleFollowOrganization,
+    isFollowingOrganization,
+    opportunities,
+    hydrated,
+  } = useAppData();
+  const activeOpportunities = hydrated ? opportunities : demoOpportunities;
+  const organizations = getOrganizationEntries(activeOpportunities);
+  const countries = getCountryEntries(activeOpportunities);
+  const institutions = getInstitutionEntries(activeOpportunities);
 
   return (
     <div className="space-y-8">

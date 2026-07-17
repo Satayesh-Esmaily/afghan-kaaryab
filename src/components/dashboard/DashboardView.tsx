@@ -1,5 +1,6 @@
 "use client";
 
+import { useSearchParams } from "next/navigation";
 import { useAppData } from "@/context/app-context";
 import { getDashboardStats } from "@/lib/opportunities";
 import DashboardHeroSection from "@/components/dashboard/sections/DashboardHeroSection";
@@ -10,14 +11,27 @@ import DashboardRecentSubmissionsSection from "@/components/dashboard/sections/D
 import DashboardQuickInsightSection from "@/components/dashboard/sections/DashboardQuickInsightSection";
 
 export default function DashboardView() {
-  const { opportunities } = useAppData();
+  const searchParams = useSearchParams();
+  const { opportunities, user } = useAppData();
   const stats = getDashboardStats(opportunities);
   const savedCount = opportunities.length - stats.recent.length;
+  const showWelcome = searchParams.get("status") === "welcome";
 
   return (
     <div className="space-y-8">
+      {showWelcome ? (
+        <div className="rounded-[1.35rem] border border-[color:var(--border)] bg-[color:var(--surface)] px-5 py-4 shadow-sm sm:px-6">
+          <p className="text-sm font-semibold text-[color:var(--foreground-strong)]">
+            Welcome back{user?.displayName ? `, ${user.displayName}` : ""}.
+          </p>
+          <p className="mt-1 text-sm text-[color:var(--foreground-muted)]">
+            Your dashboard is ready. Continue browsing opportunities, saved items, and organizations.
+          </p>
+        </div>
+      ) : null}
+
       <section className="grid gap-5 xl:grid-cols-[1.45fr_0.85fr]">
-        <DashboardHeroSection stats={stats} savedCount={savedCount} />
+        <DashboardHeroSection stats={stats} savedCount={savedCount} userName={user?.displayName ?? undefined} />
         <DashboardCalendarSection />
       </section>
 

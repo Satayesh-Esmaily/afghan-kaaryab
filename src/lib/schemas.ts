@@ -59,6 +59,64 @@ export const signupFormSchema = z
 
 export type SignupFormValues = z.infer<typeof signupFormSchema>;
 
+const requiredText = z.string().trim().min(1, "This field is required.");
+
+export const experienceEntrySchema = z.object({
+  position: requiredText,
+  organization: requiredText,
+  employmentType: requiredText,
+  currentlyWorking: z.boolean(),
+  startDate: requiredText,
+  endDate: z.string().trim(),
+  country: requiredText,
+  province: requiredText,
+  skills: z.string().trim(),
+  description: z.string().trim().min(10, "Description is required."),
+});
+
+export type ExperienceEntryFormValues = z.infer<typeof experienceEntrySchema>;
+
+export const educationEntrySchema = z.object({
+  degree: requiredText,
+  institution: requiredText,
+  fieldOfStudy: requiredText,
+  country: requiredText,
+  province: requiredText,
+  startDate: requiredText,
+  endDate: z.string().trim(),
+  description: z.string().trim(),
+});
+
+export type EducationEntryFormValues = z.infer<typeof educationEntrySchema>;
+
+export const certificationEntrySchema = z.object({
+  title: requiredText,
+  certificationUrl: z.string().trim(),
+  credentialId: z.string().trim(),
+  issuingOrganization: requiredText,
+  issueDate: requiredText,
+  expirationDate: z.string().trim(),
+  description: z.string().trim().min(5, "Description is required."),
+  attachmentUrl: z.string().trim().min(1, "Attachment is required."),
+  attachmentStoragePath: z.string().trim().min(1, "Attachment is required."),
+  attachmentFileName: z.string().trim().min(1, "Attachment is required."),
+});
+
+export type CertificationEntryFormValues = z.infer<typeof certificationEntrySchema>;
+
+export const awardEntrySchema = z.object({
+  title: requiredText,
+  issuedBy: requiredText,
+  date: requiredText,
+  description: z.string().trim().min(5, "Description is required."),
+  referenceUrl: z.string().trim(),
+  attachmentUrl: z.string().trim().min(1, "Attachment is required."),
+  attachmentStoragePath: z.string().trim().min(1, "Attachment is required."),
+  attachmentFileName: z.string().trim().min(1, "Attachment is required."),
+});
+
+export type AwardEntryFormValues = z.infer<typeof awardEntrySchema>;
+
 export const profileFormSchema = z.object({
   fullName: z.string().trim().min(2, "Full name is required."),
   headline: z.string().trim().min(3, "Headline is required."),
@@ -72,8 +130,8 @@ export const profileFormSchema = z.object({
   address: z.string().trim(),
   summary: z.string().trim().min(10, "Summary is required."),
   skills: z.string().trim().min(2, "Skills are required."),
-  experience: z.string().trim().min(10, "Experience is required."),
-  education: z.string().trim().min(10, "Education is required."),
+  experience: z.string().trim(),
+  education: z.string().trim(),
   certifications: z.string().trim(),
   awards: z.string().trim(),
   languages: z.string().trim().min(2, "Languages are required."),

@@ -5,6 +5,7 @@ import { dashboardCopy } from "@/config/dashboard";
 export default function DashboardHeroSection({
   stats,
   savedCount,
+  userName,
 }: {
   stats: {
     total: number;
@@ -12,6 +13,7 @@ export default function DashboardHeroSection({
     expiringSoon: number;
   };
   savedCount: number;
+  userName?: string;
 }) {
   return (
     <div className="rounded-[1.5rem] accent-panel p-6 sm:p-8 lg:p-10">
@@ -19,6 +21,9 @@ export default function DashboardHeroSection({
         <div className="space-y-4">
           <Badge tone="accent">{dashboardCopy.heroBadge}</Badge>
           <div>
+            {userName ? (
+              <p className="text-sm font-medium text-white/80 sm:text-base">Welcome back, {userName}</p>
+            ) : null}
             <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">{dashboardCopy.heroTitle}</h2>
             <p className="mt-3 max-w-2xl text-sm leading-7 text-white/85 sm:text-base">
               {dashboardCopy.heroDescription}

@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { Badge, EmptyState, SectionHeading } from "@/components/ui";
 import { authCopy } from "@/config/auth";
 import { useAppData, type ResumeTemplateId } from "@/context/app-context";
+import { getResumeAccessUrl } from "@/lib/resume-storage";
 
 const templates: Array<{
   id: ResumeTemplateId;
@@ -20,6 +21,8 @@ export default function ResumeBuilderView() {
   const [selectedTemplate, setSelectedTemplate] = useState<ResumeTemplateId>(
     profile.resumeTemplate ?? "modern"
   );
+  const [resumeActionError, setResumeActionError] = useState("");
+  const [resumeActionBusy, setResumeActionBusy] = useState(false);
 
   const skills = useMemo(
     () =>
@@ -44,6 +47,32 @@ export default function ResumeBuilderView() {
   const applyTemplate = (template: ResumeTemplateId) => {
     setSelectedTemplate(template);
     updateProfile({ resumeTemplate: template });
+  };
+
+  const openResumeFile = async () => {
+    setResumeActionError("");
+
+    const sourcePath = profile.resumeStoragePath || "";
+    const sourceUrl = profile.resumeUrl || "";
+
+    if (!sourcePath && !sourceUrl) {
+      setResumeActionError("No uploaded resume found yet.");
+      return;
+    }
+
+    setResumeActionBusy(true);
+
+    try {
+      const url = sourcePath ? await getResumeAccessUrl(sourcePath) : sourceUrl;
+      if (!url) {
+        setResumeActionError("We could not generate a download link.");
+        return;
+      }
+
+      window.open(url, "_blank", "noopener,noreferrer");
+    } finally {
+      setResumeActionBusy(false);
+    }
   };
 
   return (
@@ -93,13 +122,24 @@ export default function ResumeBuilderView() {
             <p className="mt-3 text-sm leading-7 text-white/85">
               Open the print dialog to download your resume as a PDF file.
             </p>
-            <button
-              type="button"
-              onClick={() => window.print()}
-              className="mt-5 inline-flex rounded-full bg-white px-4 py-2.5 text-sm font-semibold text-[color:var(--accent)] transition hover:bg-white/90"
-            >
-              Download PDF
-            </button>
+            <div className="mt-5 flex flex-wrap gap-3">
+              <button
+                type="button"
+                onClick={() => window.print()}
+                className="inline-flex rounded-full bg-white px-4 py-2.5 text-sm font-semibold text-[color:var(--accent)] transition hover:bg-white/90"
+              >
+                Download PDF
+              </button>
+              <button
+                type="button"
+                onClick={() => void openResumeFile()}
+                disabled={resumeActionBusy}
+                className="inline-flex rounded-full border border-white/20 bg-white/10 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-70"
+              >
+                {resumeActionBusy ? "Opening..." : "Open uploaded CV"}
+              </button>
+            </div>
+            {resumeActionError ? <p className="mt-3 text-sm text-white/90">{resumeActionError}</p> : null}
           </div>
         </div>
 
@@ -148,16 +188,53 @@ export default function ResumeBuilderView() {
                 </ResumePanel>
 
                 <ResumePanel title="Experience">
-                  <p className="text-sm leading-7 text-black/75 whitespace-pre-line">{profile.experience}</p>
+                  {profile.experienceEntries.length > 0 ? (
+                    <div className="space-y-3">
+                      {profile.experienceEntries.map((entry) => (
+                        <div key={entry.id} className="rounded-[1rem] border border-black/5 bg-white px-4 py-3">
+                          <p className="text-sm font-semibold text-black">{entry.position}</p>
+                          <p className="mt-1 text-xs text-black/55">{entry.organization}</p>
+                          <p className="mt-1 text-xs text-black/45">
+                            {formatDateRange(entry.startDate, entry.endDate, entry.currentlyWorking)}
+                          </p>
+                          <p className="mt-2 text-sm leading-6 text-black/75">{entry.description}</p>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm leading-7 whitespace-pre-line text-black/75">
+                      {profile.experience || "Not added"}
+                    </p>
+                  )}
                 </ResumePanel>
 
                 <ResumePanel title="Education">
-                  <p className="text-sm leading-7 text-black/75 whitespace-pre-line">{profile.education}</p>
+                  {profile.educationEntries.length > 0 ? (
+                    <div className="space-y-3">
+                      {profile.educationEntries.map((entry) => (
+                        <div key={entry.id} className="rounded-[1rem] border border-black/5 bg-white px-4 py-3">
+                          <p className="text-sm font-semibold text-black">{entry.degree}</p>
+                          <p className="mt-1 text-xs text-black/55">{entry.institution}</p>
+                          <p className="mt-1 text-xs text-black/45">
+                            {formatDateRange(entry.startDate, entry.endDate, false)}
+                          </p>
+                          <p className="mt-2 text-sm leading-6 text-black/75">{entry.fieldOfStudy}</p>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm leading-7 whitespace-pre-line text-black/75">
+                      {profile.education || "Not added"}
+                    </p>
+                  )}
                 </ResumePanel>
 
                 <ResumePanel title="Documents and links">
                   <div className="space-y-2 text-sm text-black/75">
-                    <ProfileLine label="Resume" value={profile.resumeUrl || "Not added"} />
+                    <ProfileLine
+                      label="Resume"
+                      value={profile.resumeStoragePath ? getFileNameFromPath(profile.resumeStoragePath) : "Not added"}
+                    />
                     <ProfileLine label="Portfolio" value={profile.portfolioUrl || "Not added"} />
                     <ProfileLine label="Video intro" value={profile.introVideoUrl || "Not added"} />
                     <ProfileLine label="Documents" value={profile.documents} />
@@ -200,4 +277,41 @@ function TagWrap({ items }: { items: string[] }) {
       ))}
     </div>
   );
+}
+
+function formatDateRange(startDate: string, endDate: string, currentlyWorking: boolean) {
+  const startLabel = formatDateLabel(startDate);
+  const endLabel = currentlyWorking ? "Present" : formatDateLabel(endDate);
+
+  if (startLabel && endLabel) {
+    return `${startLabel} - ${endLabel}`;
+  }
+
+  return startLabel || endLabel || "Date not added";
+}
+
+function formatDateLabel(value: string) {
+  if (!value) return "";
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  return new Intl.DateTimeFormat("en", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  }).format(date);
+}
+
+function getFileNameFromPath(value: string) {
+  const parts = value.split("/").filter(Boolean);
+  const fileName = parts.at(-1);
+
+  if (!fileName) {
+    return "resume";
+  }
+
+  return decodeURIComponent(fileName);
 }

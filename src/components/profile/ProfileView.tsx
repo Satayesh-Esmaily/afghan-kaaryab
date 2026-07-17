@@ -1,13 +1,38 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Badge, EmptyState } from "@/components/ui";
 import FormField from "@/components/common/FormField";
+import DatePickerField from "@/components/common/DatePickerField";
+import SearchableSelect from "@/components/common/SearchableSelect";
 import { authCopy } from "@/config/auth";
+import {
+  AwardEntryDialog,
+  CertificationEntryDialog,
+  EducationEntryDialog,
+  ExperienceEntryDialog,
+} from "@/components/profile/ProfileEntryDialog";
 import { useAppData } from "@/context/app-context";
-import { profileFormSchema, type ProfileFormValues } from "@/lib/schemas";
+import { getAvatarAccessUrl, uploadAvatarFile } from "@/lib/avatar-storage";
+import { deleteResumeFile, getResumeAccessUrl, uploadResumeFile } from "@/lib/resume-storage";
+import { countryOptions, genderOptions, nationalityOptions } from "@/data/profile-options";
+import type {
+  AwardEntry,
+  CertificationEntry,
+  EducationEntry,
+  ExperienceEntry,
+} from "@/lib/app-state";
+import {
+  type AwardEntryFormValues,
+  type CertificationEntryFormValues,
+  profileFormSchema,
+  type EducationEntryFormValues,
+  type ExperienceEntryFormValues,
+  type ProfileFormValues,
+} from "@/lib/schemas";
 
 type ProfileTabId = "information" | "resume" | "interview";
 
@@ -21,22 +46,37 @@ const profileTabs: Array<{
   { id: "interview", label: "AI Interview (Coming Soon)", disabled: true },
 ];
 
-const defaultResumeFiles = [
-  "ghazal cv.pdf",
-  "cover letter (2).pdf",
-  "Samira CV, Cover Letter.pdf",
-  "Samira ghazal CV.pdf",
-];
-
 export default function ProfileView() {
+  const searchParams = useSearchParams();
   const { authenticated, profile, updateProfile, user } = useAppData();
   const [activeTab, setActiveTab] = useState<ProfileTabId>("information");
-  const [resumeFiles, setResumeFiles] = useState<string[]>(defaultResumeFiles);
+  const [resumeFiles, setResumeFiles] = useState<string[]>([]);
+  const [resumeUploadError, setResumeUploadError] = useState<string>("");
+  const [resumeUploadBusy, setResumeUploadBusy] = useState(false);
+  const [certificationEntries, setCertificationEntries] = useState<CertificationEntry[]>(
+    Array.isArray(profile.certificationEntries) ? profile.certificationEntries : []
+  );
+  const [awardEntries, setAwardEntries] = useState<AwardEntry[]>(
+    Array.isArray(profile.awardEntries) ? profile.awardEntries : []
+  );
+  const [experienceEntries, setExperienceEntries] = useState<ExperienceEntry[]>(
+    Array.isArray(profile.experienceEntries) ? profile.experienceEntries : []
+  );
+  const [educationEntries, setEducationEntries] = useState<EducationEntry[]>(
+    Array.isArray(profile.educationEntries) ? profile.educationEntries : []
+  );
+  const [editingExperienceIndex, setEditingExperienceIndex] = useState<number | null>(null);
+  const [editingEducationIndex, setEditingEducationIndex] = useState<number | null>(null);
+  const [editingCertificationIndex, setEditingCertificationIndex] = useState<number | null>(null);
+  const [editingAwardIndex, setEditingAwardIndex] = useState<number | null>(null);
+  const avatarInputRef = useRef<HTMLInputElement | null>(null);
   const resumeInputRef = useRef<HTMLInputElement | null>(null);
 
   const {
     register,
     handleSubmit,
+    watch,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
@@ -48,6 +88,97 @@ export default function ProfileView() {
   const initials = useMemo(() => getInitials(profile.fullName), [profile.fullName]);
   const skills = useMemo(() => splitItems(profile.skills), [profile.skills]);
   const languages = useMemo(() => splitItems(profile.languages), [profile.languages]);
+  const showWelcome = searchParams.get("status") === "welcome";
+  const selectedCountry = watch("country");
+  const selectedNationality = watch("nationality");
+  const selectedGender = watch("gender");
+  const selectedDateOfBirth = watch("dateOfBirth");
+  const removeSkill = (skillToRemove: string) => {
+    updateProfile({ skills: removeDelimitedItem(profile.skills, skillToRemove) });
+  };
+  const removeLanguage = (languageToRemove: string) => {
+    updateProfile({ languages: removeDelimitedItem(profile.languages, languageToRemove) });
+  };
+
+  useEffect(() => {
+    setExperienceEntries(Array.isArray(profile.experienceEntries) ? profile.experienceEntries : []);
+  }, [profile.experienceEntries]);
+
+  useEffect(() => {
+    setEducationEntries(Array.isArray(profile.educationEntries) ? profile.educationEntries : []);
+  }, [profile.educationEntries]);
+
+  useEffect(() => {
+    setCertificationEntries(Array.isArray(profile.certificationEntries) ? profile.certificationEntries : []);
+  }, [profile.certificationEntries]);
+
+  useEffect(() => {
+    setAwardEntries(Array.isArray(profile.awardEntries) ? profile.awardEntries : []);
+  }, [profile.awardEntries]);
+
+  useEffect(() => {
+    if (profile.resumeStoragePath) {
+      setResumeFiles([getFileNameFromPath(profile.resumeStoragePath)]);
+      return;
+    }
+
+    if (profile.resumeUrl) {
+      setResumeFiles([getFileNameFromUrl(profile.resumeUrl)]);
+      return;
+    }
+
+    setResumeFiles([]);
+  }, [profile.resumeStoragePath, profile.resumeUrl]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function refreshAvatarUrl() {
+      if (!profile.avatarStoragePath) {
+        return;
+      }
+
+      const nextUrl = await getAvatarAccessUrl(profile.avatarStoragePath);
+      if (cancelled || !nextUrl) {
+        return;
+      }
+
+      if (nextUrl !== profile.avatarUrl) {
+        updateProfile({ avatarUrl: nextUrl });
+      }
+    }
+
+    void refreshAvatarUrl();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [profile.avatarStoragePath, profile.avatarUrl, updateProfile]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function refreshResumeUrl() {
+      if (!profile.resumeStoragePath) {
+        return;
+      }
+
+      const nextUrl = await getResumeAccessUrl(profile.resumeStoragePath);
+      if (cancelled || !nextUrl) {
+        return;
+      }
+
+      if (nextUrl !== profile.resumeUrl) {
+        updateProfile({ resumeUrl: nextUrl });
+      }
+    }
+
+    void refreshResumeUrl();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [profile.resumeStoragePath, profile.resumeUrl, updateProfile]);
 
   if (!authenticated) {
     return (
@@ -62,15 +193,34 @@ export default function ProfileView() {
 
   return (
     <div className="space-y-6">
+      {showWelcome ? (
+        <div className="rounded-[1.35rem] border border-[color:var(--border)] bg-[color:var(--surface)] px-5 py-4 shadow-sm sm:px-6">
+          <p className="text-sm font-semibold text-[color:var(--foreground-strong)]">
+            {authCopy.signupSuccessTitle}
+          </p>
+          <p className="mt-1 text-sm text-[color:var(--foreground-muted)]">
+            {authCopy.signupSuccessMessage}
+          </p>
+        </div>
+      ) : null}
+
       <div className="rounded-[1.5rem] panel px-5 py-4 text-lg font-semibold text-[color:var(--foreground)] sm:px-6">
         Profile
       </div>
 
       <section className="rounded-[1.75rem] panel p-6 sm:p-8">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex items-center gap-4 sm:gap-5">
-            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full border-4 border-[color:var(--accent-soft)] bg-[color:var(--surface-soft)] text-2xl font-semibold text-[color:var(--foreground-strong)] shadow-sm sm:h-20 sm:w-20 sm:text-3xl">
-              {initials}
+            <div className="flex items-center gap-4 sm:gap-5">
+            <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-full border-4 border-[color:var(--accent-soft)] bg-[color:var(--surface-soft)] text-2xl font-semibold text-[color:var(--foreground-strong)] shadow-sm sm:h-20 sm:w-20 sm:text-3xl">
+              {profile.avatarUrl ? (
+                <img
+                  src={profile.avatarUrl}
+                  alt={profile.fullName || "Profile photo"}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                initials
+              )}
             </div>
             <div>
               <p className="text-base font-medium leading-7 text-[color:var(--foreground)] sm:text-lg">
@@ -120,12 +270,79 @@ export default function ProfileView() {
         <ResumeTab
           resumeInputRef={resumeInputRef}
           resumeFiles={resumeFiles}
+          resumeUploadBusy={resumeUploadBusy}
+          resumeUploadError={resumeUploadError}
           onPickFiles={() => resumeInputRef.current?.click()}
-          onFilesChange={(files) => {
-            setResumeFiles((current) => Array.from(new Set([...files, ...current])));
+          onFilesChange={async (files) => {
+            setResumeUploadError("");
+
+            if (files.length === 0) {
+              return;
+            }
+
+            setResumeUploadBusy(true);
+
+            try {
+              const userId = user?.id ?? null;
+
+              if (!userId) {
+                setResumeUploadError("You need to be signed in to upload a resume.");
+                return;
+              }
+
+              const uploadedItems: Awaited<ReturnType<typeof uploadResumeFile>>[] = [];
+
+              for (const file of files) {
+                const result = await uploadResumeFile(file, userId);
+                if (result) {
+                  uploadedItems.unshift(result);
+                }
+              }
+
+              const activeResume = uploadedItems[0];
+              if (activeResume) {
+                setResumeFiles([activeResume.fileName]);
+                updateProfile({
+                  resumeUrl: activeResume.url,
+                  resumeStoragePath: activeResume.path,
+                });
+              }
+            } catch {
+              setResumeUploadError("We could not upload the file. Please try again.");
+            } finally {
+              setResumeUploadBusy(false);
+            }
           }}
-          onDeleteFile={(fileName) => {
-            setResumeFiles((current) => current.filter((item) => item !== fileName));
+          onDeleteFile={async () => {
+            if (!profile.resumeStoragePath) {
+              setResumeFiles([]);
+              updateProfile({ resumeUrl: "", resumeStoragePath: "" });
+              return;
+            }
+
+            const deleted = await deleteResumeFile(profile.resumeStoragePath);
+            if (deleted) {
+              setResumeFiles([]);
+              updateProfile({ resumeUrl: "", resumeStoragePath: "" });
+            } else {
+              setResumeUploadError("We could not delete the file right now.");
+            }
+          }}
+          onDownloadFile={async () => {
+            if (!profile.resumeStoragePath && !profile.resumeUrl) {
+              return;
+            }
+
+            const url = profile.resumeStoragePath
+              ? await getResumeAccessUrl(profile.resumeStoragePath)
+              : profile.resumeUrl;
+
+            if (!url) {
+              setResumeUploadError("We could not generate a download link.");
+              return;
+            }
+
+            window.open(url, "_blank", "noopener,noreferrer");
           }}
         />
       ) : (
@@ -139,19 +356,44 @@ export default function ProfileView() {
             <div className="grid gap-8 xl:grid-cols-[260px_1fr]">
               <aside className="space-y-5">
                 <div className="flex items-center gap-4">
-                  <div className="flex h-20 w-20 items-center justify-center rounded-full bg-[color:var(--surface-soft)] text-3xl font-semibold text-[color:var(--foreground-strong)]">
-                    {initials}
+                  <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-full bg-[color:var(--surface-soft)] text-3xl font-semibold text-[color:var(--foreground-strong)]">
+                    {profile.avatarUrl ? (
+                      <img
+                        src={profile.avatarUrl}
+                        alt={profile.fullName || "Profile photo"}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      initials
+                    )}
                   </div>
                   <button
                     type="button"
                     onClick={() => {
-                      document.getElementById("avatarUrl")?.focus();
+                      avatarInputRef.current?.click();
                     }}
                     className="ds-button-secondary rounded-full px-4 py-2.5 text-sm font-semibold"
                   >
                     Upload Photo
                   </button>
                 </div>
+                <input
+                  ref={avatarInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(event) => {
+                    const file = event.target.files?.[0];
+                    if (!file) return;
+
+                    void uploadAvatarFile(file, user?.id ?? "").then((result) => {
+                      if (result) {
+                        updateProfile({ avatarUrl: result.url, avatarStoragePath: result.path });
+                      }
+                    });
+                    event.currentTarget.value = "";
+                  }}
+                />
 
                 <div className="rounded-[1.25rem] border border-[color:var(--border)] bg-[color:var(--surface-soft)] p-4">
                   <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[color:var(--foreground-muted)]">
@@ -179,19 +421,60 @@ export default function ProfileView() {
                   </FormField>
                   <ProfileValueBox label="Email Address" value={user?.email ?? "Not available"} />
                   <FormField label="Country" error={errors.country?.message}>
-                    <input {...register("country")} className="ds-input" />
+                    <SearchableSelect
+                      value={selectedCountry}
+                      options={countryOptions}
+                      placeholder="Select country"
+                      searchPlaceholder="Search country..."
+                      onChange={(value) =>
+                        setValue("country", value, {
+                          shouldDirty: true,
+                          shouldValidate: true,
+                        })
+                      }
+                    />
                   </FormField>
                   <FormField label="Province" error={errors.province?.message}>
                     <input {...register("province")} className="ds-input" />
                   </FormField>
                   <FormField label="Nationality" error={errors.nationality?.message}>
-                    <input {...register("nationality")} className="ds-input" />
+                    <SearchableSelect
+                      value={selectedNationality}
+                      options={nationalityOptions}
+                      placeholder="Select nationality"
+                      searchPlaceholder="Search nationality..."
+                      onChange={(value) =>
+                        setValue("nationality", value, {
+                          shouldDirty: true,
+                          shouldValidate: true,
+                        })
+                      }
+                    />
                   </FormField>
                   <FormField label="Date of Birth" error={errors.dateOfBirth?.message}>
-                    <input {...register("dateOfBirth")} className="ds-input" placeholder="19 Mar, 1993" />
+                    <DatePickerField
+                      value={selectedDateOfBirth}
+                      placeholder="Select date"
+                      onChange={(value) =>
+                        setValue("dateOfBirth", value, {
+                          shouldDirty: true,
+                          shouldValidate: true,
+                        })
+                      }
+                    />
                   </FormField>
                   <FormField label="Gender" error={errors.gender?.message}>
-                    <input {...register("gender")} className="ds-input" placeholder="Female" />
+                    <SearchableSelect
+                      value={selectedGender}
+                      options={genderOptions}
+                      placeholder="Select gender"
+                      onChange={(value) =>
+                        setValue("gender", value, {
+                          shouldDirty: true,
+                          shouldValidate: true,
+                        })
+                      }
+                    />
                   </FormField>
                   <FormField label="Current Address" error={errors.address?.message}>
                     <input {...register("address")} className="ds-input" placeholder="Taimani, Kabul, Afghanistan" />
@@ -220,39 +503,137 @@ export default function ProfileView() {
             </div>
           </ProfileSection>
 
-          <ProfileSection title="Work Experience" description="List your previous roles and responsibilities.">
-            <FormField label="Experience" error={errors.experience?.message}>
-              <textarea {...register("experience")} className="ds-input min-h-40" />
-            </FormField>
+          <ProfileSection
+            title="Work Experience"
+            description="List your previous roles and responsibilities."
+          >
+            <EntriesHeader
+              actionLabel="Add Experience"
+              onAction={() => setEditingExperienceIndex(-1)}
+            />
+
+            <div className="mt-6 grid gap-4 xl:grid-cols-2">
+              {experienceEntries.length > 0 ? (
+                experienceEntries.map((entry, index) => (
+                  <ExperienceCard
+                    key={entry.id}
+                    entry={entry}
+                    onEdit={() => setEditingExperienceIndex(index)}
+                    onDelete={() => {
+                      const next = experienceEntries.filter((_, itemIndex) => itemIndex !== index);
+                      setExperienceEntries(next);
+                      updateProfile({
+                        experienceEntries: next,
+                        experience: serializeExperienceEntries(next),
+                      });
+                    }}
+                  />
+                ))
+              ) : (
+                <EmptyListCard
+                  title="No experience added yet"
+                  description="Add your latest roles, companies, and responsibilities."
+                  actionLabel="Add Experience"
+                  onAction={() => setEditingExperienceIndex(-1)}
+                />
+              )}
+            </div>
           </ProfileSection>
 
           <ProfileSection title="Education" description="Add your educational background.">
-            <FormField label="Education" error={errors.education?.message}>
-              <textarea {...register("education")} className="ds-input min-h-40" />
-            </FormField>
+            <EntriesHeader actionLabel="Add Education" onAction={() => setEditingEducationIndex(-1)} />
+
+            <div className="mt-6 grid gap-4 xl:grid-cols-2">
+              {educationEntries.length > 0 ? (
+                educationEntries.map((entry, index) => (
+                  <EducationCard
+                    key={entry.id}
+                    entry={entry}
+                    onEdit={() => setEditingEducationIndex(index)}
+                    onDelete={() => {
+                      const next = educationEntries.filter((_, itemIndex) => itemIndex !== index);
+                      setEducationEntries(next);
+                      updateProfile({
+                        educationEntries: next,
+                        education: serializeEducationEntries(next),
+                      });
+                    }}
+                  />
+                ))
+              ) : (
+                <EmptyListCard
+                  title="No education added yet"
+                  description="Add your degrees, institutes, and field of study."
+                  actionLabel="Add Education"
+                  onAction={() => setEditingEducationIndex(-1)}
+                />
+              )}
+            </div>
           </ProfileSection>
 
           <ProfileSection
             title="Certifications"
             description="Showcase certificates and credentials that strengthen your profile."
           >
-            <FormField label="Certifications" error={errors.certifications?.message}>
-              <textarea
-                {...register("certifications")}
-                className="ds-input min-h-32"
-                placeholder="PMP, Google Career Certificate, etc."
-              />
-            </FormField>
+            <EntriesHeader actionLabel="Add Certification" onAction={() => setEditingCertificationIndex(-1)} />
+
+            <div className="mt-6 grid gap-4 xl:grid-cols-2">
+              {certificationEntries.length > 0 ? (
+                certificationEntries.map((entry, index) => (
+                  <CertificationCard
+                    key={entry.id}
+                    entry={entry}
+                    onEdit={() => setEditingCertificationIndex(index)}
+                    onDelete={() => {
+                      const next = certificationEntries.filter((_, itemIndex) => itemIndex !== index);
+                      setCertificationEntries(next);
+                      updateProfile({
+                        certificationEntries: next,
+                        certifications: serializeCertificationEntries(next),
+                      });
+                    }}
+                  />
+                ))
+              ) : (
+                <EmptyListCard
+                  title="No certifications added yet"
+                  description="Add certificates, credential IDs, and attachments."
+                  actionLabel="Add Certification"
+                  onAction={() => setEditingCertificationIndex(-1)}
+                />
+              )}
+            </div>
           </ProfileSection>
 
           <ProfileSection title="Awards" description="Highlight achievements and recognitions.">
-            <FormField label="Awards" error={errors.awards?.message}>
-              <textarea
-                {...register("awards")}
-                className="ds-input min-h-32"
-                placeholder="List awards, scholarships, or recognitions."
-              />
-            </FormField>
+            <EntriesHeader actionLabel="Add Award" onAction={() => setEditingAwardIndex(-1)} />
+
+            <div className="mt-6 grid gap-4 xl:grid-cols-2">
+              {awardEntries.length > 0 ? (
+                awardEntries.map((entry, index) => (
+                  <AwardCard
+                    key={entry.id}
+                    entry={entry}
+                    onEdit={() => setEditingAwardIndex(index)}
+                    onDelete={() => {
+                      const next = awardEntries.filter((_, itemIndex) => itemIndex !== index);
+                      setAwardEntries(next);
+                      updateProfile({
+                        awardEntries: next,
+                        awards: serializeAwardEntries(next),
+                      });
+                    }}
+                  />
+                ))
+              ) : (
+                <EmptyListCard
+                  title="No awards added yet"
+                  description="Add awards, recognition, and attachment files."
+                  actionLabel="Add Award"
+                  onAction={() => setEditingAwardIndex(-1)}
+                />
+              )}
+            </div>
           </ProfileSection>
 
           <ProfileSection title="Skills" description="List your professional skills." badge={`${skills.length}/20`}>
@@ -264,9 +645,14 @@ export default function ProfileView() {
                       key={skill}
                       className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 text-sm font-medium text-[color:var(--foreground)] shadow-sm"
                     >
-                      <span className="grid h-4 w-4 place-items-center rounded-full bg-[color:var(--surface-soft)] text-[10px] text-[color:var(--foreground-muted)]">
+                      <button
+                        type="button"
+                        onClick={() => removeSkill(skill)}
+                        className="grid h-4 w-4 place-items-center rounded-full bg-[color:var(--surface-soft)] text-[10px] text-[color:var(--foreground-muted)] transition hover:text-[color:var(--foreground-strong)]"
+                        aria-label={`Remove ${skill}`}
+                      >
                         ×
-                      </span>
+                      </button>
                       {skill}
                     </span>
                   ))
@@ -295,9 +681,14 @@ export default function ProfileView() {
                       key={language}
                       className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 text-sm font-medium text-[color:var(--foreground)] shadow-sm"
                     >
-                      <span className="grid h-4 w-4 place-items-center rounded-full bg-[color:var(--surface-soft)] text-[10px] text-[color:var(--foreground-muted)]">
+                      <button
+                        type="button"
+                        onClick={() => removeLanguage(language)}
+                        className="grid h-4 w-4 place-items-center rounded-full bg-[color:var(--surface-soft)] text-[10px] text-[color:var(--foreground-muted)] transition hover:text-[color:var(--foreground-strong)]"
+                        aria-label={`Remove ${language}`}
+                      >
                         ×
-                      </span>
+                      </button>
                       {language}
                     </span>
                   ))
@@ -340,7 +731,7 @@ export default function ProfileView() {
             </FormField>
           </ProfileSection>
 
-          <div className="flex justify-end">
+        <div className="flex justify-end">
             <button
               type="submit"
               disabled={isSubmitting}
@@ -351,6 +742,112 @@ export default function ProfileView() {
           </div>
         </form>
       )}
+
+      <ExperienceEntryDialog
+        open={editingExperienceIndex !== null}
+        initialValues={
+          editingExperienceIndex === null
+            ? null
+            : editingExperienceIndex < 0
+              ? null
+              : mapExperienceEntryToForm(experienceEntries[editingExperienceIndex] ?? null)
+        }
+        onClose={() => setEditingExperienceIndex(null)}
+        onSave={(values) => {
+          const nextEntry = mapExperienceFormToEntry(values, experienceEntries[editingExperienceIndex ?? -1]?.id);
+          const nextEntries =
+            editingExperienceIndex === null || editingExperienceIndex < 0
+              ? [nextEntry, ...experienceEntries]
+              : experienceEntries.map((entry, index) => (index === editingExperienceIndex ? nextEntry : entry));
+
+          setExperienceEntries(nextEntries);
+          updateProfile({
+            experienceEntries: nextEntries,
+            experience: serializeExperienceEntries(nextEntries),
+          });
+          setEditingExperienceIndex(null);
+        }}
+      />
+
+      <EducationEntryDialog
+        open={editingEducationIndex !== null}
+        initialValues={
+          editingEducationIndex === null
+            ? null
+            : editingEducationIndex < 0
+              ? null
+              : mapEducationEntryToForm(educationEntries[editingEducationIndex] ?? null)
+        }
+        onClose={() => setEditingEducationIndex(null)}
+        onSave={(values) => {
+          const nextEntry = mapEducationFormToEntry(values, educationEntries[editingEducationIndex ?? -1]?.id);
+          const nextEntries =
+            editingEducationIndex === null || editingEducationIndex < 0
+              ? [nextEntry, ...educationEntries]
+              : educationEntries.map((entry, index) => (index === editingEducationIndex ? nextEntry : entry));
+
+          setEducationEntries(nextEntries);
+          updateProfile({
+            educationEntries: nextEntries,
+            education: serializeEducationEntries(nextEntries),
+          });
+          setEditingEducationIndex(null);
+        }}
+      />
+
+      <CertificationEntryDialog
+        open={editingCertificationIndex !== null}
+        initialValues={
+          editingCertificationIndex === null
+            ? null
+            : editingCertificationIndex < 0
+              ? null
+              : mapCertificationEntryToForm(certificationEntries[editingCertificationIndex] ?? null)
+        }
+        userId={user?.id ?? null}
+        onClose={() => setEditingCertificationIndex(null)}
+        onSave={(values) => {
+          const nextEntry = mapCertificationFormToEntry(values, certificationEntries[editingCertificationIndex ?? -1]?.id);
+          const nextEntries =
+            editingCertificationIndex === null || editingCertificationIndex < 0
+              ? [nextEntry, ...certificationEntries]
+              : certificationEntries.map((entry, index) => (index === editingCertificationIndex ? nextEntry : entry));
+
+          setCertificationEntries(nextEntries);
+          updateProfile({
+            certificationEntries: nextEntries,
+            certifications: serializeCertificationEntries(nextEntries),
+          });
+          setEditingCertificationIndex(null);
+        }}
+      />
+
+      <AwardEntryDialog
+        open={editingAwardIndex !== null}
+        initialValues={
+          editingAwardIndex === null
+            ? null
+            : editingAwardIndex < 0
+              ? null
+              : mapAwardEntryToForm(awardEntries[editingAwardIndex] ?? null)
+        }
+        userId={user?.id ?? null}
+        onClose={() => setEditingAwardIndex(null)}
+        onSave={(values) => {
+          const nextEntry = mapAwardFormToEntry(values, awardEntries[editingAwardIndex ?? -1]?.id);
+          const nextEntries =
+            editingAwardIndex === null || editingAwardIndex < 0
+              ? [nextEntry, ...awardEntries]
+              : awardEntries.map((entry, index) => (index === editingAwardIndex ? nextEntry : entry));
+
+          setAwardEntries(nextEntries);
+          updateProfile({
+            awardEntries: nextEntries,
+            awards: serializeAwardEntries(nextEntries),
+          });
+          setEditingAwardIndex(null);
+        }}
+      />
     </div>
   );
 }
@@ -358,15 +855,21 @@ export default function ProfileView() {
 function ResumeTab({
   resumeInputRef,
   resumeFiles,
+  resumeUploadBusy,
+  resumeUploadError,
   onPickFiles,
   onFilesChange,
   onDeleteFile,
+  onDownloadFile,
 }: {
   resumeInputRef: React.RefObject<HTMLInputElement | null>;
   resumeFiles: string[];
+  resumeUploadBusy: boolean;
+  resumeUploadError: string;
   onPickFiles: () => void;
-  onFilesChange: (files: string[]) => void;
-  onDeleteFile: (fileName: string) => void;
+  onFilesChange: (files: File[]) => void | Promise<void>;
+  onDeleteFile: () => void | Promise<void>;
+  onDownloadFile: () => void | Promise<void>;
 }) {
   return (
     <section className="rounded-[1.75rem] panel p-6 sm:p-8">
@@ -383,7 +886,7 @@ function ResumeTab({
                 <PlusIcon />
               </span>
               <span className="text-sm font-medium text-[color:var(--foreground)]">
-                Choose file(s) or drag them here to upload.
+                {resumeUploadBusy ? "Uploading resume..." : "Choose file(s) or drag them here to upload."}
               </span>
             </button>
 
@@ -400,14 +903,18 @@ function ResumeTab({
               accept=".pdf,.doc,.docx"
               className="hidden"
               onChange={(event) => {
-                const files = Array.from(event.target.files ?? []).map((file) => file.name);
+                const files = Array.from(event.target.files ?? []);
                 if (files.length > 0) {
-                  onFilesChange(files);
+                  void onFilesChange(files);
                 }
                 event.currentTarget.value = "";
               }}
             />
           </div>
+
+          {resumeUploadError ? (
+            <p className="text-sm font-medium text-[color:var(--danger)]">{resumeUploadError}</p>
+          ) : null}
 
           <div className="space-y-3">
             {resumeFiles.map((fileName) => (
@@ -427,7 +934,7 @@ function ResumeTab({
                     type="button"
                     className="hover:text-[color:var(--foreground)]"
                     aria-label={`Delete ${fileName}`}
-                    onClick={() => onDeleteFile(fileName)}
+                    onClick={() => void onDeleteFile()}
                   >
                     <TrashIcon />
                   </button>
@@ -435,6 +942,7 @@ function ResumeTab({
                     type="button"
                     className="hover:text-[color:var(--foreground)]"
                     aria-label={`Download ${fileName}`}
+                    onClick={() => void onDownloadFile()}
                   >
                     <DownloadIcon />
                   </button>
@@ -484,6 +992,305 @@ function ProfileValueBox({ label, value }: { label: string; value: string }) {
   );
 }
 
+function EntriesHeader({
+  actionLabel,
+  onAction,
+}: {
+  actionLabel: string;
+  onAction: () => void;
+}) {
+  return (
+    <div className="flex items-center justify-between gap-4">
+      <div className="max-w-2xl text-sm text-[color:var(--foreground-muted)]">
+        Build your profile with structured cards that are easier to scan and edit.
+      </div>
+      <button
+        type="button"
+        onClick={onAction}
+        className="inline-flex items-center gap-2 rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-2 text-sm font-semibold text-[color:var(--foreground-strong)] transition hover:bg-[color:var(--surface-soft)]"
+      >
+        <PlusIcon />
+        {actionLabel}
+      </button>
+    </div>
+  );
+}
+
+function EmptyListCard({
+  title,
+  description,
+  actionLabel,
+  onAction,
+}: {
+  title: string;
+  description: string;
+  actionLabel: string;
+  onAction: () => void;
+}) {
+  return (
+    <div className="rounded-[1.35rem] border border-dashed border-[color:var(--border)] bg-[color:var(--surface-soft)] p-6 text-center xl:col-span-2">
+      <p className="text-base font-semibold text-[color:var(--foreground-strong)]">{title}</p>
+      <p className="mt-2 text-sm leading-6 text-[color:var(--foreground-muted)]">{description}</p>
+      <button
+        type="button"
+        onClick={onAction}
+        className="mt-5 inline-flex items-center gap-2 rounded-full bg-[color:var(--accent)] px-5 py-2.5 text-sm font-semibold text-white transition hover:opacity-95"
+      >
+        <PlusIcon />
+        {actionLabel}
+      </button>
+    </div>
+  );
+}
+
+function ExperienceCard({
+  entry,
+  onEdit,
+  onDelete,
+}: {
+  entry: ExperienceEntry;
+  onEdit: () => void;
+  onDelete: () => void;
+}) {
+  return (
+    <article className="rounded-[1.5rem] border border-[color:var(--border)] bg-[color:var(--surface)] p-4 shadow-sm">
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex min-w-0 gap-3">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[0.9rem] bg-[color:var(--surface-soft)] text-sm font-semibold text-[color:var(--foreground-strong)]">
+            {getInitials(entry.organization || entry.position)}
+          </div>
+          <div className="min-w-0">
+            <p className="truncate text-base font-semibold text-[color:var(--foreground-strong)]">
+              {entry.position}
+            </p>
+            <p className="mt-1 text-sm text-[color:var(--foreground-muted)]">{entry.organization}</p>
+            <p className="mt-1 text-xs text-[color:var(--foreground-muted)]">
+              {formatDateRange(entry.startDate, entry.endDate, entry.currentlyWorking)}
+            </p>
+            <p className="mt-1 text-xs text-[color:var(--foreground-muted)]">
+              {entry.country}
+              {entry.province ? ` · ${entry.province}` : ""}
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-1.5 text-[color:var(--foreground-muted)]">
+          <IconButton label="Edit experience" onClick={onEdit}>
+            <PencilIcon />
+          </IconButton>
+          <IconButton label="Delete experience" onClick={onDelete}>
+            <TrashIcon />
+          </IconButton>
+        </div>
+      </div>
+
+      <p className="mt-4 text-sm leading-6 text-[color:var(--foreground)]">
+        {entry.description}
+      </p>
+
+      {entry.skills ? (
+        <div className="mt-4 flex flex-wrap gap-2">
+          {splitItems(entry.skills).slice(0, 4).map((skill) => (
+            <span
+              key={skill}
+              className="rounded-full bg-[color:var(--surface-soft)] px-3 py-1 text-xs font-medium text-[color:var(--foreground-muted)]"
+            >
+              {skill}
+            </span>
+          ))}
+        </div>
+      ) : null}
+    </article>
+  );
+}
+
+function EducationCard({
+  entry,
+  onEdit,
+  onDelete,
+}: {
+  entry: EducationEntry;
+  onEdit: () => void;
+  onDelete: () => void;
+}) {
+  return (
+    <article className="rounded-[1.5rem] border border-[color:var(--border)] bg-[color:var(--surface)] p-4 shadow-sm">
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex min-w-0 gap-3">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[0.9rem] bg-[color:var(--surface-soft)] text-sm font-semibold text-[color:var(--foreground-strong)]">
+            {getInitials(entry.institution || entry.degree)}
+          </div>
+          <div className="min-w-0">
+            <p className="truncate text-base font-semibold text-[color:var(--foreground-strong)]">
+              {entry.degree}
+            </p>
+            <p className="mt-1 text-sm text-[color:var(--foreground-muted)]">{entry.institution}</p>
+            <p className="mt-1 text-xs text-[color:var(--foreground-muted)]">
+              {formatDateRange(entry.startDate, entry.endDate, false)}
+            </p>
+            <p className="mt-1 text-xs text-[color:var(--foreground-muted)]">
+              {entry.fieldOfStudy}
+              {entry.country ? ` · ${entry.country}` : ""}
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-1.5 text-[color:var(--foreground-muted)]">
+          <IconButton label="Edit education" onClick={onEdit}>
+            <PencilIcon />
+          </IconButton>
+          <IconButton label="Delete education" onClick={onDelete}>
+            <TrashIcon />
+          </IconButton>
+        </div>
+      </div>
+
+      {entry.description ? (
+        <p className="mt-4 text-sm leading-6 text-[color:var(--foreground)]">{entry.description}</p>
+      ) : null}
+    </article>
+  );
+}
+
+function CertificationCard({
+  entry,
+  onEdit,
+  onDelete,
+}: {
+  entry: CertificationEntry;
+  onEdit: () => void;
+  onDelete: () => void;
+}) {
+  return (
+    <article className="rounded-[1.5rem] border border-[color:var(--border)] bg-[color:var(--surface)] p-4 shadow-sm">
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex min-w-0 gap-3">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[0.9rem] bg-[color:var(--surface-soft)] text-sm font-semibold text-[color:var(--foreground-strong)]">
+            {getInitials(entry.issuingOrganization || entry.title)}
+          </div>
+          <div className="min-w-0">
+            <p className="truncate text-base font-semibold text-[color:var(--foreground-strong)]">{entry.title}</p>
+            <p className="mt-1 text-sm text-[color:var(--foreground-muted)]">{entry.issuingOrganization}</p>
+            <p className="mt-1 text-xs text-[color:var(--foreground-muted)]">
+              Issued {formatDateLabel(entry.issueDate)}
+              {entry.expirationDate ? ` · Expires ${formatDateLabel(entry.expirationDate)}` : ""}
+            </p>
+            {entry.credentialId ? (
+              <p className="mt-1 text-xs text-[color:var(--foreground-muted)]">Credential ID: {entry.credentialId}</p>
+            ) : null}
+          </div>
+        </div>
+
+        <div className="flex items-center gap-1.5 text-[color:var(--foreground-muted)]">
+          <IconButton label="Edit certification" onClick={onEdit}>
+            <PencilIcon />
+          </IconButton>
+          <IconButton label="Delete certification" onClick={onDelete}>
+            <TrashIcon />
+          </IconButton>
+        </div>
+      </div>
+
+      {entry.description ? <p className="mt-4 text-sm leading-6 text-[color:var(--foreground)]">{entry.description}</p> : null}
+
+      <div className="mt-4 flex flex-wrap gap-2">
+        {entry.certificationUrl ? (
+          <ActionChip label="Open link" onClick={() => window.open(entry.certificationUrl, "_blank", "noopener,noreferrer")} />
+        ) : null}
+        {entry.attachmentUrl ? (
+          <ActionChip
+            label={entry.attachmentFileName || "Open attachment"}
+            onClick={() => window.open(entry.attachmentUrl, "_blank", "noopener,noreferrer")}
+          />
+        ) : null}
+      </div>
+    </article>
+  );
+}
+
+function AwardCard({
+  entry,
+  onEdit,
+  onDelete,
+}: {
+  entry: AwardEntry;
+  onEdit: () => void;
+  onDelete: () => void;
+}) {
+  return (
+    <article className="rounded-[1.5rem] border border-[color:var(--border)] bg-[color:var(--surface)] p-4 shadow-sm">
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex min-w-0 gap-3">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[0.9rem] bg-[color:var(--surface-soft)] text-sm font-semibold text-[color:var(--foreground-strong)]">
+            {getInitials(entry.issuedBy || entry.title)}
+          </div>
+          <div className="min-w-0">
+            <p className="truncate text-base font-semibold text-[color:var(--foreground-strong)]">{entry.title}</p>
+            <p className="mt-1 text-sm text-[color:var(--foreground-muted)]">{entry.issuedBy}</p>
+            <p className="mt-1 text-xs text-[color:var(--foreground-muted)]">{formatDateLabel(entry.date)}</p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-1.5 text-[color:var(--foreground-muted)]">
+          <IconButton label="Edit award" onClick={onEdit}>
+            <PencilIcon />
+          </IconButton>
+          <IconButton label="Delete award" onClick={onDelete}>
+            <TrashIcon />
+          </IconButton>
+        </div>
+      </div>
+
+      {entry.description ? <p className="mt-4 text-sm leading-6 text-[color:var(--foreground)]">{entry.description}</p> : null}
+
+      <div className="mt-4 flex flex-wrap gap-2">
+        {entry.referenceUrl ? (
+          <ActionChip label="Open link" onClick={() => window.open(entry.referenceUrl, "_blank", "noopener,noreferrer")} />
+        ) : null}
+        {entry.attachmentUrl ? (
+          <ActionChip
+            label={entry.attachmentFileName || "Open attachment"}
+            onClick={() => window.open(entry.attachmentUrl, "_blank", "noopener,noreferrer")}
+          />
+        ) : null}
+      </div>
+    </article>
+  );
+}
+
+function IconButton({
+  label,
+  onClick,
+  children,
+}: {
+  label: string;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={label}
+      className="grid h-9 w-9 place-items-center rounded-full border border-[color:var(--border)] bg-[color:var(--surface-soft)] text-[color:var(--foreground-muted)] transition hover:text-[color:var(--foreground-strong)]"
+    >
+      {children}
+    </button>
+  );
+}
+
+function ActionChip({ label, onClick }: { label: string; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="rounded-full border border-[color:var(--border)] bg-[color:var(--surface-soft)] px-3 py-1.5 text-xs font-semibold text-[color:var(--foreground-strong)] transition hover:bg-[color:var(--surface)]"
+    >
+      {label}
+    </button>
+  );
+}
+
 function getInitials(name: string) {
   const parts = name
     .trim()
@@ -503,7 +1310,20 @@ function splitItems(value: string) {
     .filter(Boolean);
 }
 
-function getProfileCompletion(profile: ProfileFormValues) {
+function removeDelimitedItem(value: string, itemToRemove: string) {
+  return splitItems(value)
+    .filter((item) => item.toLowerCase() !== itemToRemove.trim().toLowerCase())
+    .join(", ");
+}
+
+function getProfileCompletion(
+  profile: ProfileFormValues & {
+    experienceEntries?: ExperienceEntry[];
+    educationEntries?: EducationEntry[];
+    certificationEntries?: CertificationEntry[];
+    awardEntries?: AwardEntry[];
+  }
+) {
   const fields: Array<keyof ProfileFormValues> = [
     "fullName",
     "headline",
@@ -517,10 +1337,6 @@ function getProfileCompletion(profile: ProfileFormValues) {
     "address",
     "location",
     "summary",
-    "experience",
-    "education",
-    "certifications",
-    "awards",
     "skills",
     "languages",
     "documents",
@@ -533,8 +1349,261 @@ function getProfileCompletion(profile: ProfileFormValues) {
   ];
 
   const filled = fields.filter((field) => profile[field].trim().length > 0).length;
+  const structuredFilled =
+    Number((profile.experienceEntries?.length ?? 0) > 0 || profile.experience.trim().length > 0) +
+    Number((profile.educationEntries?.length ?? 0) > 0 || profile.education.trim().length > 0) +
+    Number((profile.certificationEntries?.length ?? 0) > 0 || profile.certifications.trim().length > 0) +
+    Number((profile.awardEntries?.length ?? 0) > 0 || profile.awards.trim().length > 0);
+  const total = fields.length + 4;
 
-  return Math.min(100, Math.round((filled / fields.length) * 100));
+  return Math.min(100, Math.round(((filled + structuredFilled) / total) * 100));
+}
+
+function serializeExperienceEntries(entries: ExperienceEntry[]) {
+  return entries
+    .map((entry) =>
+      [
+        entry.position,
+        entry.organization,
+        entry.employmentType,
+        formatDateRange(entry.startDate, entry.endDate, entry.currentlyWorking),
+        [entry.country, entry.province].filter(Boolean).join(", "),
+        entry.skills,
+        entry.description,
+      ]
+        .filter(Boolean)
+        .join("\n")
+    )
+    .join("\n\n");
+}
+
+function serializeEducationEntries(entries: EducationEntry[]) {
+  return entries
+    .map((entry) =>
+      [
+        entry.degree,
+        entry.institution,
+        entry.fieldOfStudy,
+        formatDateRange(entry.startDate, entry.endDate, false),
+        [entry.country, entry.province].filter(Boolean).join(", "),
+        entry.description,
+      ]
+        .filter(Boolean)
+        .join("\n")
+    )
+    .join("\n\n");
+}
+
+function serializeCertificationEntries(entries: CertificationEntry[]) {
+  return entries
+    .map((entry) =>
+      [
+        entry.title,
+        entry.issuingOrganization,
+        entry.issueDate,
+        entry.expirationDate,
+        entry.credentialId,
+        entry.certificationUrl,
+        entry.description,
+        entry.attachmentFileName,
+      ]
+        .filter(Boolean)
+        .join("\n")
+    )
+    .join("\n\n");
+}
+
+function serializeAwardEntries(entries: AwardEntry[]) {
+  return entries
+    .map((entry) =>
+      [entry.title, entry.issuedBy, entry.date, entry.referenceUrl, entry.description, entry.attachmentFileName]
+        .filter(Boolean)
+        .join("\n")
+    )
+    .join("\n\n");
+}
+
+function mapExperienceEntryToForm(entry: ExperienceEntry | null): ExperienceEntryFormValues | null {
+  if (!entry) return null;
+
+  return {
+    position: entry.position,
+    organization: entry.organization,
+    employmentType: entry.employmentType,
+    currentlyWorking: entry.currentlyWorking,
+    startDate: entry.startDate,
+    endDate: entry.endDate,
+    country: entry.country,
+    province: entry.province,
+    skills: entry.skills,
+    description: entry.description,
+  };
+}
+
+function mapEducationEntryToForm(entry: EducationEntry | null): EducationEntryFormValues | null {
+  if (!entry) return null;
+
+  return {
+    degree: entry.degree,
+    institution: entry.institution,
+    fieldOfStudy: entry.fieldOfStudy,
+    country: entry.country,
+    province: entry.province,
+    startDate: entry.startDate,
+    endDate: entry.endDate,
+    description: entry.description,
+  };
+}
+
+function mapCertificationEntryToForm(entry: CertificationEntry | null): CertificationEntryFormValues | null {
+  if (!entry) return null;
+
+  return {
+    title: entry.title,
+    certificationUrl: entry.certificationUrl,
+    credentialId: entry.credentialId,
+    issuingOrganization: entry.issuingOrganization,
+    issueDate: entry.issueDate,
+    expirationDate: entry.expirationDate,
+    description: entry.description,
+    attachmentUrl: entry.attachmentUrl,
+    attachmentStoragePath: entry.attachmentStoragePath,
+    attachmentFileName: entry.attachmentFileName,
+  };
+}
+
+function mapAwardEntryToForm(entry: AwardEntry | null): AwardEntryFormValues | null {
+  if (!entry) return null;
+
+  return {
+    title: entry.title,
+    issuedBy: entry.issuedBy,
+    date: entry.date,
+    description: entry.description,
+    referenceUrl: entry.referenceUrl,
+    attachmentUrl: entry.attachmentUrl,
+    attachmentStoragePath: entry.attachmentStoragePath,
+    attachmentFileName: entry.attachmentFileName,
+  };
+}
+
+function mapExperienceFormToEntry(values: ExperienceEntryFormValues, id?: string): ExperienceEntry {
+  return {
+    id: id ?? createEntryId(),
+    position: values.position.trim(),
+    organization: values.organization.trim(),
+    employmentType: values.employmentType.trim(),
+    currentlyWorking: values.currentlyWorking,
+    startDate: values.startDate.trim(),
+    endDate: values.currentlyWorking ? "" : values.endDate.trim(),
+    country: values.country.trim(),
+    province: values.province.trim(),
+    skills: values.skills.trim(),
+    description: values.description.trim(),
+  };
+}
+
+function mapEducationFormToEntry(values: EducationEntryFormValues, id?: string): EducationEntry {
+  return {
+    id: id ?? createEntryId(),
+    degree: values.degree.trim(),
+    institution: values.institution.trim(),
+    fieldOfStudy: values.fieldOfStudy.trim(),
+    country: values.country.trim(),
+    province: values.province.trim(),
+    startDate: values.startDate.trim(),
+    endDate: values.endDate.trim(),
+    description: values.description.trim(),
+  };
+}
+
+function mapCertificationFormToEntry(values: CertificationEntryFormValues, id?: string): CertificationEntry {
+  return {
+    id: id ?? createEntryId(),
+    title: values.title.trim(),
+    certificationUrl: values.certificationUrl.trim(),
+    credentialId: values.credentialId.trim(),
+    issuingOrganization: values.issuingOrganization.trim(),
+    issueDate: values.issueDate.trim(),
+    expirationDate: values.expirationDate.trim(),
+    description: values.description.trim(),
+    attachmentUrl: values.attachmentUrl.trim(),
+    attachmentStoragePath: values.attachmentStoragePath.trim(),
+    attachmentFileName: values.attachmentFileName.trim(),
+  };
+}
+
+function mapAwardFormToEntry(values: AwardEntryFormValues, id?: string): AwardEntry {
+  return {
+    id: id ?? createEntryId(),
+    title: values.title.trim(),
+    issuedBy: values.issuedBy.trim(),
+    date: values.date.trim(),
+    description: values.description.trim(),
+    referenceUrl: values.referenceUrl.trim(),
+    attachmentUrl: values.attachmentUrl.trim(),
+    attachmentStoragePath: values.attachmentStoragePath.trim(),
+    attachmentFileName: values.attachmentFileName.trim(),
+  };
+}
+
+function createEntryId() {
+  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
+    return crypto.randomUUID();
+  }
+
+  return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
+
+function formatDateRange(startDate: string, endDate: string, currentlyWorking: boolean) {
+  const startLabel = formatDateLabel(startDate);
+  const endLabel = currentlyWorking ? "Present" : formatDateLabel(endDate);
+
+  if (startLabel && endLabel) {
+    return `${startLabel} - ${endLabel}`;
+  }
+
+  return startLabel || endLabel || "Date not added";
+}
+
+function formatDateLabel(value: string) {
+  if (!value) return "";
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  return new Intl.DateTimeFormat("en", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  }).format(date);
+}
+
+function getFileNameFromUrl(value: string) {
+  try {
+    const url = new URL(value);
+    const parts = url.pathname.split("/").filter(Boolean);
+    const fileName = parts.at(-1);
+    if (!fileName) {
+      return "resume";
+    }
+
+    return decodeURIComponent(fileName);
+  } catch {
+    return value.split("/").filter(Boolean).at(-1) ?? "resume";
+  }
+}
+
+function getFileNameFromPath(value: string) {
+  const parts = value.split("/").filter(Boolean);
+  const fileName = parts.at(-1);
+  if (!fileName) {
+    return "resume";
+  }
+
+  return decodeURIComponent(fileName);
 }
 
 function PlusIcon() {
@@ -555,6 +1624,21 @@ function TrashIcon() {
         strokeLinecap="round"
         strokeLinejoin="round"
       />
+    </svg>
+  );
+}
+
+function PencilIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-4.5 w-4.5" fill="none" aria-hidden="true">
+      <path
+        d="M4.5 19.5 9 18.5l9.5-9.5a1.6 1.6 0 0 0 0-2.3l-1.2-1.2a1.6 1.6 0 0 0-2.3 0L5.5 15l-1 4.5Z"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path d="M13.5 6.5 17.5 10.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
     </svg>
   );
 }

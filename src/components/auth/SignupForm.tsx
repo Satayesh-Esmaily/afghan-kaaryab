@@ -1,10 +1,12 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import FormField from "@/components/common/FormField";
 import PasswordField from "@/components/common/PasswordField";
+import AuthNotice from "@/components/auth/AuthNotice";
 import { authCopy } from "@/config/auth";
 import { useAppData } from "@/context/app-context";
 import { signupFormSchema, type SignupFormValues } from "@/lib/schemas";
@@ -12,6 +14,9 @@ import { signupFormSchema, type SignupFormValues } from "@/lib/schemas";
 export default function SignupForm() {
   const router = useRouter();
   const { signup } = useAppData();
+  const [notice, setNotice] = useState<{ tone: "error" | "info" | "success"; title: string; message: string } | null>(
+    null
+  );
   const {
     register,
     handleSubmit,
@@ -29,8 +34,28 @@ export default function SignupForm() {
   return (
     <form
       onSubmit={handleSubmit(async (values) => {
-        signup(values);
-        router.replace("/profile");
+        setNotice(null);
+
+        try {
+          const result = await signup(values);
+
+          if (result.needsConfirmation) {
+            setNotice({
+              tone: "info",
+              title: authCopy.signupPendingTitle,
+              message: authCopy.signupPendingMessage,
+            });
+            return;
+          }
+
+          router.replace("/profile?status=welcome");
+        } catch (error) {
+          setNotice({
+            tone: "error",
+            title: authCopy.signupErrorFallback,
+            message: error instanceof Error ? error.message : authCopy.authErrorFallback,
+          });
+        }
       })}
       className="space-y-5"
     >
@@ -76,6 +101,8 @@ export default function SignupForm() {
       >
         {authCopy.signupSubmitLabel}
       </button>
+
+      {notice ? <AuthNotice tone={notice.tone} title={notice.title} message={notice.message} /> : null}
     </form>
   );
 }

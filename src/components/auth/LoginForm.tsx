@@ -1,10 +1,12 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import FormField from "@/components/common/FormField";
 import PasswordField from "@/components/common/PasswordField";
+import AuthNotice from "@/components/auth/AuthNotice";
 import { authCopy } from "@/config/auth";
 import { useAppData } from "@/context/app-context";
 import { loginFormSchema, type LoginFormValues } from "@/lib/schemas";
@@ -12,6 +14,9 @@ import { loginFormSchema, type LoginFormValues } from "@/lib/schemas";
 export default function LoginForm() {
   const router = useRouter();
   const { login } = useAppData();
+  const [notice, setNotice] = useState<{ tone: "error" | "info" | "success"; title: string; message: string } | null>(
+    null
+  );
   const {
     register,
     handleSubmit,
@@ -27,8 +32,18 @@ export default function LoginForm() {
   return (
     <form
       onSubmit={handleSubmit(async (values) => {
-        login(values);
-        router.replace("/dashboard");
+        setNotice(null);
+
+        try {
+          await login(values);
+          router.replace("/dashboard?status=welcome");
+        } catch (error) {
+          setNotice({
+            tone: "error",
+            title: authCopy.loginErrorFallback,
+            message: error instanceof Error ? error.message : authCopy.authErrorFallback,
+          });
+        }
       })}
       className="space-y-5"
     >
@@ -57,6 +72,8 @@ export default function LoginForm() {
       >
         {authCopy.loginSubmitLabel}
       </button>
+
+      {notice ? <AuthNotice tone={notice.tone} title={notice.title} message={notice.message} /> : null}
     </form>
   );
 }

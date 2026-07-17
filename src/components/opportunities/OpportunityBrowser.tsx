@@ -18,7 +18,8 @@ type GenderFilter = "Any" | "Male" | "Female" | "Open to all";
 type LevelFilter = "Any" | (typeof opportunityLevels)[number];
 
 export default function OpportunityBrowser({ opportunities }: { opportunities: Opportunity[] }) {
-  const { savedIds } = useAppData();
+  const { savedIds, opportunities: storedOpportunities, hydrated } = useAppData();
+  const activeOpportunities = hydrated ? storedOpportunities : opportunities;
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<(typeof opportunityCategories)[number] | "All">("All");
   const [location, setLocation] = useState("All");
@@ -30,15 +31,15 @@ export default function OpportunityBrowser({ opportunities }: { opportunities: O
   const [deadline, setDeadline] = useState<DeadlineFilter>("all");
 
   const locationOptions = useMemo(
-    () => ["All", ...new Set(opportunities.map((item) => item.location))],
-    [opportunities]
+    () => ["All", ...new Set(activeOpportunities.map((item) => item.location))],
+    [activeOpportunities]
   );
   const companyOptions = useMemo(
-    () => ["All", ...new Set(opportunities.map((item) => item.organization))],
-    [opportunities]
+    () => ["All", ...new Set(activeOpportunities.map((item) => item.organization))],
+    [activeOpportunities]
   );
 
-  const filtered = opportunities
+  const filtered = activeOpportunities
     .filter((opportunity) => {
       const searchTarget = [
         opportunity.title,
@@ -252,7 +253,7 @@ export default function OpportunityBrowser({ opportunities }: { opportunities: O
           </div>
           <div className="flex flex-wrap gap-2">
             <Badge tone="default">{savedIds.length} saved</Badge>
-            <Badge tone="success">{opportunities.length} total</Badge>
+            <Badge tone="success">{activeOpportunities.length} total</Badge>
           </div>
         </div>
 
