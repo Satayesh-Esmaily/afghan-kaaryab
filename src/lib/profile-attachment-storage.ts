@@ -9,7 +9,7 @@ export async function uploadProfileAttachment(file: File, userId: string, folder
   const supabase = getSupabaseBrowserClient();
   if (!supabase || !userId) return null;
 
-  const path = `profiles/${sanitizeStoragePath(userId)}/${folder}/${Date.now()}-${sanitizeStoragePath(
+  const path = `${sanitizeStoragePath(userId)}/${folder}/${Date.now()}-${sanitizeStoragePath(
     file.name || "attachment"
   )}`;
 

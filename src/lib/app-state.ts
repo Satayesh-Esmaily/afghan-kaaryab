@@ -56,6 +56,16 @@ export type AwardEntry = {
   attachmentFileName: string;
 };
 
+export type DocumentEntry = {
+  id: string;
+  title: string;
+  documentType: string;
+  description: string;
+  attachmentUrl: string;
+  attachmentStoragePath: string;
+  attachmentFileName: string;
+};
+
 export type AuthUser = {
   id: string;
   email: string;
@@ -71,6 +81,7 @@ export type JobSeekerProfile = {
   resumeStoragePath: string;
   certificationEntries: CertificationEntry[];
   awardEntries: AwardEntry[];
+  documentEntries: DocumentEntry[];
   country: string;
   province: string;
   nationality: string;
@@ -132,6 +143,7 @@ export function createDefaultProfile(user: AuthUser | null): JobSeekerProfile {
     resumeStoragePath: "",
     certificationEntries: [],
     awardEntries: [],
+    documentEntries: [],
     country: "Afghanistan",
     province: "Kabul",
     nationality: "Afghan",
@@ -199,6 +211,7 @@ export function normalizeAppState(
         ? profile.certificationEntries
         : defaults.profile.certificationEntries,
       awardEntries: Array.isArray(profile.awardEntries) ? profile.awardEntries : defaults.profile.awardEntries,
+      documentEntries: Array.isArray(profile.documentEntries) ? profile.documentEntries : defaults.profile.documentEntries,
       experienceEntries: Array.isArray(profile.experienceEntries) ? profile.experienceEntries : defaults.profile.experienceEntries,
       educationEntries: Array.isArray(profile.educationEntries) ? profile.educationEntries : defaults.profile.educationEntries,
       resumeTemplate: profile.resumeTemplate ?? defaults.profile.resumeTemplate,

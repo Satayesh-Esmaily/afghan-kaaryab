@@ -9,7 +9,7 @@ export async function uploadAvatarFile(file: File, userId: string) {
 
   const compressed = await compressAvatarImage(file);
   const blob = await dataUrlToBlob(compressed);
-  const path = `profiles/${sanitizeStoragePath(userId)}/avatar.webp`;
+  const path = `${sanitizeStoragePath(userId)}/avatar.webp`;
 
   const { error } = await supabase.storage.from(AVATAR_BUCKET_NAME).upload(path, blob, {
     contentType: "image/webp",

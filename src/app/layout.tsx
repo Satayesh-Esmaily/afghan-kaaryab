@@ -44,7 +44,10 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${manrope.variable} ${splineMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full bg-[color:var(--background)] text-[color:var(--foreground)]">
+      <body
+        suppressHydrationWarning
+        className="min-h-full bg-[color:var(--background)] text-[color:var(--foreground)]"
+      >
         <Providers>
           <AppShell>{children}</AppShell>
         </Providers>

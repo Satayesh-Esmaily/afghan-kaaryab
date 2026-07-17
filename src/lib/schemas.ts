@@ -117,6 +117,17 @@ export const awardEntrySchema = z.object({
 
 export type AwardEntryFormValues = z.infer<typeof awardEntrySchema>;
 
+export const documentEntrySchema = z.object({
+  title: requiredText,
+  documentType: requiredText,
+  description: z.string().trim(),
+  attachmentUrl: z.string().trim().min(1, "Attachment is required."),
+  attachmentStoragePath: z.string().trim().min(1, "Attachment is required."),
+  attachmentFileName: z.string().trim().min(1, "Attachment is required."),
+});
+
+export type DocumentEntryFormValues = z.infer<typeof documentEntrySchema>;
+
 export const profileFormSchema = z.object({
   fullName: z.string().trim().min(2, "Full name is required."),
   headline: z.string().trim().min(3, "Headline is required."),
@@ -135,7 +146,7 @@ export const profileFormSchema = z.object({
   certifications: z.string().trim(),
   awards: z.string().trim(),
   languages: z.string().trim().min(2, "Languages are required."),
-  documents: z.string().trim().min(2, "Documents are required."),
+  documents: z.string().trim(),
   portfolioUrl: z.string().trim(),
   linkedinUrl: z.string().trim(),
   githubUrl: z.string().trim(),

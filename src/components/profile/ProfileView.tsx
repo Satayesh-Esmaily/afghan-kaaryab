@@ -14,20 +14,25 @@ import {
   CertificationEntryDialog,
   EducationEntryDialog,
   ExperienceEntryDialog,
+  DocumentEntryDialog,
 } from "@/components/profile/ProfileEntryDialog";
 import { useAppData } from "@/context/app-context";
 import { getAvatarAccessUrl, uploadAvatarFile } from "@/lib/avatar-storage";
+import { getProfileAttachmentAccessUrl } from "@/lib/profile-attachment-storage";
 import { deleteResumeFile, getResumeAccessUrl, uploadResumeFile } from "@/lib/resume-storage";
+import { deleteProfileAttachment } from "@/lib/profile-attachment-storage";
 import { countryOptions, genderOptions, nationalityOptions } from "@/data/profile-options";
 import type {
   AwardEntry,
   CertificationEntry,
   EducationEntry,
+  DocumentEntry,
   ExperienceEntry,
 } from "@/lib/app-state";
 import {
   type AwardEntryFormValues,
   type CertificationEntryFormValues,
+  type DocumentEntryFormValues,
   profileFormSchema,
   type EducationEntryFormValues,
   type ExperienceEntryFormValues,
@@ -59,6 +64,9 @@ export default function ProfileView() {
   const [awardEntries, setAwardEntries] = useState<AwardEntry[]>(
     Array.isArray(profile.awardEntries) ? profile.awardEntries : []
   );
+  const [documentEntries, setDocumentEntries] = useState<DocumentEntry[]>(
+    Array.isArray(profile.documentEntries) ? profile.documentEntries : []
+  );
   const [experienceEntries, setExperienceEntries] = useState<ExperienceEntry[]>(
     Array.isArray(profile.experienceEntries) ? profile.experienceEntries : []
   );
@@ -69,6 +77,7 @@ export default function ProfileView() {
   const [editingEducationIndex, setEditingEducationIndex] = useState<number | null>(null);
   const [editingCertificationIndex, setEditingCertificationIndex] = useState<number | null>(null);
   const [editingAwardIndex, setEditingAwardIndex] = useState<number | null>(null);
+  const [editingDocumentIndex, setEditingDocumentIndex] = useState<number | null>(null);
   const avatarInputRef = useRef<HTMLInputElement | null>(null);
   const resumeInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -93,6 +102,12 @@ export default function ProfileView() {
   const selectedNationality = watch("nationality");
   const selectedGender = watch("gender");
   const selectedDateOfBirth = watch("dateOfBirth");
+  useEffect(() => {
+    setValue("documents", serializeDocumentEntries(documentEntries), {
+      shouldDirty: false,
+      shouldValidate: false,
+    });
+  }, [documentEntries, setValue]);
   const removeSkill = (skillToRemove: string) => {
     updateProfile({ skills: removeDelimitedItem(profile.skills, skillToRemove) });
   };
@@ -115,6 +130,10 @@ export default function ProfileView() {
   useEffect(() => {
     setAwardEntries(Array.isArray(profile.awardEntries) ? profile.awardEntries : []);
   }, [profile.awardEntries]);
+
+  useEffect(() => {
+    setDocumentEntries(Array.isArray(profile.documentEntries) ? profile.documentEntries : []);
+  }, [profile.documentEntries]);
 
   useEffect(() => {
     if (profile.resumeStoragePath) {
@@ -179,6 +198,49 @@ export default function ProfileView() {
       cancelled = true;
     };
   }, [profile.resumeStoragePath, profile.resumeUrl, updateProfile]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function refreshAttachmentUrls() {
+      const [certificationEntries, awardEntries, documentEntries] = await Promise.all([
+        resolveAttachmentEntryUrls(profile.certificationEntries),
+        resolveAttachmentEntryUrls(profile.awardEntries),
+        resolveAttachmentEntryUrls(profile.documentEntries),
+      ]);
+
+      if (cancelled) {
+        return;
+      }
+
+      if (certificationEntries !== profile.certificationEntries) {
+        updateProfile({
+          certificationEntries,
+          certifications: serializeCertificationEntries(certificationEntries),
+        });
+      }
+
+      if (awardEntries !== profile.awardEntries) {
+        updateProfile({
+          awardEntries,
+          awards: serializeAwardEntries(awardEntries),
+        });
+      }
+
+      if (documentEntries !== profile.documentEntries) {
+        updateProfile({
+          documentEntries,
+          documents: serializeDocumentEntries(documentEntries),
+        });
+      }
+    }
+
+    void refreshAttachmentUrls();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [profile.awardEntries, profile.certificationEntries, profile.documentEntries, updateProfile]);
 
   if (!authenticated) {
     return (
@@ -584,13 +646,16 @@ export default function ProfileView() {
                     key={entry.id}
                     entry={entry}
                     onEdit={() => setEditingCertificationIndex(index)}
-                    onDelete={() => {
+                    onDelete={async () => {
                       const next = certificationEntries.filter((_, itemIndex) => itemIndex !== index);
                       setCertificationEntries(next);
                       updateProfile({
                         certificationEntries: next,
                         certifications: serializeCertificationEntries(next),
                       });
+                      if (entry.attachmentStoragePath) {
+                        await deleteProfileAttachment(entry.attachmentStoragePath);
+                      }
                     }}
                   />
                 ))
@@ -615,13 +680,16 @@ export default function ProfileView() {
                     key={entry.id}
                     entry={entry}
                     onEdit={() => setEditingAwardIndex(index)}
-                    onDelete={() => {
+                    onDelete={async () => {
                       const next = awardEntries.filter((_, itemIndex) => itemIndex !== index);
                       setAwardEntries(next);
                       updateProfile({
                         awardEntries: next,
                         awards: serializeAwardEntries(next),
                       });
+                      if (entry.attachmentStoragePath) {
+                        await deleteProfileAttachment(entry.attachmentStoragePath);
+                      }
                     }}
                   />
                 ))
@@ -726,9 +794,39 @@ export default function ProfileView() {
           </ProfileSection>
 
           <ProfileSection title="Supporting Documents" description="Keep your documents ready for applications.">
-            <FormField label="Required Documents" error={errors.documents?.message}>
-              <input {...register("documents")} className="ds-input" placeholder="CV, national ID, certificates" />
-            </FormField>
+            <EntriesHeader actionLabel="Add Document" onAction={() => setEditingDocumentIndex(-1)} />
+
+            <input {...register("documents")} type="hidden" />
+
+            <div className="mt-6 grid gap-4 xl:grid-cols-2">
+              {documentEntries.length > 0 ? (
+                documentEntries.map((entry, index) => (
+                  <DocumentCard
+                    key={entry.id}
+                    entry={entry}
+                    onEdit={() => setEditingDocumentIndex(index)}
+                    onDelete={async () => {
+                      const next = documentEntries.filter((_, itemIndex) => itemIndex !== index);
+                      setDocumentEntries(next);
+                      updateProfile({
+                        documentEntries: next,
+                        documents: serializeDocumentEntries(next),
+                      });
+                      if (entry.attachmentStoragePath) {
+                        await deleteProfileAttachment(entry.attachmentStoragePath);
+                      }
+                    }}
+                  />
+                ))
+              ) : (
+                <EmptyListCard
+                  title="No documents added yet"
+                  description="Upload CVs, IDs, passports, transcripts, or other supporting files."
+                  actionLabel="Add Document"
+                  onAction={() => setEditingDocumentIndex(-1)}
+                />
+              )}
+            </div>
           </ProfileSection>
 
         <div className="flex justify-end">
@@ -846,6 +944,33 @@ export default function ProfileView() {
             awards: serializeAwardEntries(nextEntries),
           });
           setEditingAwardIndex(null);
+        }}
+      />
+
+      <DocumentEntryDialog
+        open={editingDocumentIndex !== null}
+        initialValues={
+          editingDocumentIndex === null
+            ? null
+            : editingDocumentIndex < 0
+              ? null
+              : mapDocumentEntryToForm(documentEntries[editingDocumentIndex] ?? null)
+        }
+        userId={user?.id ?? null}
+        onClose={() => setEditingDocumentIndex(null)}
+        onSave={(values) => {
+          const nextEntry = mapDocumentFormToEntry(values, documentEntries[editingDocumentIndex ?? -1]?.id);
+          const nextEntries =
+            editingDocumentIndex === null || editingDocumentIndex < 0
+              ? [nextEntry, ...documentEntries]
+              : documentEntries.map((entry, index) => (index === editingDocumentIndex ? nextEntry : entry));
+
+          setDocumentEntries(nextEntries);
+          updateProfile({
+            documentEntries: nextEntries,
+            documents: serializeDocumentEntries(nextEntries),
+          });
+          setEditingDocumentIndex(null);
         }}
       />
     </div>
@@ -1258,6 +1383,52 @@ function AwardCard({
   );
 }
 
+function DocumentCard({
+  entry,
+  onEdit,
+  onDelete,
+}: {
+  entry: DocumentEntry;
+  onEdit: () => void;
+  onDelete: () => void | Promise<void>;
+}) {
+  return (
+    <article className="rounded-[1.5rem] border border-[color:var(--border)] bg-[color:var(--surface)] p-4 shadow-sm">
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex min-w-0 gap-3">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[0.9rem] bg-[color:var(--surface-soft)] text-sm font-semibold text-[color:var(--foreground-strong)]">
+            {getInitials(entry.documentType || entry.title)}
+          </div>
+          <div className="min-w-0">
+            <p className="truncate text-base font-semibold text-[color:var(--foreground-strong)]">{entry.title}</p>
+            <p className="mt-1 text-sm text-[color:var(--foreground-muted)]">{entry.documentType}</p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-1.5 text-[color:var(--foreground-muted)]">
+          <IconButton label="Edit document" onClick={onEdit}>
+            <PencilIcon />
+          </IconButton>
+          <IconButton label="Delete document" onClick={onDelete}>
+            <TrashIcon />
+          </IconButton>
+        </div>
+      </div>
+
+      {entry.description ? <p className="mt-4 text-sm leading-6 text-[color:var(--foreground)]">{entry.description}</p> : null}
+
+      <div className="mt-4 flex flex-wrap gap-2">
+        {entry.attachmentUrl ? (
+          <ActionChip
+            label={entry.attachmentFileName || "Open attachment"}
+            onClick={() => window.open(entry.attachmentUrl, "_blank", "noopener,noreferrer")}
+          />
+        ) : null}
+      </div>
+    </article>
+  );
+}
+
 function IconButton({
   label,
   onClick,
@@ -1322,6 +1493,7 @@ function getProfileCompletion(
     educationEntries?: EducationEntry[];
     certificationEntries?: CertificationEntry[];
     awardEntries?: AwardEntry[];
+    documentEntries?: DocumentEntry[];
   }
 ) {
   const fields: Array<keyof ProfileFormValues> = [
@@ -1353,8 +1525,9 @@ function getProfileCompletion(
     Number((profile.experienceEntries?.length ?? 0) > 0 || profile.experience.trim().length > 0) +
     Number((profile.educationEntries?.length ?? 0) > 0 || profile.education.trim().length > 0) +
     Number((profile.certificationEntries?.length ?? 0) > 0 || profile.certifications.trim().length > 0) +
-    Number((profile.awardEntries?.length ?? 0) > 0 || profile.awards.trim().length > 0);
-  const total = fields.length + 4;
+    Number((profile.awardEntries?.length ?? 0) > 0 || profile.awards.trim().length > 0) +
+    Number((profile.documentEntries?.length ?? 0) > 0 || profile.documents.trim().length > 0);
+  const total = fields.length + 5;
 
   return Math.min(100, Math.round(((filled + structuredFilled) / total) * 100));
 }
@@ -1423,6 +1596,12 @@ function serializeAwardEntries(entries: AwardEntry[]) {
     .join("\n\n");
 }
 
+function serializeDocumentEntries(entries: DocumentEntry[]) {
+  return entries
+    .map((entry) => [entry.title, entry.documentType, entry.description, entry.attachmentFileName].filter(Boolean).join("\n"))
+    .join("\n\n");
+}
+
 function mapExperienceEntryToForm(entry: ExperienceEntry | null): ExperienceEntryFormValues | null {
   if (!entry) return null;
 
@@ -1481,6 +1660,19 @@ function mapAwardEntryToForm(entry: AwardEntry | null): AwardEntryFormValues | n
     date: entry.date,
     description: entry.description,
     referenceUrl: entry.referenceUrl,
+    attachmentUrl: entry.attachmentUrl,
+    attachmentStoragePath: entry.attachmentStoragePath,
+    attachmentFileName: entry.attachmentFileName,
+  };
+}
+
+function mapDocumentEntryToForm(entry: DocumentEntry | null): DocumentEntryFormValues | null {
+  if (!entry) return null;
+
+  return {
+    title: entry.title,
+    documentType: entry.documentType,
+    description: entry.description,
     attachmentUrl: entry.attachmentUrl,
     attachmentStoragePath: entry.attachmentStoragePath,
     attachmentFileName: entry.attachmentFileName,
@@ -1547,6 +1739,18 @@ function mapAwardFormToEntry(values: AwardEntryFormValues, id?: string): AwardEn
   };
 }
 
+function mapDocumentFormToEntry(values: DocumentEntryFormValues, id?: string): DocumentEntry {
+  return {
+    id: id ?? createEntryId(),
+    title: values.title.trim(),
+    documentType: values.documentType.trim(),
+    description: values.description.trim(),
+    attachmentUrl: values.attachmentUrl.trim(),
+    attachmentStoragePath: values.attachmentStoragePath.trim(),
+    attachmentFileName: values.attachmentFileName.trim(),
+  };
+}
+
 function createEntryId() {
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
     return crypto.randomUUID();
@@ -1604,6 +1808,32 @@ function getFileNameFromPath(value: string) {
   }
 
   return decodeURIComponent(fileName);
+}
+
+async function resolveAttachmentEntryUrls<
+  T extends { attachmentStoragePath: string; attachmentUrl: string }
+>(entries: T[]) {
+  let changed = false;
+  const resolved = await Promise.all(
+    entries.map(async (entry) => {
+      if (!entry.attachmentStoragePath || entry.attachmentUrl) {
+        return entry;
+      }
+
+      const nextUrl = await getProfileAttachmentAccessUrl(entry.attachmentStoragePath);
+      if (!nextUrl) {
+        return entry;
+      }
+
+      changed = true;
+      return {
+        ...entry,
+        attachmentUrl: nextUrl,
+      };
+    })
+  );
+
+  return changed ? resolved : entries;
 }
 
 function PlusIcon() {

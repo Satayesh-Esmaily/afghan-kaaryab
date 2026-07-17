@@ -16,7 +16,7 @@ export async function uploadResumeFile(file: File, userId: string) {
   if (!supabase) return null;
 
   const safeName = sanitizeStoragePath(file.name || "resume");
-  const path = `profiles/${sanitizeStoragePath(userId)}/resumes/${Date.now()}-${safeName}`;
+  const path = `${sanitizeStoragePath(userId)}/resumes/${Date.now()}-${safeName}`;
 
   const { error } = await supabase.storage.from(RESUME_BUCKET_NAME).upload(path, file, {
     contentType: file.type || "application/octet-stream",

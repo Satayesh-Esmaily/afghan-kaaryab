@@ -239,6 +239,20 @@ export default function ResumeBuilderView() {
                     <ProfileLine label="Video intro" value={profile.introVideoUrl || "Not added"} />
                     <ProfileLine label="Documents" value={profile.documents} />
                   </div>
+                  {profile.documentEntries.length > 0 ? (
+                    <div className="mt-4 space-y-2">
+                      {profile.documentEntries.map((entry) => (
+                        <div key={entry.id} className="rounded-[1rem] border border-black/5 bg-white px-4 py-3">
+                          <p className="text-sm font-semibold text-black">{entry.title}</p>
+                          <p className="mt-1 text-xs text-black/55">{entry.documentType}</p>
+                          <p className="mt-2 text-sm leading-6 text-black/75">{entry.description || "Supporting document"}</p>
+                          <p className="mt-2 text-xs text-black/45">
+                            {entry.attachmentFileName || "Attached file"}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  ) : null}
                 </ResumePanel>
               </div>
             </div>

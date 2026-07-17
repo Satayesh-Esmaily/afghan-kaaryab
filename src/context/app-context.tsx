@@ -63,6 +63,27 @@ function getAppStateKey(user: AuthUser | null) {
   return user?.email ?? "main";
 }
 
+function createLocalStoragePayload(payload: AppStatePayload): AppStatePayload {
+  return {
+    ...payload,
+    profile: {
+      ...payload.profile,
+      avatarUrl: "",
+      resumeUrl: "",
+      certificationEntries: payload.profile.certificationEntries.map(stripAttachmentUrl),
+      awardEntries: payload.profile.awardEntries.map(stripAttachmentUrl),
+      documentEntries: payload.profile.documentEntries.map(stripAttachmentUrl),
+    },
+  };
+}
+
+function stripAttachmentUrl<T extends { attachmentUrl: string }>(entry: T): T {
+  return {
+    ...entry,
+    attachmentUrl: "",
+  };
+}
+
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [opportunities, setOpportunities] = useState<Opportunity[]>(createDefaultAppState().opportunities);
   const [savedIds, setSavedIds] = useState<string[]>(createDefaultAppState().savedIds);
@@ -200,20 +221,17 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       theme,
       user,
     };
+    const localStoragePayload = createLocalStoragePayload(payload);
 
     try {
-      window.localStorage.setItem(storageKey, JSON.stringify(payload));
+      window.localStorage.setItem(storageKey, JSON.stringify(localStoragePayload));
     } catch (error) {
       if (
         error instanceof DOMException &&
         (error.name === "QuotaExceededError" || error.name === "NS_ERROR_DOM_QUOTA_REACHED")
       ) {
         const safePayload = {
-          ...payload,
-          profile: {
-            ...payload.profile,
-            avatarUrl: payload.profile.avatarUrl.length > 120_000 ? "" : payload.profile.avatarUrl,
-          },
+          ...localStoragePayload,
         };
 
         try {
@@ -236,12 +254,17 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       saveTimerRef.current = window.setTimeout(() => {
         void (async () => {
           try {
-            await supabase.from("app_state").upsert({
+            const { error } = await supabase.from("app_state").upsert({
               id: activeAppStateKey,
               payload,
               updated_at: new Date().toISOString(),
             });
+
+            if (error) {
+              setRemoteStateSyncEnabled(false);
+            }
           } catch {
+            setRemoteStateSyncEnabled(false);
             // Ignore persistence errors and keep the UI responsive.
           }
         })();
