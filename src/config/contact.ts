@@ -1,17 +1,17 @@
 export const contactCopy = {
-  pageEyebrow: "Contact",
-  pageTitle: "Send feedback or share an opportunity",
+  pageEyebrow: "Contact & Support",
+  pageTitle: "Talk to the KaarYab team",
   pageDescription:
-    "Use this form to contact the KaarYab team, suggest improvements, or submit an opportunity idea.",
-  detailsTitle: "Contact details",
+    "Share job leads, report a problem, or send feedback that helps us improve the platform for Afghan job seekers.",
+  detailsTitle: "Platform contact",
   detailsDescription:
-    "We review every message and use your input to improve the platform for Afghan job seekers.",
-  email: "hello@kaaryab.af",
+    "We review messages from job seekers, employers, and organizations to keep the platform useful and up to date.",
+  email: "styshstysh6@gmail.com",
   location: "Afghanistan",
-  purpose: "helping Afghan job seekers and organizations connect",
-  formBadge: "Support form",
-  formBody: "Share questions, suggestions, or opportunities that should be added to the platform.",
-  successMessage: "Thanks. Your message has been sent to the KaarYab team.",
+  purpose: "supporting Afghan job seekers, employers, and organizations",
+  formBadge: "Message the team",
+  formBody: "Send us job leads, questions, bug reports, or suggestions to improve the platform.",
+  successMessage: "Thanks. We received your message and will review it soon.",
   submitLabel: "Send message",
 };
 

@@ -160,6 +160,9 @@ NEXT_PUBLIC_SUPABASE_RESUME_BUCKET=resumes
 NEXT_PUBLIC_SUPABASE_RESUME_BUCKET_PUBLIC=false
 NEXT_PUBLIC_SUPABASE_PROFILE_ATTACHMENT_BUCKET=profile-attachments
 NEXT_PUBLIC_SUPABASE_PROFILE_ATTACHMENT_BUCKET_PUBLIC=false
+RESEND_API_KEY=your_resend_api_key
+CONTACT_TO_EMAIL=your_inbox@example.com
+CONTACT_FROM_EMAIL=KaarYab Afghanistan <onboarding@resend.dev>
 ```
 
 ## Suggested Supabase Setup
@@ -187,6 +190,19 @@ For authenticated users, keep uploads scoped to each user folder when possible.
 - Users can upload their own resumes
 - Users can upload attachments for certifications and awards
 - Users can read and delete only their own files
+
+### Contact Form Email Delivery
+
+The contact form sends messages through a server route. To enable real email delivery, add these variables to `.env.local`:
+
+```bash
+RESEND_API_KEY=your_resend_api_key
+CONTACT_TO_EMAIL=your_inbox@example.com
+CONTACT_FROM_EMAIL=KaarYab Afghanistan <onboarding@resend.dev>
+```
+
+If `CONTACT_TO_EMAIL` is omitted, the app falls back to `hello@kaaryab.af`.
+The current local setup uses Resend's testing sender format. When your own domain is verified, replace `CONTACT_FROM_EMAIL` with an address on that verified domain.
 
 ### App State Table
 
@@ -258,6 +274,26 @@ public/
 - Cards and sections are reusable and consistent
 - Fonts are controlled globally through the app layout
 - Form controls are intentionally compact for a cleaner dashboard-like experience
+
+## Design System Preview
+
+The project includes a small visual design system with shared color tokens, compact typography, and brand assets.
+
+### Colors
+
+![Color System](./public/Design%20System/Color%20System.png)
+
+### Typography
+
+![Typography System](./public/Design%20System/Tyography%20Type.png)
+
+### Brand Assets
+
+![KaarYab Logo](./public/logos/kaaryab-logo.png)
+
+![App Icon](./public/icon.png)
+
+![PWA Icon](./public/pwa-icon.svg)
 
 ## PWA Notes
 

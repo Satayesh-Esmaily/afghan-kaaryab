@@ -8,7 +8,7 @@ import { contactCopy, contactFormFields } from "@/config/contact";
 import { contactFormSchema, type ContactFormValues } from "@/lib/schemas";
 
 export default function ContactForm() {
-  const [submitted, setSubmitted] = useState(false);
+  const [submitMessage, setSubmitMessage] = useState("");
   const {
     register,
     handleSubmit,
@@ -26,8 +26,27 @@ export default function ContactForm() {
 
   return (
     <form
-      onSubmit={handleSubmit(async () => {
-        setSubmitted(true);
+      onSubmit={handleSubmit(async (values) => {
+        setSubmitMessage("");
+
+        const response = await fetch("/api/contact", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(values),
+        });
+
+        const result = (await response.json().catch(() => null)) as
+          | { ok?: boolean; message?: string }
+          | null;
+
+        if (!response.ok || !result?.ok) {
+          setSubmitMessage(result?.message ?? "We could not send your message. Please try again.");
+          return;
+        }
+
+        setSubmitMessage(result.message ?? contactCopy.successMessage);
         reset();
       })}
       className="ds-card rounded-[1.5rem] p-6 sm:p-8"
@@ -61,18 +80,18 @@ export default function ContactForm() {
         </FormField>
       </div>
 
-      {submitted ? (
+      {submitMessage ? (
         <div className="mt-5 rounded-2xl border border-[color:var(--success-soft)] bg-[color:var(--success-soft)] px-4 py-3 text-sm font-medium text-[color:var(--success)]">
-          {contactCopy.successMessage}
+          {submitMessage}
         </div>
       ) : null}
 
       <button
         type="submit"
         disabled={isSubmitting}
-      className="ds-button-primary mt-6 inline-flex w-full items-center justify-center rounded-full px-5 py-3.5 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-70"
-    >
-      {contactCopy.submitLabel}
+        className="ds-button-primary mt-6 inline-flex w-full items-center justify-center rounded-full px-5 py-3.5 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-70"
+      >
+        {isSubmitting ? "Sending..." : contactCopy.submitLabel}
       </button>
     </form>
   );
