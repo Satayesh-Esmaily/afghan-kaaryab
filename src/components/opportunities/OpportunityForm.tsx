@@ -4,6 +4,8 @@ import { useEffect } from "react";
 import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import FormField from "@/components/common/FormField";
+import DatePickerField from "@/components/common/DatePickerField";
+import SearchableSelect from "@/components/common/SearchableSelect";
 import { opportunityFormSchema, type OpportunityFormValues } from "@/lib/schemas";
 import {
   opportunityCategories,
@@ -55,6 +57,8 @@ export default function OpportunityForm({
     register,
     handleSubmit,
     reset,
+    watch,
+    setValue,
     formState: { errors, isSubmitting },
   } = form;
 
@@ -105,28 +109,47 @@ export default function OpportunityForm({
           />
         </FormField>
         <FormField label="Category" error={errors.category?.message}>
-          <select {...register("category")} className="ds-input">
-            {opportunityCategories.map((category) => (
-              <option key={category} value={category}>
-                {category}
-              </option>
-            ))}
-          </select>
+          <SearchableSelect
+            value={watch("category")}
+            options={opportunityCategories.map((category) => ({ value: category, label: category }))}
+            placeholder="Select category"
+            searchPlaceholder="Search category..."
+            onChange={(value) =>
+              setValue("category", value as OpportunityFormValues["category"], {
+                shouldDirty: true,
+                shouldValidate: true,
+              })
+            }
+          />
         </FormField>
         <FormField label="Opportunity type" error={errors.type?.message}>
-          <select {...register("type")} className="ds-input">
-            {opportunityTypes.map((type) => (
-              <option key={type} value={type}>
-                {type}
-              </option>
-            ))}
-          </select>
+          <SearchableSelect
+            value={watch("type")}
+            options={opportunityTypes.map((type) => ({ value: type, label: type }))}
+            placeholder="Select type"
+            searchPlaceholder="Search type..."
+            onChange={(value) =>
+              setValue("type", value as OpportunityFormValues["type"], {
+                shouldDirty: true,
+                shouldValidate: true,
+              })
+            }
+          />
         </FormField>
         <FormField label="Location" error={errors.location?.message}>
           <input {...register("location")} className="ds-input" placeholder={opportunityFormCopy.locationPlaceholder} />
         </FormField>
         <FormField label="Deadline" error={errors.deadline?.message}>
-          <input {...register("deadline")} type="date" className="ds-input" />
+          <DatePickerField
+            value={watch("deadline")}
+            placeholder="Select date"
+            onChange={(value) =>
+              setValue("deadline", value, {
+                shouldDirty: true,
+                shouldValidate: true,
+              })
+            }
+          />
         </FormField>
       </div>
 

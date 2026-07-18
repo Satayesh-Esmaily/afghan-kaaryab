@@ -22,6 +22,7 @@ interface AppContextValue {
   profile: JobSeekerProfile;
   theme: ThemeMode;
   hydrated: boolean;
+  authReady: boolean;
   user: AuthUser | null;
   authenticated: boolean;
   addOpportunity: (input: OpportunityInput) => Opportunity;
@@ -68,7 +69,6 @@ function createLocalStoragePayload(payload: AppStatePayload): AppStatePayload {
     ...payload,
     profile: {
       ...payload.profile,
-      avatarUrl: "",
       resumeUrl: "",
       certificationEntries: payload.profile.certificationEntries.map(stripAttachmentUrl),
       awardEntries: payload.profile.awardEntries.map(stripAttachmentUrl),
@@ -94,6 +94,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [theme, setThemeState] = useState<ThemeMode>("light");
   const [user, setUser] = useState<AuthUser | null>(null);
   const [hydrated, setHydrated] = useState(false);
+  const [authReady, setAuthReady] = useState(false);
   const [remoteStateSyncEnabled, setRemoteStateSyncEnabled] = useState(true);
   const saveTimerRef = useRef<number | null>(null);
   const activeAppStateKey = getAppStateKey(user);
@@ -113,6 +114,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       const sessionUser = data.session?.user;
       if (!sessionUser?.email) {
         setUser(null);
+        setAuthReady(true);
         return;
       }
 
@@ -124,6 +126,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           sessionUser.user_metadata?.name ??
           getDisplayName(sessionUser.email),
       });
+      setAuthReady(true);
     });
 
     const { data } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -131,6 +134,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
       if (!sessionUser?.email) {
         setUser(null);
+        setAuthReady(true);
         return;
       }
 
@@ -142,6 +146,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           sessionUser.user_metadata?.name ??
           getDisplayName(sessionUser.email),
       });
+      setAuthReady(true);
     });
 
     return () => {
@@ -151,12 +156,24 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
+    if (!authReady) {
+      return;
+    }
+
     async function loadState() {
       const storageKey = getAppStateStorageKey(activeAppStateKey);
       const cachedState = safeParse<Partial<AppStatePayload> | null>(
         window.localStorage.getItem(storageKey),
         null
       );
+      const cachedNormalized = normalizeAppState(cachedState, cachedState?.user ?? user);
+
+      setOpportunities(cachedNormalized.opportunities);
+      setSavedIds(cachedNormalized.savedIds);
+      setFollowedOrganizationSlugs(cachedNormalized.followedOrganizationSlugs);
+      setProfile(cachedNormalized.profile);
+      setThemeState(cachedNormalized.theme);
+      setHydrated(true);
 
       let remoteState: Partial<AppStatePayload> | null = null;
       const supabase = getSupabaseBrowserClient();
@@ -186,21 +203,21 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         remoteState?.user ?? cachedState?.user ?? user
       );
 
-      setOpportunities(nextState.opportunities);
-      setSavedIds(nextState.savedIds);
-      setFollowedOrganizationSlugs(nextState.followedOrganizationSlugs);
-      setProfile(nextState.profile);
-      setThemeState(nextState.theme);
+      if (remoteState || cachedState) {
+        setOpportunities(nextState.opportunities);
+        setSavedIds(nextState.savedIds);
+        setFollowedOrganizationSlugs(nextState.followedOrganizationSlugs);
+        setProfile(nextState.profile);
+        setThemeState(nextState.theme);
+      }
 
       if (!supabase) {
         setUser(nextState.user);
       }
-
-      setHydrated(true);
     }
 
     void loadState();
-  }, [activeAppStateKey]);
+  }, [activeAppStateKey, authReady, user]);
 
   useEffect(() => {
     if (!hydrated) return;
@@ -459,6 +476,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         profile,
         theme,
         hydrated,
+        authReady,
         user,
         authenticated: Boolean(user),
         addOpportunity,

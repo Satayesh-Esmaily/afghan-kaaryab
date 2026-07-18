@@ -23,7 +23,10 @@ export const metadata: Metadata = {
     "A modern opportunity finder platform for Afghan youth to browse jobs, internships, scholarships, remote work, and skill-building opportunities.",
   manifest: "/manifest.webmanifest",
   icons: {
-    icon: "/icon.png",
+    icon: [
+      { url: "/icon.png", type: "image/png" },
+      { url: "/logos/kaaryab-logo.png", type: "image/png" },
+    ],
     shortcut: "/icon.png",
     apple: "/apple-icon.png",
   },

@@ -12,10 +12,11 @@ import { brand, pageHeaders, pageTones, sidebarItems } from "@/config/navigation
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { savedIds, theme, setTheme, user, authenticated, logout } = useAppData();
+  const { savedIds, theme, setTheme, user, authenticated, logout, hydrated, authReady } = useAppData();
   const [mobileOpen, setMobileOpen] = useState(false);
   const savedCount = savedIds.length;
   const isAuthRoute = pathname === "/login" || pathname === "/signup";
+  const isAppReady = hydrated && authReady;
   const activePath = Object.keys(pageHeaders).find((path) =>
     path === "/" ? pathname === "/" : pathname?.startsWith(path)
   );
@@ -30,6 +31,10 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         </main>
       </div>
     );
+  }
+
+  if (!isAppReady) {
+    return <LoadingShell />;
   }
 
   return (
@@ -243,6 +248,18 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         </main>
 
         <Footer />
+      </div>
+    </div>
+  );
+}
+
+function LoadingShell() {
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-[color:var(--background)] text-[color:var(--foreground)]">
+      <div className="flex flex-col items-center gap-4 rounded-[1.5rem] border border-[color:var(--border)] bg-[color:var(--surface)] px-6 py-5 shadow-sm">
+        <div className="h-10 w-10 animate-pulse rounded-full bg-[color:var(--surface-soft)]" />
+        <div className="h-3 w-28 animate-pulse rounded-full bg-[color:var(--surface-soft)]" />
+        <div className="h-2 w-40 animate-pulse rounded-full bg-[color:var(--surface-soft)]" />
       </div>
     </div>
   );
