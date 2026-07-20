@@ -1,151 +1,96 @@
 "use client";
 
-import { createContext, useContext, useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { createOpportunityId, type Opportunity, type OpportunityInput } from "@/lib/opportunities";
 import { getSupabaseBrowserClient } from "@/lib/supabase-client";
 import {
   createDefaultAppState,
   createDefaultProfile,
   getDisplayName,
-  normalizeAppState,
   type AppStatePayload,
   type AuthUser,
   type ResumeTemplateId,
   type ThemeMode,
   type JobSeekerProfile,
 } from "@/lib/app-state";
+import {
+  clearSavedOpportunitiesStore,
+  deleteOpportunityStore,
+  loadAppStore,
+  saveOpportunityStore,
+  saveProfileStore,
+  setFollowedOrganization,
+  setSavedOpportunity,
+} from "@/lib/supabase-app-store";
+import { AuthContextProvider, type AuthContextValue, useAuthContext } from "@/context/auth-context";
+import { OpportunitiesContextProvider, type OpportunitiesContextValue, useOpportunitiesContext } from "@/context/opportunities-context";
+import { ProfileContextProvider, type ProfileContextValue, useProfileContext } from "@/context/profile-context";
 
-interface AppContextValue {
-  opportunities: Opportunity[];
-  savedIds: string[];
-  followedOrganizationSlugs: string[];
-  profile: JobSeekerProfile;
-  theme: ThemeMode;
-  hydrated: boolean;
-  authReady: boolean;
-  user: AuthUser | null;
-  authenticated: boolean;
-  addOpportunity: (input: OpportunityInput) => Opportunity;
-  updateOpportunity: (id: string, input: OpportunityInput) => void;
-  deleteOpportunity: (id: string) => void;
-  toggleSaved: (id: string) => void;
-  clearSaved: () => void;
-  isSaved: (id: string) => boolean;
-  toggleFollowOrganization: (slug: string) => void;
-  isFollowingOrganization: (slug: string) => boolean;
-  updateProfile: (input: Partial<JobSeekerProfile>) => void;
-  setTheme: (mode: ThemeMode) => void;
-  login: (input: { email: string; password: string }) => Promise<void>;
-  signup: (input: { fullName: string; email: string; password: string }) => Promise<{ needsConfirmation: boolean }>;
-  logout: () => Promise<void>;
+function getDisplayNameFromEmail(email: string) {
+  return getDisplayName(email);
 }
 
-const STORAGE_KEYS = {
-  appStatePrefix: "kaaryab-app-state",
-} as const;
+function mapSessionUserToAuthUser(sessionUser: {
+  id: string;
+  email?: string | null;
+  user_metadata?: { full_name?: string; name?: string };
+}): AuthUser {
+  const email = sessionUser.email ?? "";
 
-const AppContext = createContext<AppContextValue | null>(null);
-
-function safeParse<T>(value: string | null, fallback: T) {
-  if (!value) return fallback;
-
-  try {
-    return JSON.parse(value) as T;
-  } catch {
-    return fallback;
-  }
-}
-
-function getAppStateStorageKey(key: string) {
-  return `${STORAGE_KEYS.appStatePrefix}:${key}`;
-}
-
-function getAppStateKey(user: AuthUser | null) {
-  return user?.email ?? "main";
-}
-
-function createLocalStoragePayload(payload: AppStatePayload): AppStatePayload {
   return {
-    ...payload,
-    profile: {
-      ...payload.profile,
-      resumeUrl: "",
-      certificationEntries: payload.profile.certificationEntries.map(stripAttachmentUrl),
-      awardEntries: payload.profile.awardEntries.map(stripAttachmentUrl),
-      documentEntries: payload.profile.documentEntries.map(stripAttachmentUrl),
-    },
-  };
-}
-
-function stripAttachmentUrl<T extends { attachmentUrl: string }>(entry: T): T {
-  return {
-    ...entry,
-    attachmentUrl: "",
+    id: sessionUser.id,
+    email,
+    displayName:
+      sessionUser.user_metadata?.full_name ??
+      sessionUser.user_metadata?.name ??
+      getDisplayNameFromEmail(email),
   };
 }
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
-  const [opportunities, setOpportunities] = useState<Opportunity[]>(createDefaultAppState().opportunities);
-  const [savedIds, setSavedIds] = useState<string[]>(createDefaultAppState().savedIds);
+  const defaultState = createDefaultAppState();
+  const [opportunities, setOpportunities] = useState<Opportunity[]>(defaultState.opportunities);
+  const [savedIds, setSavedIds] = useState<string[]>(defaultState.savedIds);
   const [followedOrganizationSlugs, setFollowedOrganizationSlugs] = useState<string[]>(
-    createDefaultAppState().followedOrganizationSlugs
+    defaultState.followedOrganizationSlugs
   );
-  const [profile, setProfile] = useState<JobSeekerProfile>(createDefaultAppState().profile);
+  const [profile, setProfile] = useState<JobSeekerProfile>(defaultState.profile);
   const [theme, setThemeState] = useState<ThemeMode>("light");
   const [user, setUser] = useState<AuthUser | null>(null);
   const [hydrated, setHydrated] = useState(false);
   const [authReady, setAuthReady] = useState(false);
-  const [remoteStateSyncEnabled, setRemoteStateSyncEnabled] = useState(true);
-  const saveTimerRef = useRef<number | null>(null);
-  const activeAppStateKey = getAppStateKey(user);
+  const [initialLoadComplete, setInitialLoadComplete] = useState(false);
+  const profileSaveTimerRef = useRef<number | null>(null);
 
   useEffect(() => {
     const supabase = getSupabaseBrowserClient();
 
     if (!supabase) {
+      setAuthReady(true);
       return;
     }
 
     let cancelled = false;
 
-    supabase.auth.getSession().then(({ data }) => {
-      if (cancelled) return;
+    supabase.auth
+      .getSession()
+      .then(({ data }) => {
+        if (cancelled) return;
 
-      const sessionUser = data.session?.user;
-      if (!sessionUser?.email) {
-        setUser(null);
+        const sessionUser = data.session?.user;
+        setUser(sessionUser?.email ? mapSessionUserToAuthUser(sessionUser) : null);
         setAuthReady(true);
-        return;
-      }
-
-      setUser({
-        id: sessionUser.id,
-        email: sessionUser.email,
-        displayName:
-          sessionUser.user_metadata?.full_name ??
-          sessionUser.user_metadata?.name ??
-          getDisplayName(sessionUser.email),
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setUser(null);
+          setAuthReady(true);
+        }
       });
-      setAuthReady(true);
-    });
 
     const { data } = supabase.auth.onAuthStateChange((_event, session) => {
       const sessionUser = session?.user;
-
-      if (!sessionUser?.email) {
-        setUser(null);
-        setAuthReady(true);
-        return;
-      }
-
-      setUser({
-        id: sessionUser.id,
-        email: sessionUser.email,
-        displayName:
-          sessionUser.user_metadata?.full_name ??
-          sessionUser.user_metadata?.name ??
-          getDisplayName(sessionUser.email),
-      });
+      setUser(sessionUser?.email ? mapSessionUserToAuthUser(sessionUser) : null);
       setAuthReady(true);
     });
 
@@ -156,68 +101,28 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
-    if (!authReady) {
-      return;
-    }
+    if (!authReady) return;
 
-    async function loadState() {
-      const storageKey = getAppStateStorageKey(activeAppStateKey);
-      const cachedState = safeParse<Partial<AppStatePayload> | null>(
-        window.localStorage.getItem(storageKey),
-        null
-      );
-      const cachedNormalized = normalizeAppState(cachedState, cachedState?.user ?? user);
+    let cancelled = false;
 
-      setOpportunities(cachedNormalized.opportunities);
-      setSavedIds(cachedNormalized.savedIds);
-      setFollowedOrganizationSlugs(cachedNormalized.followedOrganizationSlugs);
-      setProfile(cachedNormalized.profile);
-      setThemeState(cachedNormalized.theme);
+    void (async () => {
+      const nextState = await loadAppStore(user);
+
+      if (cancelled) return;
+
+      setOpportunities(nextState.opportunities);
+      setSavedIds(nextState.savedIds);
+      setFollowedOrganizationSlugs(nextState.followedOrganizationSlugs);
+      setProfile(nextState.profile);
+      setThemeState(nextState.theme);
       setHydrated(true);
+      setInitialLoadComplete(true);
+    })();
 
-      let remoteState: Partial<AppStatePayload> | null = null;
-      const supabase = getSupabaseBrowserClient();
-
-      if (supabase) {
-        try {
-          const { data, error } = await supabase
-            .from("app_state")
-            .select("payload")
-            .eq("id", activeAppStateKey)
-            .maybeSingle();
-
-          if (!error && data?.payload) {
-            remoteState = data.payload as Partial<AppStatePayload>;
-            setRemoteStateSyncEnabled(true);
-          } else if (error) {
-            setRemoteStateSyncEnabled(false);
-          }
-        } catch {
-          remoteState = null;
-          setRemoteStateSyncEnabled(false);
-        }
-      }
-
-      const nextState = normalizeAppState(
-        remoteState ?? cachedState,
-        remoteState?.user ?? cachedState?.user ?? user
-      );
-
-      if (remoteState || cachedState) {
-        setOpportunities(nextState.opportunities);
-        setSavedIds(nextState.savedIds);
-        setFollowedOrganizationSlugs(nextState.followedOrganizationSlugs);
-        setProfile(nextState.profile);
-        setThemeState(nextState.theme);
-      }
-
-      if (!supabase) {
-        setUser(nextState.user);
-      }
-    }
-
-    void loadState();
-  }, [activeAppStateKey, authReady, user]);
+    return () => {
+      cancelled = true;
+    };
+  }, [authReady, user]);
 
   useEffect(() => {
     if (!hydrated) return;
@@ -227,83 +132,24 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   }, [hydrated, theme]);
 
   useEffect(() => {
-    if (!hydrated) return;
-
-    const storageKey = getAppStateStorageKey(activeAppStateKey);
-    const payload = {
-      opportunities,
-      savedIds,
-      followedOrganizationSlugs,
-      profile,
-      theme,
-      user,
-    };
-    const localStoragePayload = createLocalStoragePayload(payload);
-
-    try {
-      window.localStorage.setItem(storageKey, JSON.stringify(localStoragePayload));
-    } catch (error) {
-      if (
-        error instanceof DOMException &&
-        (error.name === "QuotaExceededError" || error.name === "NS_ERROR_DOM_QUOTA_REACHED")
-      ) {
-        const safePayload = {
-          ...localStoragePayload,
-        };
-
-        try {
-          window.localStorage.setItem(storageKey, JSON.stringify(safePayload));
-        } catch {
-          window.localStorage.removeItem(storageKey);
-        }
-      } else {
-        throw error;
-      }
+    if (!hydrated || !initialLoadComplete || !user?.id) {
+      return;
     }
 
-    if (saveTimerRef.current) {
-      window.clearTimeout(saveTimerRef.current);
+    if (profileSaveTimerRef.current) {
+      window.clearTimeout(profileSaveTimerRef.current);
     }
 
-    const supabase = getSupabaseBrowserClient();
-
-    if (supabase && remoteStateSyncEnabled) {
-      saveTimerRef.current = window.setTimeout(() => {
-        void (async () => {
-          try {
-            const { error } = await supabase.from("app_state").upsert({
-              id: activeAppStateKey,
-              payload,
-              updated_at: new Date().toISOString(),
-            });
-
-            if (error) {
-              setRemoteStateSyncEnabled(false);
-            }
-          } catch {
-            setRemoteStateSyncEnabled(false);
-            // Ignore persistence errors and keep the UI responsive.
-          }
-        })();
-      }, 250);
-    }
+    profileSaveTimerRef.current = window.setTimeout(() => {
+      void saveProfileStore(user.id, profile, theme);
+    }, 450);
 
     return () => {
-      if (saveTimerRef.current) {
-        window.clearTimeout(saveTimerRef.current);
+      if (profileSaveTimerRef.current) {
+        window.clearTimeout(profileSaveTimerRef.current);
       }
     };
-  }, [
-    hydrated,
-    opportunities,
-    savedIds,
-    followedOrganizationSlugs,
-    profile,
-    theme,
-    user,
-    activeAppStateKey,
-    remoteStateSyncEnabled,
-  ]);
+  }, [hydrated, initialLoadComplete, profile, theme, user?.id]);
 
   const addOpportunity = (input: OpportunityInput) => {
     const opportunity: Opportunity = {
@@ -313,46 +159,77 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     };
 
     setOpportunities((current) => [opportunity, ...current]);
+
+    if (user?.id) {
+      void saveOpportunityStore(opportunity, user.id);
+    }
+
     return opportunity;
   };
 
   const updateOpportunity = (id: string, input: OpportunityInput) => {
-    setOpportunities((current) =>
-      current.map((opportunity) =>
+    setOpportunities((current) => {
+      const next = current.map((opportunity) =>
         opportunity.id === id
           ? {
               ...opportunity,
               ...input,
             }
           : opportunity
-      )
-    );
+      );
+
+      const updatedOpportunity = next.find((item) => item.id === id);
+      if (updatedOpportunity && user?.id) {
+        void saveOpportunityStore(updatedOpportunity, user.id);
+      }
+
+      return next;
+    });
   };
 
   const deleteOpportunity = (id: string) => {
     setOpportunities((current) => current.filter((opportunity) => opportunity.id !== id));
     setSavedIds((current) => current.filter((savedId) => savedId !== id));
+
+    void deleteOpportunityStore(id);
   };
 
   const toggleSaved = (id: string) => {
-    setSavedIds((current) =>
-      current.includes(id) ? current.filter((item) => item !== id) : [id, ...current]
-    );
+    setSavedIds((current) => {
+      const next = current.includes(id) ? current.filter((item) => item !== id) : [id, ...current];
+      if (user?.id) {
+        void setSavedOpportunity(user.id, id, next.includes(id));
+      }
+      return next;
+    });
   };
 
-  const clearSaved = () => setSavedIds([]);
+  const clearSaved = () => {
+    setSavedIds([]);
+
+    if (user?.id) {
+      void clearSavedOpportunitiesStore(user.id);
+    }
+  };
 
   const isSaved = (id: string) => savedIds.includes(id);
 
   const toggleFollowOrganization = (slug: string) => {
-    setFollowedOrganizationSlugs((current) =>
-      current.includes(slug) ? current.filter((item) => item !== slug) : [slug, ...current]
-    );
+    setFollowedOrganizationSlugs((current) => {
+      const next = current.includes(slug) ? current.filter((item) => item !== slug) : [slug, ...current];
+      if (user?.id) {
+        void setFollowedOrganization(user.id, slug, next.includes(slug));
+      }
+      return next;
+    });
   };
 
   const isFollowingOrganization = (slug: string) => followedOrganizationSlugs.includes(slug);
 
-  const setTheme = (mode: ThemeMode) => setThemeState(mode);
+  const setTheme = (mode: ThemeMode) => {
+    setThemeState(mode);
+  };
+
   const updateProfile = (input: Partial<JobSeekerProfile>) => {
     setProfile((current) => ({
       ...current,
@@ -401,15 +278,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       throw new Error("Unable to sign in.");
     }
 
-    setUser({
-      id: signedInUser.id,
-      email: signedInUser.email,
-      displayName:
-        signedInUser.user_metadata?.full_name ??
-        signedInUser.user_metadata?.name ??
-        getDisplayName(signedInUser.email),
-    });
+    setUser(mapSessionUserToAuthUser(signedInUser));
   };
+
   const signup = async ({
     fullName,
     email,
@@ -430,7 +301,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       password,
       options: {
         data: {
-          full_name: fullName.trim() || getDisplayName(email),
+          full_name: fullName.trim() || getDisplayNameFromEmail(email),
         },
       },
     });
@@ -445,17 +316,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       return { needsConfirmation: true };
     }
 
-    setUser({
-      id: signedInUser.id,
-      email: signedInUser.email,
-      displayName:
-        signedInUser.user_metadata?.full_name ??
-        signedInUser.user_metadata?.name ??
-        (fullName.trim() || getDisplayName(signedInUser.email)),
-    });
-
+    setUser(mapSessionUserToAuthUser(signedInUser));
     return { needsConfirmation: false };
   };
+
   const logout = async () => {
     const supabase = getSupabaseBrowserClient();
 
@@ -464,49 +328,85 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }
 
     setUser(null);
+    setSavedIds([]);
+    setFollowedOrganizationSlugs([]);
     setProfile(createDefaultProfile(null));
+    setThemeState("light");
+    setInitialLoadComplete(false);
   };
 
+  const authValue = useMemo<AuthContextValue>(
+    () => ({
+      user,
+      authenticated: Boolean(user),
+      hydrated,
+      authReady,
+      theme,
+      setTheme,
+      login,
+      signup,
+      logout,
+    }),
+    [authReady, hydrated, login, logout, setTheme, signup, theme, user]
+  );
+
+  const profileValue = useMemo<ProfileContextValue>(
+    () => ({
+      profile,
+      updateProfile,
+      setTheme,
+    }),
+    [profile, updateProfile]
+  );
+
+  const opportunitiesValue = useMemo<OpportunitiesContextValue>(
+    () => ({
+      opportunities,
+      savedIds,
+      followedOrganizationSlugs,
+      addOpportunity,
+      updateOpportunity,
+      deleteOpportunity,
+      toggleSaved,
+      clearSaved,
+      isSaved,
+      toggleFollowOrganization,
+      isFollowingOrganization,
+    }),
+    [
+      addOpportunity,
+      clearSaved,
+      deleteOpportunity,
+      followedOrganizationSlugs,
+      isFollowingOrganization,
+      isSaved,
+      opportunities,
+      savedIds,
+      toggleFollowOrganization,
+      toggleSaved,
+      updateOpportunity,
+    ]
+  );
+
   return (
-    <AppContext.Provider
-      value={{
-        opportunities,
-        savedIds,
-        followedOrganizationSlugs,
-        profile,
-        theme,
-        hydrated,
-        authReady,
-        user,
-        authenticated: Boolean(user),
-        addOpportunity,
-        updateOpportunity,
-        deleteOpportunity,
-        toggleSaved,
-        clearSaved,
-        isSaved,
-        toggleFollowOrganization,
-        isFollowingOrganization,
-        updateProfile,
-        setTheme,
-        login,
-        signup,
-        logout,
-      }}
-    >
-      {children}
-    </AppContext.Provider>
+    <AuthContextProvider value={authValue}>
+      <ProfileContextProvider value={profileValue}>
+        <OpportunitiesContextProvider value={opportunitiesValue}>{children}</OpportunitiesContextProvider>
+      </ProfileContextProvider>
+    </AuthContextProvider>
   );
 }
 
 export function useAppData() {
-  const value = useContext(AppContext);
+  const auth = useAuthContext();
+  const profile = useProfileContext();
+  const opportunities = useOpportunitiesContext();
 
-  if (!value) {
-    throw new Error("useAppData must be used within AppProvider");
-  }
-
-  return value;
+  return {
+    ...auth,
+    ...profile,
+    ...opportunities,
+  };
 }
 
 export type { ResumeTemplateId };

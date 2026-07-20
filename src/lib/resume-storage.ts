@@ -1,4 +1,4 @@
-import { getSupabaseBrowserClient } from "@/lib/supabase-client";
+import { buildStoragePath, deleteFromBucket, getBucketAccessUrl, uploadToBucket } from "@/lib/supabase-storage";
 
 const RESUME_BUCKET_NAME = process.env.NEXT_PUBLIC_SUPABASE_RESUME_BUCKET ?? "resumes";
 const RESUME_BUCKET_PUBLIC = process.env.NEXT_PUBLIC_SUPABASE_RESUME_BUCKET_PUBLIC === "true";
@@ -12,55 +12,32 @@ export function isResumeBucketPublic() {
 }
 
 export async function uploadResumeFile(file: File, userId: string) {
-  const supabase = getSupabaseBrowserClient();
-  if (!supabase) return null;
-
   const safeName = sanitizeStoragePath(file.name || "resume");
-  const path = `${sanitizeStoragePath(userId)}/resumes/${Date.now()}-${safeName}`;
+  const path = buildStoragePath(userId, "resumes", `${Date.now()}-${safeName}`);
 
-  const { error } = await supabase.storage.from(RESUME_BUCKET_NAME).upload(path, file, {
+  const result = await uploadToBucket({
+    bucketName: RESUME_BUCKET_NAME,
+    path,
+    file,
     contentType: file.type || "application/octet-stream",
-    upsert: true,
-    cacheControl: "3600",
+    publicBucket: RESUME_BUCKET_PUBLIC,
   });
 
-  if (error) {
-    return null;
-  }
-
-  const url = RESUME_BUCKET_PUBLIC
-    ? supabase.storage.from(RESUME_BUCKET_NAME).getPublicUrl(path).data.publicUrl
-    : await getResumeAccessUrl(path);
-
-  return {
+  return result
+    ? {
     fileName: file.name,
-    path,
-    url,
-  };
+      path: result.path,
+      url: result.url,
+    }
+    : null;
 }
 
 export async function getResumeAccessUrl(path: string) {
-  const supabase = getSupabaseBrowserClient();
-  if (!supabase) return "";
-
-  if (RESUME_BUCKET_PUBLIC) {
-    return supabase.storage.from(RESUME_BUCKET_NAME).getPublicUrl(path).data.publicUrl;
-  }
-
-  const { data, error } = await supabase.storage.from(RESUME_BUCKET_NAME).createSignedUrl(path, 60 * 60);
-  if (error || !data?.signedUrl) {
-    return "";
-  }
-
-  return data.signedUrl;
+  return getBucketAccessUrl(RESUME_BUCKET_NAME, path, RESUME_BUCKET_PUBLIC);
 }
 
 export async function deleteResumeFile(path: string) {
-  const supabase = getSupabaseBrowserClient();
-  if (!supabase) return false;
-
-  const { error } = await supabase.storage.from(RESUME_BUCKET_NAME).remove([path]);
-  return !error;
+  return deleteFromBucket(RESUME_BUCKET_NAME, path);
 }
 
 function sanitizeStoragePath(value: string) {

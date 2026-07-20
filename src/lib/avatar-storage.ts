@@ -1,46 +1,26 @@
-import { getSupabaseBrowserClient } from "@/lib/supabase-client";
+import { buildStoragePath, getBucketAccessUrl, sanitizeStoragePath, uploadToBucket } from "@/lib/supabase-storage";
 
 const AVATAR_BUCKET_NAME = process.env.NEXT_PUBLIC_SUPABASE_AVATAR_BUCKET ?? "avatars";
 const AVATAR_BUCKET_PUBLIC = process.env.NEXT_PUBLIC_SUPABASE_AVATAR_BUCKET_PUBLIC === "true";
 
 export async function uploadAvatarFile(file: File, userId: string) {
-  const supabase = getSupabaseBrowserClient();
-  if (!supabase) return null;
-
   const compressed = await compressAvatarImage(file);
   const blob = await dataUrlToBlob(compressed);
-  const path = `${sanitizeStoragePath(userId)}/avatar.webp`;
+  const path = buildStoragePath(userId, "avatar.webp");
 
-  const { error } = await supabase.storage.from(AVATAR_BUCKET_NAME).upload(path, blob, {
+  const result = await uploadToBucket({
+    bucketName: AVATAR_BUCKET_NAME,
+    path,
+    file: blob,
     contentType: "image/webp",
-    upsert: true,
-    cacheControl: "3600",
+    publicBucket: AVATAR_BUCKET_PUBLIC,
   });
 
-  if (error) {
-    return null;
-  }
-
-  return {
-    path,
-    url: await getAvatarAccessUrl(path),
-  };
+  return result;
 }
 
 export async function getAvatarAccessUrl(path: string) {
-  const supabase = getSupabaseBrowserClient();
-  if (!supabase) return "";
-
-  if (AVATAR_BUCKET_PUBLIC) {
-    return supabase.storage.from(AVATAR_BUCKET_NAME).getPublicUrl(path).data.publicUrl;
-  }
-
-  const { data, error } = await supabase.storage.from(AVATAR_BUCKET_NAME).createSignedUrl(path, 60 * 60);
-  if (error || !data?.signedUrl) {
-    return "";
-  }
-
-  return data.signedUrl;
+  return getBucketAccessUrl(AVATAR_BUCKET_NAME, path, AVATAR_BUCKET_PUBLIC);
 }
 
 async function compressAvatarImage(file: File) {
@@ -105,13 +85,4 @@ function fileToDataUrl(file: File) {
 async function dataUrlToBlob(dataUrl: string) {
   const response = await fetch(dataUrl);
   return response.blob();
-}
-
-function sanitizeStoragePath(value: string) {
-  return value
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9._-]+/g, "-")
-    .replace(/-+/g, "-")
-    .replace(/^-|-$/g, "");
 }

@@ -6,8 +6,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { EmptyState } from "@/components/ui";
 import FormField from "@/components/common/FormField";
-import DatePickerField from "@/components/common/DatePickerField";
-import SearchableSelect from "@/components/common/SearchableSelect";
 import { authCopy } from "@/config/auth";
 import {
   AwardEntryDialog,
@@ -30,9 +28,10 @@ import {
   EntriesHeader,
   ExperienceCard,
   ProfileSection,
-  ProfileValueBox,
   ResumeTab,
 } from "@/components/profile/profile-view/ProfileViewParts";
+import { ProfilePersonalDetailsSection } from "@/components/profile/profile-view/ProfilePersonalDetailsSection";
+import { ProfileViewHeader } from "@/components/profile/profile-view/ProfileViewHeader";
 import {
   formatDateRange,
   getFileNameFromPath,
@@ -291,21 +290,13 @@ export default function ProfileView() {
   }
 
   return (
-    <div className="space-y-6">
-      {showWelcome ? (
-        <div className="rounded-[1.35rem] border border-[color:var(--border)] bg-[color:var(--surface)] px-5 py-4 shadow-sm sm:px-6">
-          <p className="text-sm font-semibold text-[color:var(--foreground-strong)]">
-            {authCopy.signupSuccessTitle}
-          </p>
-          <p className="mt-1 text-sm text-[color:var(--foreground-muted)]">
-            {authCopy.signupSuccessMessage}
-          </p>
-        </div>
-      ) : null}
-
-      <div className="rounded-[1.5rem] panel px-5 py-4 text-lg font-semibold text-[color:var(--foreground)] sm:px-6">
-        Profile
-      </div>
+      <div className="space-y-6">
+      <ProfileViewHeader
+        showWelcome={showWelcome}
+        signupSuccessTitle={authCopy.signupSuccessTitle}
+        signupSuccessMessage={authCopy.signupSuccessMessage}
+        title="Profile"
+      />
 
       <section className="rounded-[1.75rem] panel p-6 sm:p-8">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
@@ -451,156 +442,35 @@ export default function ProfileView() {
           })}
           className="space-y-6"
         >
-          <ProfileSection title="Personal Details" description="Share your expertise and complete your profile.">
-            <div className="grid gap-8 xl:grid-cols-[260px_1fr]">
-              <aside className="space-y-5">
-                <div className="flex items-center gap-4">
-                  <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-full bg-[color:var(--surface-soft)] text-3xl font-semibold text-[color:var(--foreground-strong)]">
-                    {profile.avatarUrl ? (
-                      <img
-                        src={profile.avatarUrl}
-                        alt={profile.fullName || "Profile photo"}
-                        className="h-full w-full object-cover"
-                      />
-                    ) : (
-                      initials
-                    )}
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      avatarInputRef.current?.click();
-                    }}
-                    className="ds-button-secondary rounded-full px-4 py-2.5 text-sm font-semibold"
-                  >
-                    Upload Photo
-                  </button>
-                </div>
-                <input
-                  ref={avatarInputRef}
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={(event) => {
-                    const file = event.target.files?.[0];
-                    if (!file) return;
+          <ProfilePersonalDetailsSection
+            avatarInputRef={avatarInputRef}
+            avatarUrl={profile.avatarUrl}
+            initials={initials}
+            completion={completion}
+            userEmail={user?.email ?? ""}
+            errors={errors}
+            register={register}
+            setValue={setValue}
+            selectedCountry={selectedCountry}
+            selectedNationality={selectedNationality}
+            selectedGender={selectedGender}
+            selectedDateOfBirth={selectedDateOfBirth}
+            countryOptions={countryOptions}
+            nationalityOptions={nationalityOptions}
+            genderOptions={genderOptions}
+            onPickAvatar={() => {
+              avatarInputRef.current?.click();
+            }}
+            onAvatarFileChange={(file) => {
+              if (!file) return;
 
-                    void uploadAvatarFile(file, user?.id ?? "").then((result) => {
-                      if (result) {
-                        updateProfile({ avatarUrl: result.url, avatarStoragePath: result.path });
-                      }
-                    });
-                    event.currentTarget.value = "";
-                  }}
-                />
-
-                <div className="rounded-[1.25rem] border border-[color:var(--border)] bg-[color:var(--surface-soft)] p-4">
-                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[color:var(--foreground-muted)]">
-                    Profile completion
-                  </p>
-                  <p className="mt-2 text-2xl font-semibold text-[color:var(--foreground-strong)]">
-                    {completion}%
-                  </p>
-                  <p className="mt-2 text-sm leading-6 text-[color:var(--foreground-muted)]">
-                    Fill the sections below to make your profile stronger for employers.
-                  </p>
-                </div>
-              </aside>
-
-              <div className="space-y-5">
-                <div className="grid gap-5 md:grid-cols-2">
-                  <FormField label="Full Name" error={errors.fullName?.message}>
-                    <input {...register("fullName")} className="ds-input" />
-                  </FormField>
-                  <FormField label="Professional Expertise" error={errors.headline?.message}>
-                    <input {...register("headline")} className="ds-input" />
-                  </FormField>
-                  <FormField label="Contact Number" error={errors.phone?.message}>
-                    <input {...register("phone")} className="ds-input" placeholder="+93 79 123 4567" />
-                  </FormField>
-                  <ProfileValueBox label="Email Address" value={user?.email ?? "Not available"} />
-                  <FormField label="Country" error={errors.country?.message}>
-                    <SearchableSelect
-                      value={selectedCountry}
-                      options={countryOptions}
-                      placeholder="Select country"
-                      searchPlaceholder="Search country..."
-                      onChange={(value) =>
-                        setValue("country", value, {
-                          shouldDirty: true,
-                          shouldValidate: true,
-                        })
-                      }
-                    />
-                  </FormField>
-                  <FormField label="Province" error={errors.province?.message}>
-                    <input {...register("province")} className="ds-input" />
-                  </FormField>
-                  <FormField label="Nationality" error={errors.nationality?.message}>
-                    <SearchableSelect
-                      value={selectedNationality}
-                      options={nationalityOptions}
-                      placeholder="Select nationality"
-                      searchPlaceholder="Search nationality..."
-                      onChange={(value) =>
-                        setValue("nationality", value, {
-                          shouldDirty: true,
-                          shouldValidate: true,
-                        })
-                      }
-                    />
-                  </FormField>
-                  <FormField label="Date of Birth" error={errors.dateOfBirth?.message}>
-                    <DatePickerField
-                      value={selectedDateOfBirth}
-                      placeholder="Select date"
-                      onChange={(value) =>
-                        setValue("dateOfBirth", value, {
-                          shouldDirty: true,
-                          shouldValidate: true,
-                        })
-                      }
-                    />
-                  </FormField>
-                  <FormField label="Gender" error={errors.gender?.message}>
-                    <SearchableSelect
-                      value={selectedGender}
-                      options={genderOptions}
-                      placeholder="Select gender"
-                      onChange={(value) =>
-                        setValue("gender", value, {
-                          shouldDirty: true,
-                          shouldValidate: true,
-                        })
-                      }
-                    />
-                  </FormField>
-                  <FormField label="Current Address" error={errors.address?.message}>
-                    <input {...register("address")} className="ds-input" placeholder="Taimani, Kabul, Afghanistan" />
-                  </FormField>
-                  <FormField label="Location" error={errors.location?.message}>
-                    <input {...register("location")} className="ds-input" placeholder="Kabul" />
-                  </FormField>
-                  <FormField label="Avatar URL" error={errors.avatarUrl?.message}>
-                    <input
-                      id="avatarUrl"
-                      {...register("avatarUrl")}
-                      className="ds-input"
-                      placeholder="https://..."
-                    />
-                  </FormField>
-                </div>
-
-                <FormField label="Professional Summary" error={errors.summary?.message}>
-                  <textarea
-                    {...register("summary")}
-                    className="ds-input min-h-32"
-                    placeholder="Introduce your background, experience, and strengths."
-                  />
-                </FormField>
-              </div>
-            </div>
-          </ProfileSection>
+              void uploadAvatarFile(file, user?.id ?? "").then((result) => {
+                if (result) {
+                  updateProfile({ avatarUrl: result.url, avatarStoragePath: result.path });
+                }
+              });
+            }}
+          />
 
           <ProfileSection
             title="Work Experience"

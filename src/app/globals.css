@@ -3,6 +3,8 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
+  --font-manrope: "Inter", "Segoe UI", Arial, sans-serif;
+  --font-spline-mono: "SFMono-Regular", "Consolas", "Liberation Mono", monospace;
   --background: #f8f9fa;
   --foreground: #202124;
   --foreground-strong: #000000;

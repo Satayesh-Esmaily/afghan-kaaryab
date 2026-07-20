@@ -2,6 +2,8 @@
 
 import type { ReactNode } from "react";
 import { Badge } from "@/components/ui";
+import DatePickerField from "@/components/common/DatePickerField";
+import SearchableSelect from "@/components/common/SearchableSelect";
 import { opportunityLevels, opportunityTypes, type DeadlineFilter } from "@/lib/opportunities";
 
 export type GenderFilter = "Any" | "Male" | "Female" | "Open to all";
@@ -83,67 +85,62 @@ export function OpportunityFilterSidebar({
         </FilterSelect>
 
         <FilterSelect label="Province">
-          <select value={location} onChange={(event) => onLocationChange(event.target.value)} className="ds-input">
-            {locationOptions.map((item) => (
-              <option key={item} value={item}>
-                {item}
-              </option>
-            ))}
-          </select>
-        </FilterSelect>
-
-        <FilterSelect label="Company">
-          <select value={company} onChange={(event) => onCompanyChange(event.target.value)} className="ds-input">
-            {companyOptions.map((item) => (
-              <option key={item} value={item}>
-                {item}
-              </option>
-            ))}
-          </select>
-        </FilterSelect>
-
-        <FilterSelect label="Contract type">
-          <select
-            value={type}
-            onChange={(event) => onTypeChange(event.target.value as (typeof opportunityTypes)[number] | "All")}
-            className="ds-input"
-          >
-            <option value="All">All</option>
-            {opportunityTypes.map((item) => (
-              <option key={item} value={item}>
-                {item}
-              </option>
-            ))}
-          </select>
-        </FilterSelect>
-
-        <FilterSelect label="Published after">
-          <input
-            type="date"
-            value={publishedAfter}
-            onChange={(event) => onPublishedAfterChange(event.target.value)}
-            className="ds-input"
+          <SearchableSelect
+            value={location}
+            options={locationOptions.map((item) => ({ value: item, label: item }))}
+            placeholder="All"
+            searchPlaceholder="Search province..."
+            onChange={onLocationChange}
           />
         </FilterSelect>
 
+        <FilterSelect label="Company">
+          <SearchableSelect
+            value={company}
+            options={companyOptions.map((item) => ({ value: item, label: item }))}
+            placeholder="All"
+            searchPlaceholder="Search company..."
+            onChange={onCompanyChange}
+          />
+        </FilterSelect>
+
+        <FilterSelect label="Contract type">
+          <SearchableSelect
+            value={type}
+            options={[{ value: "All", label: "All" }, ...opportunityTypes.map((item) => ({ value: item, label: item }))]}
+            placeholder="All"
+            searchPlaceholder="Search type..."
+            onChange={(value) => onTypeChange(value as (typeof opportunityTypes)[number] | "All")}
+          />
+        </FilterSelect>
+
+        <FilterSelect label="Published after">
+          <DatePickerField value={publishedAfter} onChange={onPublishedAfterChange} placeholder="Any date" />
+        </FilterSelect>
+
         <FilterSelect label="Gender">
-          <select value={gender} onChange={(event) => onGenderChange(event.target.value as GenderFilter)} className="ds-input">
-            <option value="Any">Any</option>
-            <option value="Open to all">Open to all</option>
-            <option value="Female">Female</option>
-            <option value="Male">Male</option>
-          </select>
+          <SearchableSelect
+            value={gender}
+            options={[
+              { value: "Any", label: "Any" },
+              { value: "Open to all", label: "Open to all" },
+              { value: "Female", label: "Female" },
+              { value: "Male", label: "Male" },
+            ]}
+            placeholder="Any"
+            searchPlaceholder="Search gender..."
+            onChange={(value) => onGenderChange(value as GenderFilter)}
+          />
         </FilterSelect>
 
         <FilterSelect label="Job level">
-          <select value={level} onChange={(event) => onLevelChange(event.target.value as LevelFilter)} className="ds-input">
-            <option value="Any">Any</option>
-            {opportunityLevels.map((item) => (
-              <option key={item} value={item}>
-                {item}
-              </option>
-            ))}
-          </select>
+          <SearchableSelect
+            value={level}
+            options={[{ value: "Any", label: "Any" }, ...opportunityLevels.map((item) => ({ value: item, label: item }))]}
+            placeholder="Any"
+            searchPlaceholder="Search level..."
+            onChange={(value) => onLevelChange(value as LevelFilter)}
+          />
         </FilterSelect>
       </div>
 
