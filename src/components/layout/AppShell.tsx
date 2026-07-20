@@ -1,27 +1,57 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
-import { useRouter, usePathname } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import { useAppData } from "@/context/app-context";
-import { authCopy } from "@/config/auth";
 import Footer from "@/components/layout/Footer";
-import { brand, pageHeaders, pageTones, sidebarItems } from "@/config/navigation";
+import { Link, usePathname, useRouter } from "@/i18n/navigation";
+import { brand, pageTones } from "@/config/navigation";
+import { locales, type Locale } from "@/i18n/config";
+import { stripLocalePrefix } from "@/i18n/utils";
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
+  const tNav = useTranslations("navigation");
+  const tCommon = useTranslations("common");
+  const normalizedPathname = stripLocalePrefix(pathname);
+  const pageHeaders = {
+    "/": { title: tNav("pages.home.title"), subtitle: tNav("pages.home.subtitle") },
+    "/dashboard": { title: tNav("pages.dashboard.title"), subtitle: tNav("pages.dashboard.subtitle") },
+    "/profile": { title: tNav("pages.profile.title"), subtitle: tNav("pages.profile.subtitle") },
+    "/resume-builder": { title: tNav("pages.resumeBuilder.title"), subtitle: tNav("pages.resumeBuilder.subtitle") },
+    "/opportunities": { title: tNav("pages.discover.title"), subtitle: tNav("pages.discover.subtitle") },
+    "/organizations": { title: tNav("pages.directory.title"), subtitle: tNav("pages.directory.subtitle") },
+    "/saved": { title: tNav("pages.saved.title"), subtitle: tNav("pages.saved.subtitle") },
+    "/add-opportunity": { title: tNav("pages.addOpportunity.title"), subtitle: tNav("pages.addOpportunity.subtitle") },
+    "/about": { title: tNav("pages.about.title"), subtitle: tNav("pages.about.subtitle") },
+    "/contact": { title: tNav("pages.contact.title"), subtitle: tNav("pages.contact.subtitle") },
+    "/settings": { title: tNav("pages.settings.title"), subtitle: tNav("pages.settings.subtitle") },
+  } as const;
+  const sidebarItems: Array<{ href: string; label: string; authOnly?: boolean }> = [
+    { href: "/dashboard", label: tNav("sidebar.dashboard") },
+    { href: "/profile", label: tNav("sidebar.profile"), authOnly: true },
+    { href: "/resume-builder", label: tNav("sidebar.resumeBuilder"), authOnly: true },
+    { href: "/opportunities", label: tNav("sidebar.discover") },
+    { href: "/organizations", label: tNav("sidebar.directory") },
+    { href: "/saved", label: tNav("sidebar.saved") },
+    { href: "/add-opportunity", label: tNav("sidebar.addOpportunity") },
+    { href: "/about", label: tNav("sidebar.about") },
+    { href: "/contact", label: tNav("sidebar.contact") },
+    { href: "/settings", label: tNav("sidebar.settings") },
+  ] as const;
   const { savedIds, theme, setTheme, user, authenticated, logout, hydrated, authReady } = useAppData();
   const [mobileOpen, setMobileOpen] = useState(false);
   const savedCount = savedIds.length;
-  const isAuthRoute = pathname === "/login" || pathname === "/signup";
+  const isAuthRoute = normalizedPathname === "/login" || normalizedPathname === "/signup";
   const isAppReady = hydrated && authReady;
   const activePath = Object.keys(pageHeaders).find((path) =>
-    path === "/" ? pathname === "/" : pathname?.startsWith(path)
+    path === "/" ? normalizedPathname === "/" : normalizedPathname?.startsWith(path)
   );
-  const page = pageHeaders[activePath ?? "/opportunities"];
-  const pageTone = pageTones[activePath ?? "/opportunities"] ?? pageTones["/opportunities"];
+  const activePagePath = (activePath ?? "/opportunities") as keyof typeof pageHeaders;
+  const page = pageHeaders[activePagePath];
+  const pageTone = pageTones[activePagePath] ?? pageTones["/opportunities"];
 
   if (isAuthRoute) {
     return (
@@ -40,7 +70,10 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-[color:var(--background)] text-[color:var(--foreground)]">
       <aside className="fixed inset-y-0 left-0 hidden w-[276px] flex-col border-r border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-4 lg:flex">
-        <Link href="/" className="panel group rounded-[1.25rem] px-3.5 py-3.5 transition hover:-translate-y-0.5 hover:shadow-xl">
+        <Link
+          href="/"
+          className="panel group rounded-[1.25rem] px-3.5 py-3.5 transition hover:-translate-y-0.5 hover:shadow-xl"
+        >
           <div className="flex items-center gap-3">
             <span className="relative flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-[1rem] border border-[color:var(--border)] bg-[color:var(--surface)] shadow-sm">
               <Image
@@ -67,7 +100,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                 return null;
               }
 
-              const active = isActiveLink(pathname, item.href);
+              const active = isActiveLink(normalizedPathname, item.href);
 
               return (
                 <Link
@@ -105,10 +138,10 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         <div className="mt-4 space-y-3 border-t border-[color:var(--border)] pt-4">
           <div className="rounded-[1.25rem] border border-[color:var(--border)] bg-[color:var(--surface-soft)] px-4 py-4">
             <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[color:var(--foreground-muted)]">
-              Signed in as
+              {tNav("auth.signedInAs")}
             </p>
             <p className="mt-2 truncate text-sm font-semibold text-[color:var(--foreground-strong)]">
-              {user?.displayName ?? authCopy.guestLabel}
+              {user?.displayName ?? tNav("auth.guest")}
             </p>
             <p className="truncate text-xs text-[color:var(--foreground-muted)]">{user?.email ?? ""}</p>
           </div>
@@ -119,10 +152,9 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             }}
             className="w-full rounded-[1rem] border border-[color:var(--border)] bg-[color:var(--surface)] px-3 py-2.5 text-left text-sm font-medium text-[color:var(--foreground)] transition hover:bg-[color:var(--surface-soft)]"
           >
-            {authCopy.signOutLabel}
+            {tNav("auth.logout")}
           </button>
         </div>
-
       </aside>
 
       <div className="lg:pl-[276px]">
@@ -153,29 +185,25 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
                   router.push("/login");
                 }}
-                className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] text-[color:var(--foreground)] sm:w-auto sm:px-3.5"
-                aria-label={authenticated ? authCopy.signOutLabel : authCopy.loginButtonLabel}
+                className="inline-flex h-11 items-center justify-center rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] px-3.5 text-[color:var(--foreground)]"
+                aria-label={authenticated ? tNav("auth.logout") : tNav("auth.login")}
               >
-                <span className="hidden text-sm font-semibold sm:inline">
-                  {authenticated ? authCopy.signOutLabel : authCopy.loginButtonLabel}
-                </span>
-                <span className="sm:hidden">
-                  <UserIcon />
-                </span>
+                <span className="text-sm font-semibold">{authenticated ? tNav("auth.logout") : tNav("auth.login")}</span>
               </button>
+
+              <LocaleSwitcher />
+
               <button
                 type="button"
                 onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] text-[color:var(--foreground)] sm:w-auto sm:px-3.5"
-                aria-label="Toggle theme"
+                className="inline-flex h-11 items-center justify-center rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] px-3.5 text-[color:var(--foreground)]"
+                aria-label={theme === "dark" ? tCommon("theme.light") : tCommon("theme.dark")}
               >
-                <span className="hidden text-sm font-semibold sm:inline">
-                  {theme === "dark" ? "Light mode" : "Dark mode"}
-                </span>
-                <span className="sm:hidden">
-                  {theme === "dark" ? <SunIcon /> : <MoonIcon />}
+                <span className="text-sm font-semibold">
+                  {theme === "dark" ? tCommon("theme.light") : tCommon("theme.dark")}
                 </span>
               </button>
+
               <button
                 type="button"
                 onClick={() => setMobileOpen((value) => !value)}
@@ -196,7 +224,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                   return null;
                 }
 
-                const active = isActiveLink(pathname, item.href);
+                const active = isActiveLink(normalizedPathname, item.href);
 
                 return (
                   <Link
@@ -223,10 +251,10 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             <div className="mt-4 space-y-3 border-t border-[color:var(--border)] pt-4">
               <div className="rounded-[1.25rem] bg-[color:var(--surface-soft)] px-4 py-4">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[color:var(--foreground-muted)]">
-                  Signed in as
+                  {tNav("auth.signedInAs")}
                 </p>
                 <p className="mt-2 truncate text-sm font-semibold text-[color:var(--foreground-strong)]">
-                  {user?.displayName ?? authCopy.guestLabel}
+                  {user?.displayName ?? tNav("auth.guest")}
                 </p>
               </div>
               <button
@@ -237,7 +265,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                 }}
                 className="w-full rounded-[1rem] border border-[color:var(--border)] bg-[color:var(--surface)] px-3 py-2.5 text-left text-sm font-medium text-[color:var(--foreground)] transition hover:bg-[color:var(--surface-soft)]"
               >
-                {authCopy.signOutLabel}
+                {tNav("auth.logout")}
               </button>
             </div>
           </div>
@@ -271,6 +299,38 @@ function isActiveLink(pathname: string | null, href: string) {
   return pathname === href || (href === "/opportunities" && pathname === "/") || pathname.startsWith(href);
 }
 
+function LocaleSwitcher() {
+  const locale = useLocale();
+  const pathname = usePathname();
+  const router = useRouter();
+  const tCommon = useTranslations("common");
+  const activePath = stripLocalePrefix(pathname);
+
+  return (
+    <label className="inline-flex items-center">
+      <span className="sr-only">{tCommon("language")}</span>
+      <select
+        aria-label={tCommon("language")}
+        value={locale}
+        onChange={(event) => {
+          router.replace(activePath, { locale: event.target.value as Locale });
+        }}
+        className="h-11 rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] px-3 text-sm font-medium text-[color:var(--foreground)] outline-none transition hover:bg-[color:var(--surface-soft)]"
+      >
+        {locales.map((option) => (
+          <option key={option} value={option}>
+            {option === "en"
+              ? tCommon("languageOptions.en")
+              : option === "fa-AF"
+                ? tCommon("languageOptions.faAF")
+                : tCommon("languageOptions.psAF")}
+          </option>
+        ))}
+      </select>
+    </label>
+  );
+}
+
 function MenuIcon() {
   return (
     <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" aria-hidden="true">
@@ -289,46 +349,6 @@ function CloseIcon() {
     <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" aria-hidden="true">
       <path
         d="M6 6L18 18M18 6L6 18"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
-
-function SunIcon() {
-  return (
-    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" aria-hidden="true">
-      <circle cx="12" cy="12" r="4.2" stroke="currentColor" strokeWidth="1.8" />
-      <path
-        d="M12 2.5V4.8M12 19.2V21.5M2.5 12H4.8M19.2 12H21.5M5.2 5.2L6.8 6.8M17.2 17.2L18.8 18.8M18.8 5.2L17.2 6.8M6.8 17.2L5.2 18.8"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
-
-function MoonIcon() {
-  return (
-    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" aria-hidden="true">
-      <path
-        d="M20.2 15.6A8.5 8.5 0 0 1 8.4 3.8a8.8 8.8 0 1 0 11.8 11.8Z"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function UserIcon() {
-  return (
-    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" aria-hidden="true">
-      <path
-        d="M12 12.2A4.1 4.1 0 1 0 12 4a4.1 4.1 0 0 0 0 8.2ZM4.8 20c1.2-3 3.8-4.7 7.2-4.7s6 1.7 7.2 4.7"
         stroke="currentColor"
         strokeWidth="1.8"
         strokeLinecap="round"

@@ -1,22 +1,24 @@
-import Link from "next/link";
+"use client";
 
-const footerLinks = [
-  { href: "/opportunities", label: "Browse" },
-  { href: "/add-opportunity", label: "Submit" },
-  { href: "/dashboard", label: "Dashboard" },
-  { href: "/contact", label: "Contact" },
-];
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 
 export default function Footer() {
+  const tFooter = useTranslations("footer");
+
+  const footerLinks = [
+    { href: "/opportunities", label: tFooter("links.browse") },
+    { href: "/add-opportunity", label: tFooter("links.submit") },
+    { href: "/dashboard", label: tFooter("links.dashboard") },
+    { href: "/contact", label: tFooter("links.contact") },
+  ];
+
   return (
     <footer className="border-t border-[color:var(--border)]/80 bg-[color:var(--surface)]/80 backdrop-blur">
       <div className="mx-auto grid w-full max-w-7xl gap-8 px-4 py-10 sm:px-6 lg:grid-cols-3 lg:px-8">
         <div className="space-y-3">
           <p className="ds-title text-lg font-semibold">KaarYab Afghanistan</p>
-          <p className="ds-muted max-w-md text-sm leading-6">
-            A modern opportunity finder for Afghan job seekers, built for jobs, internships,
-            scholarships, remote work, and skill-building opportunities.
-          </p>
+          <p className="ds-muted max-w-md text-sm leading-6">{tFooter("brandDescription")}</p>
         </div>
 
         <div className="grid grid-cols-2 gap-3 text-sm font-medium text-[color:var(--foreground)]">
@@ -32,9 +34,11 @@ export default function Footer() {
         </div>
 
         <div className="space-y-2 text-sm text-[color:var(--foreground)]">
-          <p className="ds-title font-semibold">Platform focus</p>
-          <p>Built to help Afghan communities discover and share trusted opportunities.</p>
-          <p>© {new Date().getFullYear()} KaarYab Afghanistan</p>
+          <p className="ds-title font-semibold">{tFooter("focusTitle")}</p>
+          <p>{tFooter("focusBody")}</p>
+          <p>
+            © {new Date().getFullYear()} {tFooter("copyright")}
+          </p>
         </div>
       </div>
     </footer>

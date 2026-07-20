@@ -1,0 +1,230 @@
+{
+  "seo": {
+    "siteName": "کارياب افغانستان",
+    "description": "د افغان ځوانانو لپاره یو عصري دندې موندلو پلیټفارم چې د کار، انټرنشپ، بورس، لیرې کار، سازمانونو او د CV جوړولو وسایل پکې شامل دي.",
+    "openGraphTitle": "کارياب افغانستان",
+    "openGraphDescription": "د افغان ځوانانو لپاره یو عصري دندې موندلو پلیټفارم.",
+    "twitterDescription": "کار، انټرنشپ، بورس، لیرې کار، سازمانونه او د CV وسایل وپلټئ."
+  },
+  "common": {
+    "loading": "بار کېږي...",
+    "save": "ساتل",
+    "cancel": "لغوه",
+    "language": "ژبه",
+    "theme": {
+      "light": "روښانه حالت",
+      "dark": "تیاره حالت"
+    },
+    "languageOptions": {
+      "en": "English",
+      "faAF": "دری",
+      "psAF": "پښتو"
+    }
+  },
+  "navigation": {
+    "sidebar": {
+      "dashboard": "ډشبورډ",
+      "profile": "پروفایل",
+      "resumeBuilder": "CV جوړول",
+      "discover": "لټون",
+      "directory": "لارښود",
+      "saved": "ساتل شوي",
+      "addOpportunity": "فرصت زیاتول",
+      "about": "په اړه",
+      "contact": "اړیکه",
+      "settings": "تنظیمات"
+    },
+    "pages": {
+      "home": {
+        "title": "لټون",
+        "subtitle": "فرصتونه وپلټئ، خوښ شوي وساتئ، او وروستۍ نېټې تعقیب کړئ."
+      },
+      "dashboard": {
+        "title": "ډشبورډ",
+        "subtitle": "د پلیټفارم احصایې او وروستي submissions په یوه نظر کې وګورئ."
+      },
+      "profile": {
+        "title": "پروفایل",
+        "subtitle": "CV، مهارتونه او د کار لټون معلومات مدیریت کړئ."
+      },
+      "resumeBuilder": {
+        "title": "CV جوړول",
+        "subtitle": "د کار لپاره چمتو CV جوړ کړئ او PDF یې ترلاسه کړئ."
+      },
+      "discover": {
+        "title": "لټون",
+        "subtitle": "فرصتونه جست‌وجو، فلټر او وګورئ."
+      },
+      "directory": {
+        "title": "لارښود",
+        "subtitle": "سازمانونه، هېوادونه او ادارې وڅېړئ چې فرصتونه ورسره تړلي دي."
+      },
+      "saved": {
+        "title": "ساتل شوي",
+        "subtitle": "هغو فرصتونو ته بېرته ورشئ چې وروسته لپاره مو ساتلي وو."
+      },
+      "addOpportunity": {
+        "title": "فرصت زیاتول",
+        "subtitle": "له ټولنې سره نوی اعلان شریک کړئ."
+      },
+      "about": {
+        "title": "په اړه",
+        "subtitle": "وګورئ چې پلیټفارم کومه ستونزه حلوي او د چا لپاره دی."
+      },
+      "contact": {
+        "title": "اړیکه",
+        "subtitle": "پیشنهادونه راولېږئ یا ستونزه راپور کړئ."
+      },
+      "settings": {
+        "title": "تنظیمات",
+        "subtitle": "خپل شخصي ترجیحات او د پلیټفارم چلند تنظیم کړئ."
+      }
+    },
+    "auth": {
+      "signedInAs": "ننوتلی د",
+      "guest": "مېلمه",
+      "login": "ننوتل",
+      "logout": "وتل"
+    }
+  },
+  "home": {
+    "badge": "فعال فرصتونه",
+    "heroTitle": "د افغان کار لټوونکو لپاره فرصتونه په یوه پاک ځای کې ومومئ.",
+    "heroDescription": "کارونه، انټرنشپونه، بورسونه، لیرې کار او روزنیز پروګرامونه د لټون، فلټرونو، ساتلو او د افغان کاروونکو لپاره د متمرکز تجربې سره وپلټئ.",
+    "explore": "فرصتونه وپلټئ",
+    "dashboard": "ډشبورډ پرانیزئ",
+    "includedTitle": "څه پکې شامل دي",
+    "included": [
+      "د فرصتونو لټون او فلټر",
+      "د وروسته لپاره فرصتونه ساتل",
+      "اعلانونه زیاتول، بدلول او حذفول",
+      "تیاره حالت او responsive ډیزاین"
+    ],
+    "quickStats": "چټک احصایې",
+    "listings": "اعلانونه",
+    "featured": "ځانګړي",
+    "soon": "ژر",
+    "categories": "کټګورۍ",
+    "whoItHelps": "چا ته ګټه لري",
+    "audience": ["محصلان", "د کار لټوونکي", "نوي فارغان", "ښځې", "سازمانونه"],
+    "categoryJob": {
+      "title": "کار",
+      "description": "د استخدام او دندې فرصتونه."
+    },
+    "categoryInternship": {
+      "title": "انټرنشپ",
+      "description": "د زده کړې او ابتدايي کچې فرصتونه."
+    },
+    "categoryScholarship": {
+      "title": "بورس",
+      "description": "تعلیمي ملاتړ او مالي مرستې."
+    },
+    "categoryRemote": {
+      "title": "لیرې کار",
+      "description": "انعطاف منونکي او آنلاین دندې."
+    },
+    "featuredSection": "ځانګړي",
+    "highlighted": "برجسته فرصتونه",
+    "seeAll": "ټول وګورئ",
+    "builtForRealUse": "د واقعي استعمال لپاره جوړ شوی",
+    "platformHeadline": "د افغان ټولنې لپاره یو عملي دندې موندلو پلیټفارم.",
+    "platformBody": "دا نسخه responsive layouts، تیاره حالت، ساتل شوي فرصتونه، dynamic routes، CRUD او د سازمانونو پاڼې لري چې د کار لټون اسانه کوي.",
+    "submitOpportunity": "فرصت ولېږئ"
+  },
+  "contact": {
+    "eyebrow": "اړیکه او ملاتړ",
+    "title": "له کارياب ټیم سره خبرې وکړئ",
+    "description": "دندې، ستونزې یا وړاندیزونه راولېږئ چې پلیټفارم د افغان کار لټوونکو لپاره ښه شي.",
+    "detailsTitle": "د اړیکې معلومات",
+    "detailsDescription": "موږ د کار لټوونکو، کارفرمایانو او سازمانونو پیغامونه ګورو ترڅو پلیټفارم ګټور او تازه پاتې شي.",
+    "emailLabel": "ایمیل",
+    "locationLabel": "ځای",
+    "purposeLabel": "موخه",
+    "email": "styshstysh6@gmail.com",
+    "location": "افغانستان",
+    "purpose": "د افغان کار لټوونکو، کارفرمایانو او سازمانونو ملاتړ",
+    "formBadge": "ټیم ته پیغام",
+    "formBody": "دندې، پوښتنې، bug reports یا د ښه‌والي وړاندیزونه راولېږئ.",
+    "successMessage": "مننه. ستاسو پیغام ترلاسه شو او ژر به وکتل شي.",
+    "errorFallback": "ستاسو پیغام ونه لېږدول شو. مهرباني وکړئ بیا هڅه وکړئ.",
+    "sending": "لېږل کېږي...",
+    "submitLabel": "پیغام ولېږئ",
+    "fields": {
+      "name": "نوم",
+      "email": "ایمیل",
+      "subject": "موضوع",
+      "message": "پیغام"
+    },
+    "placeholders": {
+      "name": "ستاسو نوم",
+      "email": "you@example.com",
+      "subject": "د فرصت وړاندیز",
+      "message": "وایاست چې څه باید زیات یا ښه شي."
+    }
+  },
+  "auth": {
+    "appName": "کارياب افغانستان",
+    "loginTitle": "بېرته ښه راغلاست",
+    "loginSubtitle": "د لټون دوام، د فرصتونو ساتلو او د پروفایل مدیریت لپاره ننوتل وکړئ.",
+    "loginButtonLabel": "ننوتل",
+    "loginSubmitLabel": "ننوتل",
+    "loginSuccessTitle": "په بریالیتوب ننوتل",
+    "loginSuccessMessage": "ستاسو ډشبورډ چمتو دی. ستاسو حساب پرانیستل شو.",
+    "loginHint": "د خپلو ثبت شویو ایمیل څخه د ساتل شویو دندو او پروفایل جزئیاتو ته لاسرسی وکړئ.",
+    "signupTitle": "حساب جوړ کړئ",
+    "signupSubtitle": "یو ځل خپل پروفایل برابر کړئ او ژر درخواست ورکړئ.",
+    "signupButtonLabel": "ثبت‌نام",
+    "signupSubmitLabel": "حساب جوړ کړئ",
+    "signupSuccessTitle": "حساب چمتو دی",
+    "signupSuccessMessage": "ستاسو حساب جوړ شو. پروفایل بشپړ کړئ چې درخواست ورکړئ.",
+    "signupPendingTitle": "خپل inbox وګورئ",
+    "signupPendingMessage": "موږ د تایید لینک ستاسو ایمیل ته لېږلی دی.",
+    "signupHint": "د کارياب وړیا حساب جوړول یوازې یوه دقیقه نیسي.",
+    "loginPrompt": "ایا مخکې حساب لرئ؟",
+    "signupPrompt": "حساب نه لرئ؟",
+    "emailLabel": "ایمیل",
+    "passwordLabel": "پاسورډ",
+    "fullNameLabel": "بشپړ نوم",
+    "confirmPasswordLabel": "پاسورډ تایید",
+    "emailPlaceholder": "satayesh@example.com",
+    "passwordPlaceholder": "خپل پاسورډ ولیکئ",
+    "fullNamePlaceholder": "ستاسو بشپړ نوم",
+    "confirmPasswordPlaceholder": "پاسورډ بیا ولیکئ",
+    "submitLabel": "دوام",
+    "loadingText": "بار کېږي...",
+    "welcomeLabel": "کارياب افغانستان",
+    "signOutLabel": "وتل",
+    "guestLabel": "مېلمه",
+    "authErrorFallback": "څه ستونزه پېښه شوه. بیا هڅه وکړئ.",
+    "loginErrorFallback": "موږ نه شوای کولای تاسو داخل کړو. خپل معلومات وګورئ او بیا هڅه وکړئ.",
+    "signupErrorFallback": "موږ حساب نه شوای جوړولای. فورم وګورئ او بیا هڅه وکړئ.",
+    "sidebar": {
+      "introEyebrow": "د افغان دندو پلیټفارم",
+      "introTitle": "واقعي فرصتونه ومومئ، خپل پروفایل چمتو وساتئ، او په اعتماد غوښتنه وکړئ.",
+      "introBody": "له یوه حساب څخه د ساتل شویو دندو، CV او هغو سازمانونو مدیریت وکړئ چې تعقیب کوئ.",
+      "highlights": [
+        "د تایید شویو فرصتونو لټون",
+        "د دندو او سازمانونو ساتل",
+        "د کار لټوونکي قوي پروفایل جوړول"
+      ],
+      "backToHome": "کور ته بېرته",
+      "mobileBrand": "کارياب افغانستان"
+    },
+    "messages": {
+      "loginSuccessNotice": "ستاسو ډشبورډ چمتو دی. ستاسو حساب پرانیستل شو.",
+      "signupNotice": "د تایید لینک خپل ایمیل کې وګورئ."
+    }
+  },
+  "footer": {
+    "brandDescription": "د افغان کار لټوونکو لپاره یو عصري فرصت موندونکی پلیټفارم، د دندو، انټرنشپ، بورس، لیرې کار او مهارت‌زده کړې فرصتونو لپاره.",
+    "focusTitle": "د پلیټفارم تمرکز",
+    "focusBody": "د دې لپاره جوړ شوی چې افغان ټولنه باوري فرصتونه وپلټي او شریک کړي.",
+    "copyright": "کارياب افغانستان",
+    "links": {
+      "browse": "لټون",
+      "submit": "لېږل",
+      "dashboard": "ډشبورډ",
+      "contact": "اړیکه"
+    }
+  }
+}

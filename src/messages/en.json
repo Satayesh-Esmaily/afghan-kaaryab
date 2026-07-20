@@ -1,0 +1,230 @@
+{
+  "seo": {
+    "siteName": "KaarYab Afghanistan",
+    "description": "A modern opportunity platform for Afghan job seekers to browse jobs, internships, scholarships, remote work, organizations, and resume tools.",
+    "openGraphTitle": "KaarYab Afghanistan",
+    "openGraphDescription": "A modern opportunity platform for Afghan job seekers.",
+    "twitterDescription": "Browse jobs, internships, scholarships, remote work, organizations, and resume tools."
+  },
+  "common": {
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "language": "Language",
+    "theme": {
+      "light": "Light mode",
+      "dark": "Dark mode"
+    },
+    "languageOptions": {
+      "en": "English",
+      "faAF": "Dari",
+      "psAF": "Pashto"
+    }
+  },
+  "navigation": {
+    "sidebar": {
+      "dashboard": "Dashboard",
+      "profile": "Profile",
+      "resumeBuilder": "Resume Builder",
+      "discover": "Discover",
+      "directory": "Directory",
+      "saved": "Saved",
+      "addOpportunity": "Add Opportunity",
+      "about": "About",
+      "contact": "Contact",
+      "settings": "Settings"
+    },
+    "pages": {
+      "home": {
+        "title": "Discover",
+        "subtitle": "Browse opportunities, save favorites, and keep track of deadlines."
+      },
+      "dashboard": {
+        "title": "Dashboard",
+        "subtitle": "See the platform stats and recent submissions at a glance."
+      },
+      "profile": {
+        "title": "Profile",
+        "subtitle": "Manage your resume, skills, and job-seeking details."
+      },
+      "resumeBuilder": {
+        "title": "Resume Builder",
+        "subtitle": "Create a job-ready resume and export it as PDF."
+      },
+      "discover": {
+        "title": "Discover",
+        "subtitle": "Search, filter, and explore opportunities in one place."
+      },
+      "directory": {
+        "title": "Directory",
+        "subtitle": "Review organizations, countries, and institutions behind active opportunities."
+      },
+      "saved": {
+        "title": "Saved",
+        "subtitle": "Return to the opportunities you bookmarked for later."
+      },
+      "addOpportunity": {
+        "title": "Add Opportunity",
+        "subtitle": "Share a new listing with the community."
+      },
+      "about": {
+        "title": "About",
+        "subtitle": "Learn what the platform solves and who it helps."
+      },
+      "contact": {
+        "title": "Contact",
+        "subtitle": "Send suggestions or report an issue."
+      },
+      "settings": {
+        "title": "Settings",
+        "subtitle": "Adjust your personal preferences and platform behavior."
+      }
+    },
+    "auth": {
+      "signedInAs": "Signed in as",
+      "guest": "Guest",
+      "login": "Login",
+      "logout": "Sign out"
+    }
+  },
+  "home": {
+    "badge": "Live opportunities",
+    "heroTitle": "Discover opportunities for Afghan job seekers in one clean place.",
+    "heroDescription": "Browse jobs, internships, scholarships, remote work, and training programs with search, filters, saved items, and a focused experience built for Afghan users.",
+    "explore": "Explore opportunities",
+    "dashboard": "Open dashboard",
+    "includedTitle": "What is included",
+    "included": [
+      "Search and filter opportunities",
+      "Save opportunities for later",
+      "Add, edit, and delete listings",
+      "Dark mode and responsive design"
+    ],
+    "quickStats": "Quick stats",
+    "listings": "Listings",
+    "featured": "Featured",
+    "soon": "Soon",
+    "categories": "Categories",
+    "whoItHelps": "Who it helps",
+    "audience": ["Students", "Job seekers", "Fresh graduates", "Women", "Organizations"],
+    "categoryJob": {
+      "title": "Job",
+      "description": "Open roles and hiring opportunities."
+    },
+    "categoryInternship": {
+      "title": "Internship",
+      "description": "Entry-level learning opportunities."
+    },
+    "categoryScholarship": {
+      "title": "Scholarship",
+      "description": "Study support and funding options."
+    },
+    "categoryRemote": {
+      "title": "Remote work",
+      "description": "Flexible work and online roles."
+    },
+    "featuredSection": "Featured",
+    "highlighted": "Highlighted opportunities",
+    "seeAll": "See all",
+    "builtForRealUse": "Built for real use",
+    "platformHeadline": "A practical job platform for Afghan communities.",
+    "platformBody": "This build includes responsive layouts, dark mode, saved opportunities, dynamic routes, CRUD actions, and organization pages that make job discovery easier.",
+    "submitOpportunity": "Submit an opportunity"
+  },
+  "contact": {
+    "eyebrow": "Contact & Support",
+    "title": "Talk to the KaarYab team",
+    "description": "Share job leads, report a problem, or send feedback that helps us improve the platform for Afghan job seekers.",
+    "detailsTitle": "Platform contact",
+    "detailsDescription": "We review messages from job seekers, employers, and organizations to keep the platform useful and up to date.",
+    "emailLabel": "Email",
+    "locationLabel": "Location",
+    "purposeLabel": "Purpose",
+    "email": "styshstysh6@gmail.com",
+    "location": "Afghanistan",
+    "purpose": "supporting Afghan job seekers, employers, and organizations",
+    "formBadge": "Message the team",
+    "formBody": "Send us job leads, questions, bug reports, or suggestions to improve the platform.",
+    "successMessage": "Thanks. We received your message and will review it soon.",
+    "errorFallback": "We could not send your message. Please try again.",
+    "sending": "Sending...",
+    "submitLabel": "Send message",
+    "fields": {
+      "name": "Name",
+      "email": "Email",
+      "subject": "Subject",
+      "message": "Message"
+    },
+    "placeholders": {
+      "name": "Your name",
+      "email": "you@example.com",
+      "subject": "Opportunity suggestion",
+      "message": "Tell us what should be added or improved."
+    }
+  },
+  "auth": {
+    "appName": "KaarYab Afghanistan",
+    "loginTitle": "Welcome back",
+    "loginSubtitle": "Sign in to continue your search, save opportunities, and manage your profile.",
+    "loginButtonLabel": "Login",
+    "loginSubmitLabel": "Login",
+    "loginSuccessTitle": "Signed in successfully",
+    "loginSuccessMessage": "Your dashboard is ready. We have opened your account.",
+    "loginHint": "Use your registered email to access saved jobs and profile details.",
+    "signupTitle": "Create account",
+    "signupSubtitle": "Set up your profile once and start applying faster.",
+    "signupButtonLabel": "Sign up",
+    "signupSubmitLabel": "Create account",
+    "signupSuccessTitle": "Account ready",
+    "signupSuccessMessage": "Your account has been created. Finish your profile to start applying.",
+    "signupPendingTitle": "Check your inbox",
+    "signupPendingMessage": "We sent a confirmation link to your email address.",
+    "signupHint": "It only takes a minute to create your free KaarYab account.",
+    "loginPrompt": "Already have an account?",
+    "signupPrompt": "Don't have an account?",
+    "emailLabel": "Email",
+    "passwordLabel": "Password",
+    "fullNameLabel": "Full name",
+    "confirmPasswordLabel": "Confirm password",
+    "emailPlaceholder": "satayesh@example.com",
+    "passwordPlaceholder": "Enter your password",
+    "fullNamePlaceholder": "Your full name",
+    "confirmPasswordPlaceholder": "Re-enter your password",
+    "submitLabel": "Continue",
+    "loadingText": "Loading...",
+    "welcomeLabel": "KaarYab Afghanistan",
+    "signOutLabel": "Sign out",
+    "guestLabel": "Guest",
+    "authErrorFallback": "Something went wrong. Please try again.",
+    "loginErrorFallback": "We could not sign you in. Check your credentials and try again.",
+    "signupErrorFallback": "We could not create your account. Please review the form and try again.",
+    "sidebar": {
+      "introEyebrow": "Afghan jobs platform",
+      "introTitle": "Find real opportunities, keep your profile ready, and apply with confidence.",
+      "introBody": "Use one account to manage saved jobs, your resume, and the organizations you follow.",
+      "highlights": [
+        "Browse verified opportunities",
+        "Save jobs and organizations",
+        "Build a stronger job-seeker profile"
+      ],
+      "backToHome": "Back to home",
+      "mobileBrand": "KaarYab Afghanistan"
+    },
+    "messages": {
+      "loginSuccessNotice": "Your dashboard is ready. We have opened your account.",
+      "signupNotice": "Check your inbox for the confirmation link."
+    }
+  },
+  "footer": {
+    "brandDescription": "A modern opportunity finder for Afghan job seekers, built for jobs, internships, scholarships, remote work, and skill-building opportunities.",
+    "focusTitle": "Platform focus",
+    "focusBody": "Built to help Afghan communities discover and share trusted opportunities.",
+    "copyright": "KaarYab Afghanistan",
+    "links": {
+      "browse": "Browse",
+      "submit": "Submit",
+      "dashboard": "Dashboard",
+      "contact": "Contact"
+    }
+  }
+}

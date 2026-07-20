@@ -1,48 +1,84 @@
 import type { Metadata, Viewport } from "next";
+import { NextIntlClientProvider } from "next-intl";
+import { getLocale, getMessages, getTranslations } from "next-intl/server";
 import Providers from "@/components/layout/Providers";
 import AppShell from "@/components/layout/AppShell";
+import { defaultLocale } from "@/i18n/config";
+import { getLocaleDirection } from "@/i18n/utils";
 import "./globals.css";
 
-export const metadata: Metadata = {
-  title: {
-    default: "KaarYab Afghanistan",
-    template: "%s | KaarYab Afghanistan",
-  },
-  description:
-    "A modern opportunity finder platform for Afghan youth to browse jobs, internships, scholarships, remote work, and skill-building opportunities.",
-  manifest: "/manifest.webmanifest",
-  icons: {
-    icon: [
-      { url: "/icon.png", type: "image/png" },
-      { url: "/logos/kaaryab-logo.png", type: "image/png" },
-    ],
-    shortcut: "/icon.png",
-    apple: "/apple-icon.png",
-  },
-};
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale();
+  const t = await getTranslations({ locale, namespace: "seo" });
+  const siteName = t("siteName");
+  const description = t("description");
+
+  return {
+    metadataBase: new URL(siteUrl),
+    title: {
+      default: siteName,
+      template: `%s | ${siteName}`,
+    },
+    description,
+    manifest: "/manifest.webmanifest",
+    alternates: {
+      canonical: locale === defaultLocale ? "/" : `/${locale}`,
+      languages: {
+        en: siteUrl,
+        "fa-AF": `${siteUrl}/fa-AF`,
+        "ps-AF": `${siteUrl}/ps-AF`,
+      },
+    },
+    openGraph: {
+      title: siteName,
+      description,
+      url: locale === defaultLocale ? siteUrl : `${siteUrl}/${locale}`,
+      siteName,
+      type: "website",
+      locale: locale === "fa-AF" ? "fa_AF" : locale === "ps-AF" ? "ps_AF" : "en_US",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: siteName,
+      description: t("twitterDescription"),
+    },
+    icons: {
+      icon: [
+        { url: "/icon.png", type: "image/png" },
+        { url: "/logos/kaaryab-logo.png", type: "image/png" },
+      ],
+      shortcut: "/icon.png",
+      apple: "/apple-icon.png",
+    },
+  };
+}
 
 export const viewport: Viewport = {
   themeColor: "#6E5BFF",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = await getLocale();
+  const messages = await getMessages();
+  const dir = getLocaleDirection(locale);
+
   return (
-    <html
-      lang="en"
-      suppressHydrationWarning
-      className="h-full antialiased"
-    >
+    <html lang={locale} dir={dir} suppressHydrationWarning className="h-full antialiased">
       <body
         suppressHydrationWarning
         className="min-h-full bg-[color:var(--background)] text-[color:var(--foreground)]"
       >
-        <Providers>
-          <AppShell>{children}</AppShell>
-        </Providers>
+        <NextIntlClientProvider locale={locale} messages={messages}>
+          <Providers>
+            <AppShell>{children}</AppShell>
+          </Providers>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

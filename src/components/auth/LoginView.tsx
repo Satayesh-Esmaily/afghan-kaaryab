@@ -1,19 +1,29 @@
-import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import LoginForm from "@/components/auth/LoginForm";
 import AuthPageShell from "@/components/auth/AuthPageShell";
-import { authCopy } from "@/config/auth";
+import { Link } from "@/i18n/navigation";
 
-export default function LoginView() {
+export default async function LoginView() {
+  const t = await getTranslations("auth");
+
   return (
-    <AuthPageShell title={authCopy.loginTitle} subtitle={authCopy.loginSubtitle}>
+    <AuthPageShell
+      title={t("loginTitle")}
+      subtitle={t("loginSubtitle")}
+      introEyebrow={t("sidebar.introEyebrow")}
+      introTitle={t("sidebar.introTitle")}
+      introBody={t("sidebar.introBody")}
+      highlights={t.raw("sidebar.highlights") as string[]}
+      backLabel={t("sidebar.backToHome")}
+    >
       <LoginForm />
       <p className="mt-4 text-center text-xs leading-6 text-[color:var(--foreground-muted)]">
-        {authCopy.loginHint}
+        {t("loginHint")}
       </p>
       <p className="mt-5 text-center text-sm text-[color:var(--foreground-muted)]">
-        {`Don't have an account? `}
+        {t("signupPrompt")}{" "}
         <Link href="/signup" className="font-semibold text-[color:var(--accent-strong)] hover:underline">
-          Sign up
+          {t("signupButtonLabel")}
         </Link>
       </p>
     </AuthPageShell>
