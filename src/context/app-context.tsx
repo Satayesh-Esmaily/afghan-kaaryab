@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { AuthContextProvider, type AuthContextValue } from "@/context/auth-context";
 import { OpportunitiesContextProvider, type OpportunitiesContextValue } from "@/context/opportunities-context";
 import { ProfileContextProvider, type ProfileContextValue } from "@/context/profile-context";
@@ -30,41 +30,36 @@ export function AppProvider({
     useServerBootstrap
   );
 
-  const authValue = useMemo<AuthContextValue>(
-    () => ({
-      user: auth.user,
-      authenticated: auth.authenticated,
-      hydrated,
-      authReady: auth.authReady,
-      login: auth.login,
-      signup: auth.signup,
-      logout: auth.logout,
-    }),
-    [auth.authReady, auth.authenticated, auth.login, auth.logout, auth.signup, auth.user, hydrated]
-  );
-
   return (
-    <AuthContextProvider value={authValue}>
-      <AppStateProviders
-        key={revision}
-        snapshot={snapshot}
-        hydrated={hydrated}
-        userId={auth.user?.id ?? null}
-      >
-        {children}
-      </AppStateProviders>
-    </AuthContextProvider>
+    <AppStateProviders
+      key={revision}
+      auth={auth}
+      snapshot={snapshot}
+      hydrated={hydrated}
+      userId={auth.user?.id ?? null}
+    >
+      {children}
+    </AppStateProviders>
   );
 }
 
 export type { ResumeTemplateId };
 
 function AppStateProviders({
+  auth,
   snapshot,
   hydrated,
   userId,
   children,
 }: {
+  auth: {
+    user: ReturnType<typeof useAuthState>["user"];
+    authenticated: boolean;
+    authReady: boolean;
+    login: ReturnType<typeof useAuthState>["login"];
+    signup: ReturnType<typeof useAuthState>["signup"];
+    logout: ReturnType<typeof useAuthState>["logout"];
+  };
   snapshot: LoadedAppStore;
   hydrated: boolean;
   userId: string | null;
@@ -78,6 +73,25 @@ function AppStateProviders({
     followedOrganizationSlugs: snapshot.followedOrganizationSlugs,
     userId,
   });
+  const { user, authenticated, authReady, login, signup, logout } = auth;
+  const { flushSave } = profile;
+  const handleLogout = useCallback(async () => {
+    await flushSave();
+    await logout();
+  }, [flushSave, logout]);
+
+  const authValue = useMemo<AuthContextValue>(
+    () => ({
+      user,
+      authenticated,
+      hydrated,
+      authReady,
+      login,
+      signup,
+      logout: handleLogout,
+    }),
+    [authReady, authenticated, handleLogout, hydrated, login, signup, user]
+  );
 
   const themeValue = useMemo<ThemeContextValue>(
     () => ({
@@ -125,10 +139,12 @@ function AppStateProviders({
   );
 
   return (
-    <ThemeContextProvider value={themeValue}>
-      <ProfileContextProvider value={profileValue}>
-        <OpportunitiesContextProvider value={opportunitiesValue}>{children}</OpportunitiesContextProvider>
-      </ProfileContextProvider>
-    </ThemeContextProvider>
+    <AuthContextProvider value={authValue}>
+      <ThemeContextProvider value={themeValue}>
+        <ProfileContextProvider value={profileValue}>
+          <OpportunitiesContextProvider value={opportunitiesValue}>{children}</OpportunitiesContextProvider>
+        </ProfileContextProvider>
+      </ThemeContextProvider>
+    </AuthContextProvider>
   );
 }

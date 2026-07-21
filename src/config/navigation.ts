@@ -80,7 +80,7 @@ export const pageTones: Record<ShellPath, { dot: string; title: string }> = {
 export function isShellLinkActive(pathname: string | null, href: ShellPath) {
   if (!pathname) return false;
 
-  return pathname === href || (href === "/opportunities" && pathname === "/") || pathname.startsWith(href);
+  return pathname === href || (href === "/dashboard" && pathname === "/") || pathname.startsWith(href);
 }
 
 export const brand = {

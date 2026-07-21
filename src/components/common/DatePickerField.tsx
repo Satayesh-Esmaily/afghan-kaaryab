@@ -74,25 +74,39 @@ export default function DatePickerField({
         disabled={disabled}
         onClick={() => setOpen((current) => !current)}
         className={[
-          "ds-input flex min-h-[3rem] items-center justify-between gap-3 text-start transition",
-          disabled ? "cursor-not-allowed opacity-60" : "",
+          "ds-input flex min-h-[3.15rem] items-center justify-between gap-3.5 px-4 py-3 text-start shadow-sm transition",
+          "hover:border-[color:var(--accent-soft)] hover:bg-[color:var(--surface-soft)] hover:shadow-md",
+          "focus:border-[color:var(--accent)] focus:shadow-[0_0_0_4px_rgba(114,93,255,0.14)]",
+          open ? "border-[color:var(--accent-soft)] bg-[color:var(--surface-soft)] shadow-md" : "",
+          disabled ? "cursor-not-allowed opacity-60 hover:border-[color:var(--border)] hover:bg-[color:var(--surface)] hover:shadow-sm" : "",
         ].join(" ")}
         aria-expanded={open}
         aria-haspopup="dialog"
       >
-        <span className={selectedLabel ? "text-[color:var(--foreground)]" : "text-[color:var(--foreground-muted)]"}>
-          {selectedLabel || placeholder}
+        <span className="flex min-w-0 items-center gap-3">
+          <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-[linear-gradient(135deg,var(--accent-soft),var(--surface-soft))] text-[color:var(--accent-strong)]">
+            <CalendarIcon />
+          </span>
+          <span
+            className={[
+              "truncate text-sm font-medium",
+              selectedLabel ? "text-[color:var(--foreground)]" : "text-[color:var(--foreground-muted)]",
+            ].join(" ")}
+          >
+            {selectedLabel || placeholder}
+          </span>
         </span>
-        <CalendarIcon />
+        <ChevronIcon className={open ? "rotate-180 text-[color:var(--accent)]" : ""} />
       </button>
 
       {open ? (
-        <div className="absolute z-50 mt-2 w-[min(22rem,calc(100vw-2rem))] rounded-[1.25rem] border border-[color:var(--border)] bg-[color:var(--surface)] p-3 shadow-2xl">
-          <div className="flex items-center justify-between gap-2">
+        <div className="absolute z-50 mt-2 w-[min(22rem,calc(100vw-2rem))] overflow-hidden rounded-[1.35rem] border border-[color:var(--border)] bg-[color:var(--surface)] shadow-[0_22px_50px_rgba(15,16,19,0.16)]">
+          <div className="border-b border-[color:var(--border)] bg-[color:var(--surface-soft)] p-3">
+            <div className="flex items-center justify-between gap-2">
             <button
               type="button"
               onClick={() => setViewDate((current) => addMonths(current, -1))}
-              className="grid h-9 w-9 place-items-center rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] text-[color:var(--foreground)] transition hover:bg-[color:var(--surface-soft)]"
+              className="grid h-9 w-9 place-items-center rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] text-[color:var(--foreground)] shadow-sm transition hover:border-[color:var(--accent-soft)] hover:bg-[color:var(--surface-soft)]"
               aria-label="Previous month"
             >
               <ArrowIcon direction="left" />
@@ -102,7 +116,7 @@ export default function DatePickerField({
               <select
                 value={currentMonth}
                 onChange={(event) => setViewDate((current) => new Date(current.getFullYear(), Number(event.target.value), 1))}
-                className="ds-input rounded-[0.9rem] px-3 py-2 text-sm"
+                className="appearance-none rounded-[1rem] border border-[color:var(--border)] bg-[color:var(--surface)] px-3 py-2.5 text-sm text-[color:var(--foreground)] shadow-sm outline-none transition hover:bg-[color:var(--surface-soft)] focus:border-[color:var(--accent)] focus:shadow-[0_0_0_4px_rgba(114,93,255,0.14)]"
               >
                 {monthLabels.map((label, index) => (
                   <option key={label} value={index}>
@@ -113,7 +127,7 @@ export default function DatePickerField({
               <select
                 value={currentYear}
                 onChange={(event) => setViewDate((current) => new Date(Number(event.target.value), current.getMonth(), 1))}
-                className="ds-input rounded-[0.9rem] px-3 py-2 text-sm"
+                className="appearance-none rounded-[1rem] border border-[color:var(--border)] bg-[color:var(--surface)] px-3 py-2.5 text-sm text-[color:var(--foreground)] shadow-sm outline-none transition hover:bg-[color:var(--surface-soft)] focus:border-[color:var(--accent)] focus:shadow-[0_0_0_4px_rgba(114,93,255,0.14)]"
               >
                 {buildYearOptions().map((year) => (
                   <option key={year} value={year}>
@@ -126,14 +140,15 @@ export default function DatePickerField({
             <button
               type="button"
               onClick={() => setViewDate((current) => addMonths(current, 1))}
-              className="grid h-9 w-9 place-items-center rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] text-[color:var(--foreground)] transition hover:bg-[color:var(--surface-soft)]"
+              className="grid h-9 w-9 place-items-center rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] text-[color:var(--foreground)] shadow-sm transition hover:border-[color:var(--accent-soft)] hover:bg-[color:var(--surface-soft)]"
               aria-label="Next month"
             >
               <ArrowIcon direction="right" />
             </button>
           </div>
+          </div>
 
-          <div className="mt-3 grid grid-cols-7 text-center text-xs font-medium text-[color:var(--foreground-muted)]">
+          <div className="grid grid-cols-7 border-b border-[color:var(--border)] px-3 py-2 text-center text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--foreground-muted)]">
             {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((day) => (
               <div key={day} className="py-2">
                 {day}
@@ -141,7 +156,7 @@ export default function DatePickerField({
             ))}
           </div>
 
-          <div className="grid grid-cols-7 gap-1 text-sm">
+          <div className="grid grid-cols-7 gap-1 p-3 text-sm">
             {calendar.map((cell) => {
               const date = cell.date;
 
@@ -153,26 +168,26 @@ export default function DatePickerField({
               const isCurrentMonth = date.getMonth() === viewDate.getMonth();
               const isToday = isSameDay(date, new Date());
 
-              return (
-                <button
-                  key={cell.key}
-                  type="button"
-                  onClick={() => {
-                    onChange(toIsoDate(date));
-                    setOpen(false);
-                  }}
-                  className={[
-                    "aspect-square rounded-[0.95rem] transition",
+                return (
+                  <button
+                    key={cell.key}
+                    type="button"
+                    onClick={() => {
+                      onChange(toIsoDate(date));
+                      setOpen(false);
+                    }}
+                    className={[
+                    "aspect-square rounded-[1rem] transition",
                     active
                       ? "bg-[color:var(--accent)] text-white shadow-lg shadow-[rgba(114,93,255,0.24)]"
                       : isCurrentMonth
                         ? "text-[color:var(--foreground)] hover:bg-[color:var(--surface-soft)]"
                         : "text-[color:var(--foreground-muted)] hover:bg-[color:var(--surface-soft)]",
                     isToday && !active ? "ring-1 ring-[color:var(--accent-soft)]" : "",
-                  ].join(" ")}
-                >
-                  {date.getDate()}
-                </button>
+                    ].join(" ")}
+                  >
+                    {date.getDate()}
+                  </button>
               );
             })}
           </div>
@@ -239,6 +254,19 @@ function formatDisplayDate(date: Date) {
   return `${day} ${month}, ${year}`;
 }
 
+function ChevronIcon({ className = "" }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 20 20"
+      className={`h-4.5 w-4.5 shrink-0 text-[color:var(--foreground-muted)] transition ${className}`}
+      fill="none"
+      aria-hidden="true"
+    >
+      <path d="M5 7.5 10 12.5 15 7.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 function buildYearOptions() {
   const currentYear = new Date().getFullYear();
   const years: number[] = [];
@@ -252,7 +280,7 @@ function buildYearOptions() {
 
 function CalendarIcon() {
   return (
-    <svg viewBox="0 0 20 20" className="h-4.5 w-4.5 shrink-0 text-[color:var(--foreground-muted)]" fill="none" aria-hidden="true">
+    <svg viewBox="0 0 20 20" className="h-4 w-4 shrink-0 text-[color:var(--accent-strong)]" fill="none" aria-hidden="true">
       <path d="M6 3.5V5M14 3.5V5M4.5 7.5h11M5.5 4.5h9A1.5 1.5 0 0 1 16 6v8A1.5 1.5 0 0 1 14.5 15.5h-9A1.5 1.5 0 0 1 4 14V6A1.5 1.5 0 0 1 5.5 4.5Z" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );

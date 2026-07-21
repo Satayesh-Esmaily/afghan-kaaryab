@@ -3,6 +3,7 @@
 import { useRef } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import DatePickerField from "@/components/common/DatePickerField";
 import FormField from "@/components/common/FormField";
 import { useAttachmentUpload } from "@/hooks/profile/useAttachmentUpload";
 import { certificationEntrySchema, type CertificationEntryFormValues } from "@/lib/schemas";
@@ -42,6 +43,8 @@ export function CertificationEntryDialog({
   });
 
   const attachmentFileName = useWatch({ control, name: "attachmentFileName" });
+  const issueDateValue = useWatch({ control, name: "issueDate" });
+  const expirationDateValue = useWatch({ control, name: "expirationDate" });
 
   if (!open) return null;
 
@@ -72,10 +75,18 @@ export function CertificationEntryDialog({
 
         <div className="grid gap-5 md:grid-cols-2">
           <FormField label="Issue Date" error={errors.issueDate?.message}>
-            <input {...register("issueDate")} type="date" className="ds-input" />
+            <DatePickerField
+              value={issueDateValue}
+              onChange={(value) => setValue("issueDate", value, { shouldDirty: true, shouldValidate: true })}
+              placeholder="Select date"
+            />
           </FormField>
           <FormField label="Expiration Date" error={errors.expirationDate?.message} hint="Optional">
-            <input {...register("expirationDate")} type="date" className="ds-input" />
+            <DatePickerField
+              value={expirationDateValue}
+              onChange={(value) => setValue("expirationDate", value, { shouldDirty: true, shouldValidate: true })}
+              placeholder="Select date"
+            />
           </FormField>
         </div>
 

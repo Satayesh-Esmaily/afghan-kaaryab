@@ -4,6 +4,7 @@ import Providers from "@/components/layout/Providers";
 import { defaultLocale } from "@/i18n/config";
 import { getLocaleDirection } from "@/i18n/utils";
 import { loadServerBootstrap } from "@/lib/supabase/server";
+import PwaRegistration from "@/components/layout/PwaRegistration";
 import "./globals.css";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
@@ -80,6 +81,7 @@ export default async function RootLayout({
         className="min-h-full bg-[color:var(--background)] text-[color:var(--foreground)]"
       >
         <Providers bootstrap={bootstrap}>{children}</Providers>
+        <PwaRegistration />
       </body>
     </html>
   );

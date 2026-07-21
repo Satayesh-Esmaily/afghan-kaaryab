@@ -9,6 +9,19 @@ export function useProfileState(initialProfile: JobSeekerProfile, userId: string
   const profileSaveTimerRef = useRef<number | null>(null);
   const skipInitialSaveRef = useRef(true);
 
+  const flushSave = useCallback(async () => {
+    if (!hydrated || !userId) {
+      return;
+    }
+
+    if (profileSaveTimerRef.current) {
+      window.clearTimeout(profileSaveTimerRef.current);
+      profileSaveTimerRef.current = null;
+    }
+
+    await saveProfileStore(userId, profile, theme);
+  }, [hydrated, profile, theme, userId]);
+
   useEffect(() => {
     if (skipInitialSaveRef.current) {
       skipInitialSaveRef.current = false;
@@ -45,7 +58,8 @@ export function useProfileState(initialProfile: JobSeekerProfile, userId: string
     () => ({
       profile,
       updateProfile,
+      flushSave,
     }),
-    [profile, updateProfile]
+    [flushSave, profile, updateProfile]
   );
 }

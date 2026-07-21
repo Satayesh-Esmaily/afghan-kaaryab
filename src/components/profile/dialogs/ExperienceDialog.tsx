@@ -2,6 +2,7 @@
 
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import DatePickerField from "@/components/common/DatePickerField";
 import FormField from "@/components/common/FormField";
 import SearchableSelect from "@/components/common/SearchableSelect";
 import { experienceEntrySchema, type ExperienceEntryFormValues } from "@/lib/schemas";
@@ -29,6 +30,8 @@ export function ExperienceEntryDialog({ open, initialValues, onClose, onSave }: 
   const currentlyWorking = useWatch({ control, name: "currentlyWorking" });
   const currentlyWorkingField = register("currentlyWorking");
   const employmentTypeValue = useWatch({ control, name: "employmentType" });
+  const startDateValue = useWatch({ control, name: "startDate" });
+  const endDateValue = useWatch({ control, name: "endDate" });
 
   if (!open) return null;
 
@@ -79,10 +82,19 @@ export function ExperienceEntryDialog({ open, initialValues, onClose, onSave }: 
 
         <div className="grid gap-5 md:grid-cols-2">
           <FormField label="Start Date" error={errors.startDate?.message}>
-            <input {...register("startDate")} type="date" className="ds-input" />
+            <DatePickerField
+              value={startDateValue}
+              onChange={(value) => setValue("startDate", value, { shouldDirty: true, shouldValidate: true })}
+              placeholder="Select date"
+            />
           </FormField>
           <FormField label="End Date" error={errors.endDate?.message}>
-            <input {...register("endDate")} type="date" className="ds-input" disabled={currentlyWorking} />
+            <DatePickerField
+              value={endDateValue}
+              onChange={(value) => setValue("endDate", value, { shouldDirty: true, shouldValidate: true })}
+              placeholder={currentlyWorking ? "Currently working" : "Select date"}
+              disabled={currentlyWorking}
+            />
           </FormField>
         </div>
 

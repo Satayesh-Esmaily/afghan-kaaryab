@@ -2,7 +2,9 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import DatePickerField from "@/components/common/DatePickerField";
 import FormField from "@/components/common/FormField";
+import { useWatch } from "react-hook-form";
 import { educationEntrySchema, type EducationEntryFormValues } from "@/lib/schemas";
 import { DialogShell, getDefaultEducationEntry } from "@/components/profile/dialogs/shared";
 
@@ -15,13 +17,18 @@ type EducationDialogProps = {
 
 export function EducationEntryDialog({ open, initialValues, onClose, onSave }: EducationDialogProps) {
   const {
+    control,
     register,
     handleSubmit,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<EducationEntryFormValues>({
     resolver: zodResolver(educationEntrySchema),
     defaultValues: initialValues ?? getDefaultEducationEntry(),
   });
+
+  const startDateValue = useWatch({ control, name: "startDate" });
+  const endDateValue = useWatch({ control, name: "endDate" });
 
   if (!open) return null;
 
@@ -58,10 +65,18 @@ export function EducationEntryDialog({ open, initialValues, onClose, onSave }: E
 
         <div className="grid gap-5 md:grid-cols-2">
           <FormField label="Start Date" error={errors.startDate?.message}>
-            <input {...register("startDate")} type="date" className="ds-input" />
+            <DatePickerField
+              value={startDateValue}
+              onChange={(value) => setValue("startDate", value, { shouldDirty: true, shouldValidate: true })}
+              placeholder="Select date"
+            />
           </FormField>
           <FormField label="End Date" error={errors.endDate?.message}>
-            <input {...register("endDate")} type="date" className="ds-input" />
+            <DatePickerField
+              value={endDateValue}
+              onChange={(value) => setValue("endDate", value, { shouldDirty: true, shouldValidate: true })}
+              placeholder="Select date"
+            />
           </FormField>
         </div>
 

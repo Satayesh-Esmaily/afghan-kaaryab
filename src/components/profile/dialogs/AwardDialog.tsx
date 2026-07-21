@@ -3,6 +3,7 @@
 import { useRef } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import DatePickerField from "@/components/common/DatePickerField";
 import FormField from "@/components/common/FormField";
 import { useAttachmentUpload } from "@/hooks/profile/useAttachmentUpload";
 import { awardEntrySchema, type AwardEntryFormValues } from "@/lib/schemas";
@@ -36,6 +37,7 @@ export function AwardEntryDialog({ open, initialValues, userId, onClose, onSave 
   });
 
   const attachmentFileName = useWatch({ control, name: "attachmentFileName" });
+  const awardDateValue = useWatch({ control, name: "date" });
 
   if (!open) return null;
 
@@ -57,7 +59,11 @@ export function AwardEntryDialog({ open, initialValues, userId, onClose, onSave 
             <input {...register("issuedBy")} className="ds-input" placeholder="Netlinks LTD" />
           </FormField>
           <FormField label="Date" error={errors.date?.message}>
-            <input {...register("date")} type="date" className="ds-input" />
+            <DatePickerField
+              value={awardDateValue}
+              onChange={(value) => setValue("date", value, { shouldDirty: true, shouldValidate: true })}
+              placeholder="Select date"
+            />
           </FormField>
         </div>
 

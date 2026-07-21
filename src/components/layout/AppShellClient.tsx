@@ -36,9 +36,12 @@ export default function AppShellClient({ children, footer }: AppShellClientProps
 
   const isAuthRoute = normalizedPathname === "/login" || normalizedPathname === "/signup";
   const isAppReady = hydrated && authReady;
-  const activePagePath = pageHeaderOrder.find((path) =>
-    path === "/" ? normalizedPathname === "/" : normalizedPathname?.startsWith(path)
-  ) ?? "/opportunities";
+  const activePagePath =
+    (normalizedPathname === "/" ? "/dashboard" : undefined) ??
+    pageHeaderOrder.find((path) =>
+      path === "/" ? normalizedPathname === "/" : normalizedPathname?.startsWith(path)
+    ) ??
+    "/dashboard";
   const page = pageHeaders[activePagePath];
   const pageTone = pageTones[activePagePath] ?? pageTones["/opportunities"];
 
