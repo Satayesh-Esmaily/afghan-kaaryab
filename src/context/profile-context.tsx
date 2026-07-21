@@ -1,12 +1,11 @@
 "use client";
 
 import { createContext, useContext } from "react";
-import type { JobSeekerProfile, ThemeMode } from "@/lib/app-state";
+import type { JobSeekerProfile } from "@/lib/app-state";
 
 export type ProfileContextValue = {
   profile: JobSeekerProfile;
   updateProfile: (input: Partial<JobSeekerProfile>) => void;
-  setTheme: (mode: ThemeMode) => void;
 };
 
 const ProfileContext = createContext<ProfileContextValue | null>(null);

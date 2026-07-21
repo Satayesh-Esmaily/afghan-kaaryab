@@ -1,15 +1,13 @@
 "use client";
 
 import { createContext, useContext } from "react";
-import type { AuthUser, ThemeMode } from "@/lib/app-state";
+import type { AuthUser } from "@/lib/app-state";
 
 export type AuthContextValue = {
   user: AuthUser | null;
   authenticated: boolean;
   hydrated: boolean;
   authReady: boolean;
-  theme: ThemeMode;
-  setTheme: (mode: ThemeMode) => void;
   login: (input: { email: string; password: string }) => Promise<void>;
   signup: (input: { fullName: string; email: string; password: string }) => Promise<{ needsConfirmation: boolean }>;
   logout: () => Promise<void>;
