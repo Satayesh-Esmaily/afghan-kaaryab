@@ -1,37 +1,69 @@
+export type ShellPath =
+  | "/"
+  | "/dashboard"
+  | "/profile"
+  | "/resume-builder"
+  | "/opportunities"
+  | "/organizations"
+  | "/saved"
+  | "/add-opportunity"
+  | "/about"
+  | "/contact"
+  | "/settings";
+
 export type NavItem = {
-  href: string;
-  label: string;
+  href: ShellPath;
+  labelKey: string;
   authOnly?: boolean;
 };
 
-export const sidebarItems: NavItem[] = [
-  { href: "/dashboard", label: "Dashboard" },
-  { href: "/profile", label: "Profile", authOnly: true },
-  { href: "/resume-builder", label: "Resume Builder", authOnly: true },
-  { href: "/opportunities", label: "Discover" },
-  { href: "/organizations", label: "Directory" },
-  { href: "/saved", label: "Saved" },
-  { href: "/add-opportunity", label: "Add Opportunity" },
-  { href: "/about", label: "About" },
-  { href: "/contact", label: "Contact" },
-  { href: "/settings", label: "Settings" },
-];
-
-export const pageHeaders: Record<string, { title: string; subtitle: string }> = {
-  "/": { title: "Discover", subtitle: "Browse opportunities, save favorites, and keep track of deadlines." },
-  "/dashboard": { title: "Dashboard", subtitle: "See the platform stats and recent submissions at a glance." },
-  "/profile": { title: "Profile", subtitle: "Manage your resume, skills, and job-seeking details." },
-  "/resume-builder": { title: "Resume Builder", subtitle: "Create a job-ready resume and export it as PDF." },
-  "/opportunities": { title: "Discover", subtitle: "Search, filter, and explore opportunities in one place." },
-  "/organizations": { title: "Directory", subtitle: "Review organizations, countries, and institutions behind active opportunities." },
-  "/saved": { title: "Saved", subtitle: "Return to the opportunities you bookmarked for later." },
-  "/add-opportunity": { title: "Add Opportunity", subtitle: "Share a new listing with the community." },
-  "/about": { title: "About", subtitle: "Learn what the platform solves and who it helps." },
-  "/contact": { title: "Contact", subtitle: "Send suggestions or report an issue." },
-  "/settings": { title: "Settings", subtitle: "Adjust your personal preferences and platform behavior." },
+export type PageHeader = {
+  titleKey: string;
+  subtitleKey: string;
 };
 
-export const pageTones: Record<string, { dot: string; title: string }> = {
+export const sidebarItems: NavItem[] = [
+  { href: "/dashboard", labelKey: "sidebar.dashboard" },
+  { href: "/profile", labelKey: "sidebar.profile", authOnly: true },
+  { href: "/resume-builder", labelKey: "sidebar.resumeBuilder", authOnly: true },
+  { href: "/opportunities", labelKey: "sidebar.discover" },
+  { href: "/organizations", labelKey: "sidebar.directory" },
+  { href: "/saved", labelKey: "sidebar.saved" },
+  { href: "/add-opportunity", labelKey: "sidebar.addOpportunity" },
+  { href: "/about", labelKey: "sidebar.about" },
+  { href: "/contact", labelKey: "sidebar.contact" },
+  { href: "/settings", labelKey: "sidebar.settings" },
+];
+
+export const pageHeaderOrder: ShellPath[] = [
+  "/",
+  "/dashboard",
+  "/profile",
+  "/resume-builder",
+  "/opportunities",
+  "/organizations",
+  "/saved",
+  "/add-opportunity",
+  "/about",
+  "/contact",
+  "/settings",
+];
+
+export const pageHeaders: Record<ShellPath, PageHeader> = {
+  "/": { titleKey: "pages.home.title", subtitleKey: "pages.home.subtitle" },
+  "/dashboard": { titleKey: "pages.dashboard.title", subtitleKey: "pages.dashboard.subtitle" },
+  "/profile": { titleKey: "pages.profile.title", subtitleKey: "pages.profile.subtitle" },
+  "/resume-builder": { titleKey: "pages.resumeBuilder.title", subtitleKey: "pages.resumeBuilder.subtitle" },
+  "/opportunities": { titleKey: "pages.discover.title", subtitleKey: "pages.discover.subtitle" },
+  "/organizations": { titleKey: "pages.directory.title", subtitleKey: "pages.directory.subtitle" },
+  "/saved": { titleKey: "pages.saved.title", subtitleKey: "pages.saved.subtitle" },
+  "/add-opportunity": { titleKey: "pages.addOpportunity.title", subtitleKey: "pages.addOpportunity.subtitle" },
+  "/about": { titleKey: "pages.about.title", subtitleKey: "pages.about.subtitle" },
+  "/contact": { titleKey: "pages.contact.title", subtitleKey: "pages.contact.subtitle" },
+  "/settings": { titleKey: "pages.settings.title", subtitleKey: "pages.settings.subtitle" },
+};
+
+export const pageTones: Record<ShellPath, { dot: string; title: string }> = {
   "/": { dot: "bg-[color:var(--accent)]", title: "text-[color:var(--accent-strong)]" },
   "/dashboard": { dot: "bg-[color:var(--success)]", title: "text-[color:var(--success)]" },
   "/profile": { dot: "bg-[color:var(--accent)]", title: "text-[color:var(--accent)]" },
@@ -44,6 +76,12 @@ export const pageTones: Record<string, { dot: string; title: string }> = {
   "/contact": { dot: "bg-[color:var(--danger)]", title: "text-[color:var(--danger)]" },
   "/settings": { dot: "bg-[color:var(--accent-strong)]", title: "text-[color:var(--accent-strong)]" },
 };
+
+export function isShellLinkActive(pathname: string | null, href: ShellPath) {
+  if (!pathname) return false;
+
+  return pathname === href || (href === "/opportunities" && pathname === "/") || pathname.startsWith(href);
+}
 
 export const brand = {
   name: "KaarYab Afghanistan",

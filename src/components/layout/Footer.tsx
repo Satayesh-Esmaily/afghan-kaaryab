@@ -1,17 +1,15 @@
-"use client";
-
-import { useTranslations } from "next-intl";
+import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 
-export default function Footer() {
-  const tFooter = useTranslations("footer");
+const footerLinks = [
+  { href: "/opportunities", labelKey: "links.browse" },
+  { href: "/add-opportunity", labelKey: "links.submit" },
+  { href: "/dashboard", labelKey: "links.dashboard" },
+  { href: "/contact", labelKey: "links.contact" },
+] as const;
 
-  const footerLinks = [
-    { href: "/opportunities", label: tFooter("links.browse") },
-    { href: "/add-opportunity", label: tFooter("links.submit") },
-    { href: "/dashboard", label: tFooter("links.dashboard") },
-    { href: "/contact", label: tFooter("links.contact") },
-  ];
+export default async function Footer() {
+  const tFooter = await getTranslations("footer");
 
   return (
     <footer className="border-t border-[color:var(--border)]/80 bg-[color:var(--surface)]/80 backdrop-blur">
@@ -28,7 +26,7 @@ export default function Footer() {
               href={link.href}
               className="rounded-xl px-3 py-2 transition hover:bg-[color:var(--surface-soft)] hover:text-[color:var(--foreground-strong)]"
             >
-              {link.label}
+              {tFooter(link.labelKey)}
             </Link>
           ))}
         </div>
