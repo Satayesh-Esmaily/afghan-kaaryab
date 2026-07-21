@@ -3,6 +3,12 @@
 import type { ReactNode, RefObject } from "react";
 import { Badge } from "@/components/ui";
 import type { AwardEntry, CertificationEntry, DocumentEntry, EducationEntry, ExperienceEntry } from "@/lib/app-state";
+import {
+  formatDateLabel,
+  formatDateRange,
+  getInitials,
+  splitItems,
+} from "@/components/profile/profile-view/profile-view-helpers";
 
 type ResumeTabProps = {
   resumeInputRef: RefObject<HTMLInputElement | null>;
@@ -472,51 +478,6 @@ function ActionChip({ label, onClick }: ActionChipProps) {
       {label}
     </button>
   );
-}
-
-function getInitials(name: string) {
-  const parts = name
-    .trim()
-    .split(/\s+/)
-    .filter(Boolean);
-
-  if (parts.length === 0) return "U";
-  if (parts.length === 1) return parts[0]?.slice(0, 2).toUpperCase() ?? "U";
-
-  return `${parts[0]?.[0] ?? ""}${parts[1]?.[0] ?? ""}`.toUpperCase();
-}
-
-function splitItems(value: string) {
-  return value
-    .split(",")
-    .map((item) => item.trim())
-    .filter(Boolean);
-}
-
-function formatDateRange(startDate: string, endDate: string, currentlyWorking: boolean) {
-  const startLabel = formatDateLabel(startDate);
-  const endLabel = currentlyWorking ? "Present" : formatDateLabel(endDate);
-
-  if (startLabel && endLabel) {
-    return `${startLabel} - ${endLabel}`;
-  }
-
-  return startLabel || endLabel || "Date not added";
-}
-
-function formatDateLabel(value: string) {
-  if (!value) return "";
-
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) {
-    return value;
-  }
-
-  return new Intl.DateTimeFormat("en", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  }).format(date);
 }
 
 function PlusIcon() {
