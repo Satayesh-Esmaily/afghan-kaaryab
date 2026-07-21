@@ -11,10 +11,24 @@ import { useOpportunitiesState } from "@/hooks/useOpportunities";
 import { useProfileState } from "@/hooks/useProfile";
 import { useThemeState } from "@/hooks/useTheme";
 import type { ResumeTemplateId } from "@/lib/app-state";
+import type { ServerBootstrapState } from "@/lib/bootstrap";
+import type { LoadedAppStore } from "@/lib/supabase-app-store";
 
-export function AppProvider({ children }: { children: React.ReactNode }) {
-  const auth = useAuthState();
-  const { snapshot, hydrated, revision } = useAppBootstrap(auth.user, auth.authReady);
+export function AppProvider({
+  children,
+  bootstrap,
+}: {
+  children: React.ReactNode;
+  bootstrap: ServerBootstrapState;
+}) {
+  const useServerBootstrap = bootstrap.source === "server";
+  const auth = useAuthState(bootstrap.user, bootstrap.authReady, useServerBootstrap);
+  const { snapshot, hydrated, revision } = useAppBootstrap(
+    auth.user,
+    auth.authReady,
+    bootstrap.snapshot,
+    useServerBootstrap
+  );
 
   const authValue = useMemo<AuthContextValue>(
     () => ({
@@ -31,7 +45,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <AuthContextProvider value={authValue}>
-      <AppStateProviders key={revision} snapshot={snapshot} hydrated={hydrated} userId={auth.user?.id ?? null}>
+      <AppStateProviders
+        key={revision}
+        snapshot={snapshot}
+        hydrated={hydrated}
+        userId={auth.user?.id ?? null}
+      >
         {children}
       </AppStateProviders>
     </AuthContextProvider>
@@ -46,13 +65,7 @@ function AppStateProviders({
   userId,
   children,
 }: {
-  snapshot: {
-    opportunities: OpportunitiesContextValue["opportunities"];
-    savedIds: OpportunitiesContextValue["savedIds"];
-    followedOrganizationSlugs: OpportunitiesContextValue["followedOrganizationSlugs"];
-    profile: ProfileContextValue["profile"];
-    theme: ThemeContextValue["theme"];
-  };
+  snapshot: LoadedAppStore;
   hydrated: boolean;
   userId: string | null;
   children: React.ReactNode;

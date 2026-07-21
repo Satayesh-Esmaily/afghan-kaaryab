@@ -7,8 +7,14 @@ import type { JobSeekerProfile, ThemeMode } from "@/lib/app-state";
 export function useProfileState(initialProfile: JobSeekerProfile, userId: string | null, theme: ThemeMode, hydrated: boolean) {
   const [profile, setProfile] = useState<JobSeekerProfile>(initialProfile);
   const profileSaveTimerRef = useRef<number | null>(null);
+  const skipInitialSaveRef = useRef(true);
 
   useEffect(() => {
+    if (skipInitialSaveRef.current) {
+      skipInitialSaveRef.current = false;
+      return;
+    }
+
     if (!hydrated || !userId) {
       return;
     }

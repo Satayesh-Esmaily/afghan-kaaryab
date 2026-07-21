@@ -1,4 +1,5 @@
 import { demoOpportunities } from "@/data/opportunities";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { getSupabaseBrowserClient } from "@/lib/supabase-client";
 import type {
   AwardEntry,
@@ -154,14 +155,17 @@ export async function loadAppStore(user: AuthUser | null): Promise<LoadedAppStor
   const defaultProfile = createDefaultProfile(user);
 
   if (!supabase) {
-    return {
-      opportunities: demoOpportunities,
-      savedIds: [],
-      followedOrganizationSlugs: [],
-      profile: defaultProfile,
-      theme: "light",
-    };
+    return createFallbackAppStore(defaultProfile);
   }
+
+  return loadAppStoreFromSupabase(supabase, user);
+}
+
+export async function loadAppStoreFromSupabase(
+  supabase: SupabaseClient,
+  user: AuthUser | null
+): Promise<LoadedAppStore> {
+  const defaultProfile = createDefaultProfile(user);
 
   const [opportunitiesResult, profileResult, savedResult, followedResult] = await Promise.all([
     supabase
@@ -275,6 +279,16 @@ export async function loadAppStore(user: AuthUser | null): Promise<LoadedAppStor
     followedOrganizationSlugs,
     profile,
     theme: profileRow?.theme_mode === "dark" ? "dark" : "light",
+  };
+}
+
+function createFallbackAppStore(profile: JobSeekerProfile): LoadedAppStore {
+  return {
+    opportunities: demoOpportunities,
+    savedIds: [],
+    followedOrganizationSlugs: [],
+    profile,
+    theme: "light",
   };
 }
 

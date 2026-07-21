@@ -5,6 +5,7 @@ import Providers from "@/components/layout/Providers";
 import AppShell from "@/components/layout/AppShell";
 import { defaultLocale } from "@/i18n/config";
 import { getLocaleDirection } from "@/i18n/utils";
+import { loadServerBootstrap } from "@/lib/supabase/server";
 import "./globals.css";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
@@ -64,18 +65,24 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const locale = await getLocale();
-  const messages = await getMessages();
+  const [locale, messages, bootstrap] = await Promise.all([getLocale(), getMessages(), loadServerBootstrap()]);
   const dir = getLocaleDirection(locale);
+  const theme = bootstrap.snapshot.theme;
 
   return (
-    <html lang={locale} dir={dir} suppressHydrationWarning className="h-full antialiased">
+    <html
+      lang={locale}
+      dir={dir}
+      suppressHydrationWarning
+      className={["h-full antialiased", theme === "dark" ? "dark" : ""].join(" ").trim()}
+      style={{ colorScheme: theme }}
+    >
       <body
         suppressHydrationWarning
         className="min-h-full bg-[color:var(--background)] text-[color:var(--foreground)]"
       >
         <NextIntlClientProvider locale={locale} messages={messages}>
-          <Providers>
+          <Providers bootstrap={bootstrap}>
             <AppShell>{children}</AppShell>
           </Providers>
         </NextIntlClientProvider>

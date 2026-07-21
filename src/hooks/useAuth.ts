@@ -1,25 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { mapSessionUserToAuthUser } from "@/lib/auth";
 import { getSupabaseBrowserClient } from "@/lib/supabase-client";
 import { getDisplayName, type AuthUser } from "@/lib/app-state";
-
-function mapSessionUserToAuthUser(sessionUser: {
-  id: string;
-  email?: string | null;
-  user_metadata?: { full_name?: string; name?: string };
-}): AuthUser {
-  const email = sessionUser.email ?? "";
-
-  return {
-    id: sessionUser.id,
-    email,
-    displayName:
-      sessionUser.user_metadata?.full_name ??
-      sessionUser.user_metadata?.name ??
-      getDisplayName(email),
-  };
-}
 
 function getFriendlyAuthError(error: unknown, fallback: string) {
   const message = error instanceof Error ? error.message.toLowerCase() : "";
@@ -43,14 +27,26 @@ function getFriendlyAuthError(error: unknown, fallback: string) {
   return error instanceof Error && error.message ? error.message : fallback;
 }
 
-export function useAuthState() {
+export function useAuthState(initialUser: AuthUser | null, initialAuthReady: boolean, useServerBootstrap: boolean) {
   const supabase = getSupabaseBrowserClient();
-  const [user, setUser] = useState<AuthUser | null>(null);
-  const [authReady, setAuthReady] = useState(() => !supabase);
+  const [user, setUser] = useState<AuthUser | null>(initialUser);
+  const [authReady, setAuthReady] = useState(() => initialAuthReady || !supabase);
 
   useEffect(() => {
     if (!supabase) {
       return;
+    }
+
+    if (useServerBootstrap && initialAuthReady) {
+      const { data } = supabase.auth.onAuthStateChange((_event, session) => {
+        const sessionUser = session?.user;
+        setUser(sessionUser?.email ? mapSessionUserToAuthUser(sessionUser) : null);
+        setAuthReady(true);
+      });
+
+      return () => {
+        data.subscription.unsubscribe();
+      };
     }
 
     let cancelled = false;
@@ -81,7 +77,7 @@ export function useAuthState() {
       cancelled = true;
       data.subscription.unsubscribe();
     };
-  }, [supabase]);
+  }, [initialAuthReady, supabase, useServerBootstrap]);
 
   const login = useCallback(async ({ email, password }: { email: string; password: string }) => {
     const supabase = getSupabaseBrowserClient();
