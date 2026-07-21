@@ -115,7 +115,12 @@ export function OpportunityFilterSidebar({
         </FilterSelect>
 
         <FilterSelect label="Published after">
-          <DatePickerField value={publishedAfter} onChange={onPublishedAfterChange} placeholder="Any date" />
+          <DatePickerField
+            key={publishedAfter || "empty-published-after"}
+            value={publishedAfter}
+            onChange={onPublishedAfterChange}
+            placeholder="Any date"
+          />
         </FilterSelect>
 
         <FilterSelect label="Gender">

@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import FormField from "@/components/common/FormField";
@@ -18,18 +17,11 @@ export function EducationEntryDialog({ open, initialValues, onClose, onSave }: E
   const {
     register,
     handleSubmit,
-    reset,
     formState: { errors, isSubmitting },
   } = useForm<EducationEntryFormValues>({
     resolver: zodResolver(educationEntrySchema),
     defaultValues: initialValues ?? getDefaultEducationEntry(),
   });
-
-  useEffect(() => {
-    if (open) {
-      reset(initialValues ?? getDefaultEducationEntry());
-    }
-  }, [initialValues, open, reset]);
 
   if (!open) return null;
 

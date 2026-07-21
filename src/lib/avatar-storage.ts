@@ -1,4 +1,4 @@
-import { buildStoragePath, getBucketAccessUrl, sanitizeStoragePath, uploadToBucket } from "@/lib/supabase-storage";
+import { buildStoragePath, getBucketAccessUrl, uploadToBucket } from "@/lib/supabase-storage";
 
 const AVATAR_BUCKET_NAME = process.env.NEXT_PUBLIC_SUPABASE_AVATAR_BUCKET ?? "avatars";
 const AVATAR_BUCKET_PUBLIC = process.env.NEXT_PUBLIC_SUPABASE_AVATAR_BUCKET_PUBLIC === "true";

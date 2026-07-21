@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { Badge, SectionHeading } from "@/components/ui";
-import { useAppData } from "@/context/app-context";
+import { useAuthContext } from "@/context/auth-context";
+import { useOpportunitiesContext } from "@/context/opportunities-context";
 import { networkPageCopy } from "@/config/network";
 import { demoOpportunities } from "@/data/opportunities";
 import {
@@ -12,13 +13,13 @@ import {
 } from "@/lib/network";
 
 export default function NetworkView() {
+  const { hydrated } = useAuthContext();
   const {
     followedOrganizationSlugs,
     toggleFollowOrganization,
     isFollowingOrganization,
     opportunities,
-    hydrated,
-  } = useAppData();
+  } = useOpportunitiesContext();
   const activeOpportunities = hydrated ? opportunities : demoOpportunities;
   const organizations = getOrganizationEntries(activeOpportunities);
   const countries = getCountryEntries(activeOpportunities);

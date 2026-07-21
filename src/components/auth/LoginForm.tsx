@@ -8,12 +8,12 @@ import { useTranslations } from "next-intl";
 import FormField from "@/components/common/FormField";
 import PasswordField from "@/components/common/PasswordField";
 import AuthNotice from "@/components/auth/AuthNotice";
-import { useAppData } from "@/context/app-context";
+import { useAuthContext } from "@/context/auth-context";
 import { loginFormSchema, type LoginFormValues } from "@/lib/schemas";
 
 export default function LoginForm() {
   const router = useRouter();
-  const { login } = useAppData();
+  const { login } = useAuthContext();
   const t = useTranslations("auth");
   const [notice, setNotice] = useState<{ tone: "error" | "info" | "success"; title: string; message: string } | null>(
     null

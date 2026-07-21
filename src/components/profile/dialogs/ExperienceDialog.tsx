@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import FormField from "@/components/common/FormField";
 import SearchableSelect from "@/components/common/SearchableSelect";
@@ -17,10 +16,9 @@ type ExperienceDialogProps = {
 
 export function ExperienceEntryDialog({ open, initialValues, onClose, onSave }: ExperienceDialogProps) {
   const {
+    control,
     register,
     handleSubmit,
-    reset,
-    watch,
     setValue,
     formState: { errors, isSubmitting },
   } = useForm<ExperienceEntryFormValues>({
@@ -28,19 +26,9 @@ export function ExperienceEntryDialog({ open, initialValues, onClose, onSave }: 
     defaultValues: initialValues ?? getDefaultExperienceEntry(),
   });
 
-  const currentlyWorking = watch("currentlyWorking");
-
-  useEffect(() => {
-    if (open) {
-      reset(initialValues ?? getDefaultExperienceEntry());
-    }
-  }, [initialValues, open, reset]);
-
-  useEffect(() => {
-    if (currentlyWorking) {
-      setValue("endDate", "");
-    }
-  }, [currentlyWorking, setValue]);
+  const currentlyWorking = useWatch({ control, name: "currentlyWorking" });
+  const currentlyWorkingField = register("currentlyWorking");
+  const employmentTypeValue = useWatch({ control, name: "employmentType" });
 
   if (!open) return null;
 
@@ -63,7 +51,7 @@ export function ExperienceEntryDialog({ open, initialValues, onClose, onSave }: 
           </FormField>
           <FormField label="Employment Type" error={errors.employmentType?.message}>
             <SearchableSelect
-              value={watch("employmentType")}
+              value={employmentTypeValue}
               options={employmentTypes.map((type) => ({ value: type, label: type }))}
               placeholder="Select type"
               searchPlaceholder="Search type..."
@@ -77,7 +65,13 @@ export function ExperienceEntryDialog({ open, initialValues, onClose, onSave }: 
         <label className="flex items-center gap-3 rounded-[1rem] border border-[color:var(--border)] bg-[color:var(--surface-soft)] px-4 py-3 text-sm font-medium text-[color:var(--foreground)]">
           <input
             type="checkbox"
-            {...register("currentlyWorking")}
+            {...currentlyWorkingField}
+            onChange={(event) => {
+              currentlyWorkingField.onChange(event);
+              if (event.target.checked) {
+                setValue("endDate", "", { shouldDirty: true, shouldValidate: true });
+              }
+            }}
             className="h-4 w-4 rounded border-[color:var(--border-strong)] text-[color:var(--accent)]"
           />
           I am currently working in this role

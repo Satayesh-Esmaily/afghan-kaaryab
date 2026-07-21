@@ -2,13 +2,6 @@
 
 import { useCallback, useMemo, useState } from "react";
 import { useProfileContext } from "@/context/profile-context";
-import type {
-  AwardEntry,
-  CertificationEntry,
-  DocumentEntry,
-  EducationEntry,
-  ExperienceEntry,
-} from "@/lib/app-state";
 import { deleteProfileAttachment } from "@/lib/profile-attachment-storage";
 import {
   mapAwardFormToEntry,

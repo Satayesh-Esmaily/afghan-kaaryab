@@ -41,12 +41,6 @@ export default function DatePickerField({
   const [viewDate, setViewDate] = useState<Date>(() => selectedDate ?? new Date());
 
   useEffect(() => {
-    if (selectedDate) {
-      setViewDate(selectedDate);
-    }
-  }, [selectedDate]);
-
-  useEffect(() => {
     function handlePointerDown(event: PointerEvent) {
       if (!rootRef.current?.contains(event.target as Node)) {
         setOpen(false);

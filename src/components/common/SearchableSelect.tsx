@@ -38,12 +38,14 @@ export default function SearchableSelect({
     function handlePointerDown(event: PointerEvent) {
       if (!rootRef.current?.contains(event.target as Node)) {
         setOpen(false);
+        setQuery("");
       }
     }
 
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") {
         setOpen(false);
+        setQuery("");
       }
     }
 
@@ -55,12 +57,6 @@ export default function SearchableSelect({
       document.removeEventListener("keydown", handleKeyDown);
     };
   }, []);
-
-  useEffect(() => {
-    if (!open) {
-      setQuery("");
-    }
-  }, [open]);
 
   return (
     <div ref={rootRef} className="relative">
@@ -107,6 +103,7 @@ export default function SearchableSelect({
                     onClick={() => {
                       onChange(option.value);
                       setOpen(false);
+                      setQuery("");
                     }}
                     className={[
                       "flex w-full items-center justify-between gap-3 rounded-[0.95rem] px-3 py-2.5 text-left text-sm transition",

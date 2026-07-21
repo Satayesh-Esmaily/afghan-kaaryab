@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { createOpportunityId, type Opportunity, type OpportunityInput } from "@/lib/opportunities";
 import {
   clearSavedOpportunitiesStore,
@@ -15,7 +15,6 @@ type UseOpportunitiesStateInput = {
   savedIds: string[];
   followedOrganizationSlugs: string[];
   userId: string | null;
-  hydrated: boolean;
 };
 
 export function useOpportunitiesState({
@@ -23,25 +22,12 @@ export function useOpportunitiesState({
   savedIds: initialSavedIds,
   followedOrganizationSlugs: initialFollowedOrganizationSlugs,
   userId,
-  hydrated,
 }: UseOpportunitiesStateInput) {
   const [opportunities, setOpportunities] = useState<Opportunity[]>(initialOpportunities);
   const [savedIds, setSavedIds] = useState<string[]>(initialSavedIds);
   const [followedOrganizationSlugs, setFollowedOrganizationSlugs] = useState<string[]>(
     initialFollowedOrganizationSlugs
   );
-
-  useEffect(() => {
-    setOpportunities(initialOpportunities);
-  }, [initialOpportunities]);
-
-  useEffect(() => {
-    setSavedIds(initialSavedIds);
-  }, [initialSavedIds]);
-
-  useEffect(() => {
-    setFollowedOrganizationSlugs(initialFollowedOrganizationSlugs);
-  }, [initialFollowedOrganizationSlugs]);
 
   const addOpportunity = useCallback(
     (input: OpportunityInput) => {

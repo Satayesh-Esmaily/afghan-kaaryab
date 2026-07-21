@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { useForm } from "react-hook-form";
+import { useRef } from "react";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import FormField from "@/components/common/FormField";
 import SearchableSelect from "@/components/common/SearchableSelect";
@@ -26,10 +26,9 @@ export function DocumentEntryDialog({ open, initialValues, userId, onClose, onSa
     uploadAttachment,
   } = useAttachmentUpload({ userId, folder: "documents" });
   const {
+    control,
     register,
     handleSubmit,
-    reset,
-    watch,
     setValue,
     formState: { errors, isSubmitting },
   } = useForm<DocumentEntryFormValues>({
@@ -37,14 +36,8 @@ export function DocumentEntryDialog({ open, initialValues, userId, onClose, onSa
     defaultValues: initialValues ?? getDefaultDocumentEntry(),
   });
 
-  const attachmentFileName = watch("attachmentFileName");
-
-  useEffect(() => {
-    if (open) {
-      reset(initialValues ?? getDefaultDocumentEntry());
-      setAttachmentError("");
-    }
-  }, [initialValues, open, reset, setAttachmentError]);
+  const attachmentFileName = useWatch({ control, name: "attachmentFileName" });
+  const documentTypeValue = useWatch({ control, name: "documentType" });
 
   if (!open) return null;
 
@@ -63,7 +56,7 @@ export function DocumentEntryDialog({ open, initialValues, userId, onClose, onSa
 
         <FormField label="Document Type" error={errors.documentType?.message}>
           <SearchableSelect
-            value={watch("documentType")}
+            value={documentTypeValue}
             options={documentTypes.map((type) => ({ value: type, label: type }))}
             placeholder="Select type"
             searchPlaceholder="Search document type..."

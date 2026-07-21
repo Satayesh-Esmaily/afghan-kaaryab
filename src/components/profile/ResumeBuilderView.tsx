@@ -1,9 +1,11 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Badge, EmptyState, SectionHeading } from "@/components/ui";
 import { authCopy } from "@/config/auth";
-import { useAppData, type ResumeTemplateId } from "@/context/app-context";
+import { useAuthContext } from "@/context/auth-context";
+import { useProfileContext } from "@/context/profile-context";
+import type { ResumeTemplateId } from "@/context/app-context";
 import { getResumeAccessUrl } from "@/lib/resume-storage";
 import { getProfileCompletion, splitItems } from "@/components/profile/profile-view/profile-view-helpers";
 
@@ -18,10 +20,8 @@ const templates: Array<{
 ];
 
 export default function ResumeBuilderView() {
-  const { authenticated, profile, updateProfile, user } = useAppData();
-  const [selectedTemplate, setSelectedTemplate] = useState<ResumeTemplateId>(
-    profile.resumeTemplate ?? "modern"
-  );
+  const { authenticated, user } = useAuthContext();
+  const { profile, updateProfile } = useProfileContext();
   const [resumeActionError, setResumeActionError] = useState("");
   const [resumeActionBusy, setResumeActionBusy] = useState(false);
 
@@ -36,12 +36,7 @@ export default function ResumeBuilderView() {
   const completion = useMemo(() => getProfileCompletion(profile), [profile]);
   const documentTags = useMemo(() => splitItems(profile.documents), [profile.documents]);
   const hasUploadedResume = Boolean(profile.resumeStoragePath || profile.resumeUrl);
-
-  useEffect(() => {
-    if (profile.resumeTemplate) {
-      setSelectedTemplate(profile.resumeTemplate);
-    }
-  }, [profile.resumeTemplate]);
+  const selectedTemplate: ResumeTemplateId = profile.resumeTemplate ?? "modern";
 
   if (!authenticated) {
     return (
@@ -55,7 +50,6 @@ export default function ResumeBuilderView() {
   }
 
   const applyTemplate = (template: ResumeTemplateId) => {
-    setSelectedTemplate(template);
     updateProfile({ resumeTemplate: template });
   };
 

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { useAppData } from "@/context/app-context";
+import { useOpportunitiesContext } from "@/context/opportunities-context";
 import { Badge, ConfirmDialog, EmptyState, SectionHeading } from "@/components/ui";
 import {
   formatDeadline,
@@ -17,7 +17,7 @@ export default function OpportunityDetails() {
   const params = useParams<{ id: string | string[] }>();
   const id = Array.isArray(params.id) ? params.id[0] : params.id;
   const router = useRouter();
-  const { opportunities, isSaved, toggleSaved, deleteOpportunity } = useAppData();
+  const { opportunities, isSaved, toggleSaved, deleteOpportunity } = useOpportunitiesContext();
   const [deleteOpen, setDeleteOpen] = useState(false);
 
   const opportunity = id ? getOpportunityById(opportunities, id) : undefined;

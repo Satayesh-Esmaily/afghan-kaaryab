@@ -44,14 +44,12 @@ function getFriendlyAuthError(error: unknown, fallback: string) {
 }
 
 export function useAuthState() {
+  const supabase = getSupabaseBrowserClient();
   const [user, setUser] = useState<AuthUser | null>(null);
-  const [authReady, setAuthReady] = useState(false);
+  const [authReady, setAuthReady] = useState(() => !supabase);
 
   useEffect(() => {
-    const supabase = getSupabaseBrowserClient();
-
     if (!supabase) {
-      setAuthReady(true);
       return;
     }
 
@@ -83,7 +81,7 @@ export function useAuthState() {
       cancelled = true;
       data.subscription.unsubscribe();
     };
-  }, []);
+  }, [supabase]);
 
   const login = useCallback(async ({ email, password }: { email: string; password: string }) => {
     const supabase = getSupabaseBrowserClient();

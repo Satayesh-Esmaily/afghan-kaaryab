@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
-import { useForm, type Resolver } from "react-hook-form";
+import { useForm, useWatch, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import FormField from "@/components/common/FormField";
 import DatePickerField from "@/components/common/DatePickerField";
@@ -54,29 +53,15 @@ export default function OpportunityForm({
   });
 
   const {
+    control,
     register,
     handleSubmit,
-    reset,
-    watch,
     setValue,
     formState: { errors, isSubmitting },
   } = form;
-
-  useEffect(() => {
-    reset({
-      title: initialValues?.title ?? "",
-      organization: initialValues?.organization ?? "",
-      category: initialValues?.category ?? "Job",
-      location: initialValues?.location ?? "",
-      type: initialValues?.type ?? "Remote",
-      deadline: initialValues?.deadline ?? "",
-      description: initialValues?.description ?? "",
-      requirementsText: initialValues?.requirements?.join("\n") ?? "",
-      applyLink: initialValues?.applyLink ?? "",
-      tagsText: initialValues?.tags?.join(", ") ?? "",
-      featured: initialValues?.featured ?? false,
-    });
-  }, [initialValues, reset]);
+  const categoryValue = useWatch({ control, name: "category" });
+  const typeValue = useWatch({ control, name: "type" });
+  const deadlineValue = useWatch({ control, name: "deadline" });
 
   return (
     <form
@@ -110,7 +95,7 @@ export default function OpportunityForm({
         </FormField>
         <FormField label="Category" error={errors.category?.message}>
           <SearchableSelect
-            value={watch("category")}
+            value={categoryValue}
             options={opportunityCategories.map((category) => ({ value: category, label: category }))}
             placeholder="Select category"
             searchPlaceholder="Search category..."
@@ -124,7 +109,7 @@ export default function OpportunityForm({
         </FormField>
         <FormField label="Opportunity type" error={errors.type?.message}>
           <SearchableSelect
-            value={watch("type")}
+            value={typeValue}
             options={opportunityTypes.map((type) => ({ value: type, label: type }))}
             placeholder="Select type"
             searchPlaceholder="Search type..."
@@ -141,7 +126,8 @@ export default function OpportunityForm({
         </FormField>
         <FormField label="Deadline" error={errors.deadline?.message}>
           <DatePickerField
-            value={watch("deadline")}
+            key={deadlineValue || "empty-deadline"}
+            value={deadlineValue}
             placeholder="Select date"
             onChange={(value) =>
               setValue("deadline", value, {

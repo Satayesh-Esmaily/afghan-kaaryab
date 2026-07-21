@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { useForm } from "react-hook-form";
+import { useRef } from "react";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import FormField from "@/components/common/FormField";
 import { useAttachmentUpload } from "@/hooks/profile/useAttachmentUpload";
@@ -25,10 +25,9 @@ export function AwardEntryDialog({ open, initialValues, userId, onClose, onSave 
     uploadAttachment,
   } = useAttachmentUpload({ userId, folder: "awards" });
   const {
+    control,
     register,
     handleSubmit,
-    reset,
-    watch,
     setValue,
     formState: { errors, isSubmitting },
   } = useForm<AwardEntryFormValues>({
@@ -36,14 +35,7 @@ export function AwardEntryDialog({ open, initialValues, userId, onClose, onSave 
     defaultValues: initialValues ?? getDefaultAwardEntry(),
   });
 
-  const attachmentFileName = watch("attachmentFileName");
-
-  useEffect(() => {
-    if (open) {
-      reset(initialValues ?? getDefaultAwardEntry());
-      setAttachmentError("");
-    }
-  }, [initialValues, open, reset, setAttachmentError]);
+  const attachmentFileName = useWatch({ control, name: "attachmentFileName" });
 
   if (!open) return null;
 

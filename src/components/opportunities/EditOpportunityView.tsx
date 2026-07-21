@@ -3,12 +3,12 @@
 import { useRouter } from "next/navigation";
 import OpportunityForm from "@/components/opportunities/OpportunityForm";
 import { EmptyState, SectionHeading } from "@/components/ui";
-import { useAppData } from "@/context/app-context";
+import { useOpportunitiesContext } from "@/context/opportunities-context";
 import { getOpportunityById } from "@/lib/opportunities";
 
 export default function EditOpportunityView({ id }: { id: string }) {
   const router = useRouter();
-  const { opportunities, updateOpportunity } = useAppData();
+  const { opportunities, updateOpportunity } = useOpportunitiesContext();
   const opportunity = getOpportunityById(opportunities, id);
 
   if (!opportunity) {
@@ -31,6 +31,7 @@ export default function EditOpportunityView({ id }: { id: string }) {
       />
 
       <OpportunityForm
+        key={opportunity.id}
         initialValues={opportunity}
         submitLabel="Save changes"
         onSubmit={(values) => {

@@ -3,12 +3,12 @@
 import { useMemo, useState } from "react";
 import OpportunityCard from "@/components/opportunities/OpportunityCard";
 import { EmptyState } from "@/components/ui";
-import { useAppData } from "@/context/app-context";
+import { useAuthContext } from "@/context/auth-context";
+import { useOpportunitiesContext } from "@/context/opportunities-context";
 import {
   matchesDeadlineFilter,
   matchesPublishedAfterFilter,
   opportunityCategories,
-  opportunityLevels,
   opportunityTypes,
   type DeadlineFilter,
   type Opportunity,
@@ -21,7 +21,8 @@ import {
 import { OpportunityResultsHeader } from "@/components/opportunities/browser/OpportunityResultsHeader";
 
 export default function OpportunityBrowser({ opportunities }: { opportunities: Opportunity[] }) {
-  const { savedIds, opportunities: storedOpportunities, hydrated } = useAppData();
+  const { hydrated } = useAuthContext();
+  const { savedIds, opportunities: storedOpportunities } = useOpportunitiesContext();
   const activeOpportunities = hydrated ? storedOpportunities : opportunities;
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<(typeof opportunityCategories)[number] | "All">("All");

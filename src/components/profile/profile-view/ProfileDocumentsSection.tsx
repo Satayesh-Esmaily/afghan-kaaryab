@@ -3,7 +3,6 @@
 import { EmptyListCard, EntriesHeader, DocumentCard, ProfileSection } from "@/components/profile/profile-view/ProfileViewParts";
 import type { DocumentEntry } from "@/lib/app-state";
 import type { UseFormRegister } from "react-hook-form";
-import FormField from "@/components/common/FormField";
 import type { ProfileFormValues } from "@/lib/schemas";
 
 type ProfileDocumentsSectionProps = {

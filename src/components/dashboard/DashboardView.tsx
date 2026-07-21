@@ -1,7 +1,8 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { useAppData } from "@/context/app-context";
+import { useAuthContext } from "@/context/auth-context";
+import { useOpportunitiesContext } from "@/context/opportunities-context";
 import { getDashboardStats } from "@/lib/opportunities";
 import DashboardHeroSection from "@/components/dashboard/sections/DashboardHeroSection";
 import DashboardCalendarSection from "@/components/dashboard/sections/DashboardCalendarSection";
@@ -12,7 +13,8 @@ import DashboardQuickInsightSection from "@/components/dashboard/sections/Dashbo
 
 export default function DashboardView() {
   const searchParams = useSearchParams();
-  const { opportunities, user } = useAppData();
+  const { user } = useAuthContext();
+  const { opportunities } = useOpportunitiesContext();
   const stats = getDashboardStats(opportunities);
   const savedCount = opportunities.length - stats.recent.length;
   const showWelcome = searchParams.get("status") === "welcome";

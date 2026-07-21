@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useAppData } from "@/context/app-context";
+import { useOpportunitiesContext } from "@/context/opportunities-context";
 import { Badge } from "@/components/ui";
 import {
   formatDeadline,
@@ -32,7 +32,7 @@ export default function OpportunityCard({
   opportunity: Opportunity;
   compact?: boolean;
 }) {
-  const { isSaved, toggleSaved } = useAppData();
+  const { isSaved, toggleSaved } = useOpportunitiesContext();
   const saved = isSaved(opportunity.id);
 
   return (

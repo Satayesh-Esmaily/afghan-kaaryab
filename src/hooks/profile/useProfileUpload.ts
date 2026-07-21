@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useProfileContext } from "@/context/profile-context";
 import { getAvatarAccessUrl, uploadAvatarFile } from "@/lib/avatar-storage";
 import { uploadProfileAttachment } from "@/lib/profile-attachment-storage";
@@ -28,22 +28,18 @@ type UseProfileUploadResult = {
 
 export function useProfileUpload(userId: string | null): UseProfileUploadResult {
   const { profile, updateProfile } = useProfileContext();
-  const [resumeFiles, setResumeFiles] = useState<string[]>([]);
   const [resumeUploadError, setResumeUploadError] = useState("");
   const [resumeUploadBusy, setResumeUploadBusy] = useState(false);
-
-  useEffect(() => {
+  const resumeFiles = useMemo(() => {
     if (profile.resumeStoragePath) {
-      setResumeFiles([getFileNameFromPath(profile.resumeStoragePath)]);
-      return;
+      return [getFileNameFromPath(profile.resumeStoragePath)];
     }
 
     if (profile.resumeUrl) {
-      setResumeFiles([getFileNameFromUrl(profile.resumeUrl)]);
-      return;
+      return [getFileNameFromUrl(profile.resumeUrl)];
     }
 
-    setResumeFiles([]);
+    return [];
   }, [profile.resumeStoragePath, profile.resumeUrl]);
 
   useEffect(() => {
@@ -176,7 +172,6 @@ export function useProfileUpload(userId: string | null): UseProfileUploadResult 
 
         const activeResume = uploadedItems[0];
         if (activeResume) {
-          setResumeFiles([activeResume.fileName]);
           updateProfile({
             resumeUrl: activeResume.url,
             resumeStoragePath: activeResume.path,
@@ -193,14 +188,12 @@ export function useProfileUpload(userId: string | null): UseProfileUploadResult 
 
   const deleteResume = useCallback(async () => {
     if (!profile.resumeStoragePath) {
-      setResumeFiles([]);
       updateProfile({ resumeUrl: "", resumeStoragePath: "" });
       return;
     }
 
     const deleted = await deleteStoredResumeFile(profile.resumeStoragePath);
     if (deleted) {
-      setResumeFiles([]);
       updateProfile({ resumeUrl: "", resumeStoragePath: "" });
     } else {
       setResumeUploadError("We could not delete the file right now.");

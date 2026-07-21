@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import type { RefObject } from "react";
 import DatePickerField from "@/components/common/DatePickerField";
 import FormField from "@/components/common/FormField";
@@ -53,8 +54,12 @@ export function ProfilePersonalDetailsSection({
       <div className="grid gap-8 xl:grid-cols-[260px_1fr]">
         <aside className="space-y-5">
           <div className="flex items-center gap-4">
-            <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-full bg-[color:var(--surface-soft)] text-3xl font-semibold text-[color:var(--foreground-strong)]">
-              {avatarUrl ? <img src={avatarUrl} alt="Profile photo" className="h-full w-full object-cover" /> : initials}
+            <div className="relative flex h-20 w-20 items-center justify-center overflow-hidden rounded-full bg-[color:var(--surface-soft)] text-3xl font-semibold text-[color:var(--foreground-strong)]">
+              {avatarUrl ? (
+                <Image src={avatarUrl} alt="Profile photo" fill unoptimized sizes="80px" className="object-cover" />
+              ) : (
+                initials
+              )}
             </div>
             <button type="button" onClick={onPickAvatar} className="ds-button-secondary rounded-full px-4 py-2.5 text-sm font-semibold">
               Upload Photo
@@ -126,10 +131,11 @@ export function ProfilePersonalDetailsSection({
               />
             </FormField>
             <FormField label="Date of Birth" error={errors.dateOfBirth?.message}>
-              <DatePickerField
-                value={selectedDateOfBirth}
-                placeholder="Select date"
-                onChange={(value) =>
+            <DatePickerField
+              key={selectedDateOfBirth || "empty-date-of-birth"}
+              value={selectedDateOfBirth}
+              placeholder="Select date"
+              onChange={(value) =>
                   setValue("dateOfBirth", value, {
                     shouldDirty: true,
                     shouldValidate: true,

@@ -20,6 +20,7 @@ const fallbackSnapshot = (user: AuthUser | null): LoadedAppStore => {
 export function useAppBootstrap(user: AuthUser | null, authReady: boolean) {
   const [snapshot, setSnapshot] = useState<LoadedAppStore>(() => fallbackSnapshot(user));
   const [hydrated, setHydrated] = useState(false);
+  const [revision, setRevision] = useState(0);
 
   useEffect(() => {
     if (!authReady) {
@@ -28,30 +29,31 @@ export function useAppBootstrap(user: AuthUser | null, authReady: boolean) {
 
     let cancelled = false;
 
-    setHydrated(false);
-
     void loadAppStore(user)
       .then((next) => {
         if (cancelled) return;
         setSnapshot(next);
         setHydrated(true);
+        setRevision((current) => current + 1);
       })
       .catch(() => {
         if (cancelled) return;
         setSnapshot(fallbackSnapshot(user));
         setHydrated(true);
+        setRevision((current) => current + 1);
       });
 
     return () => {
       cancelled = true;
     };
-  }, [authReady, user?.id]);
+  }, [authReady, user]);
 
   return useMemo(
     () => ({
       snapshot,
       hydrated,
+      revision,
     }),
-    [hydrated, snapshot]
+    [hydrated, revision, snapshot]
   );
 }

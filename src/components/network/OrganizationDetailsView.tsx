@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Badge, SectionHeading } from "@/components/ui";
-import { useAppData } from "@/context/app-context";
+import { useOpportunitiesContext } from "@/context/opportunities-context";
 import { formatDeadline, type Opportunity } from "@/lib/opportunities";
 import type { OrganizationProfile } from "@/lib/network";
 
@@ -11,7 +11,7 @@ export default function OrganizationDetailsView({
 }: {
   organization: OrganizationProfile;
 }) {
-  const { isFollowingOrganization, toggleFollowOrganization } = useAppData();
+  const { isFollowingOrganization, toggleFollowOrganization } = useOpportunitiesContext();
   const followed = isFollowingOrganization(organization.slug);
 
   return (

@@ -3,10 +3,10 @@
 import Link from "next/link";
 import OpportunityCard from "@/components/opportunities/OpportunityCard";
 import { EmptyState, SectionHeading, StatCard } from "@/components/ui";
-import { useAppData } from "@/context/app-context";
+import { useOpportunitiesContext } from "@/context/opportunities-context";
 
 export default function SavedOpportunitiesView() {
-  const { opportunities, savedIds, clearSaved } = useAppData();
+  const { opportunities, savedIds, clearSaved } = useOpportunitiesContext();
   const saved = opportunities.filter((opportunity) => savedIds.includes(opportunity.id));
 
   return (

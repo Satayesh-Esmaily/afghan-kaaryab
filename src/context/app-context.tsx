@@ -1,10 +1,10 @@
 "use client";
 
 import { useMemo } from "react";
-import { AuthContextProvider, type AuthContextValue, useAuthContext } from "@/context/auth-context";
-import { OpportunitiesContextProvider, type OpportunitiesContextValue, useOpportunitiesContext } from "@/context/opportunities-context";
-import { ProfileContextProvider, type ProfileContextValue, useProfileContext } from "@/context/profile-context";
-import { ThemeContextProvider, type ThemeContextValue, useThemeContext } from "@/context/theme-context";
+import { AuthContextProvider, type AuthContextValue } from "@/context/auth-context";
+import { OpportunitiesContextProvider, type OpportunitiesContextValue } from "@/context/opportunities-context";
+import { ProfileContextProvider, type ProfileContextValue } from "@/context/profile-context";
+import { ThemeContextProvider, type ThemeContextValue } from "@/context/theme-context";
 import { useAuthState } from "@/hooks/useAuth";
 import { useAppBootstrap } from "@/hooks/useAppBootstrap";
 import { useOpportunitiesState } from "@/hooks/useOpportunities";
@@ -14,16 +14,7 @@ import type { ResumeTemplateId } from "@/lib/app-state";
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const auth = useAuthState();
-  const { snapshot, hydrated } = useAppBootstrap(auth.user, auth.authReady);
-  const theme = useThemeState(snapshot.theme);
-  const profile = useProfileState(snapshot.profile, auth.user?.id ?? null, theme.theme, hydrated);
-  const opportunities = useOpportunitiesState({
-    opportunities: snapshot.opportunities,
-    savedIds: snapshot.savedIds,
-    followedOrganizationSlugs: snapshot.followedOrganizationSlugs,
-    userId: auth.user?.id ?? null,
-    hydrated,
-  });
+  const { snapshot, hydrated, revision } = useAppBootstrap(auth.user, auth.authReady);
 
   const authValue = useMemo<AuthContextValue>(
     () => ({
@@ -37,6 +28,43 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }),
     [auth.authReady, auth.authenticated, auth.login, auth.logout, auth.signup, auth.user, hydrated]
   );
+
+  return (
+    <AuthContextProvider value={authValue}>
+      <AppStateProviders key={revision} snapshot={snapshot} hydrated={hydrated} userId={auth.user?.id ?? null}>
+        {children}
+      </AppStateProviders>
+    </AuthContextProvider>
+  );
+}
+
+export type { ResumeTemplateId };
+
+function AppStateProviders({
+  snapshot,
+  hydrated,
+  userId,
+  children,
+}: {
+  snapshot: {
+    opportunities: OpportunitiesContextValue["opportunities"];
+    savedIds: OpportunitiesContextValue["savedIds"];
+    followedOrganizationSlugs: OpportunitiesContextValue["followedOrganizationSlugs"];
+    profile: ProfileContextValue["profile"];
+    theme: ThemeContextValue["theme"];
+  };
+  hydrated: boolean;
+  userId: string | null;
+  children: React.ReactNode;
+}) {
+  const theme = useThemeState(snapshot.theme);
+  const profile = useProfileState(snapshot.profile, userId, theme.theme, hydrated);
+  const opportunities = useOpportunitiesState({
+    opportunities: snapshot.opportunities,
+    savedIds: snapshot.savedIds,
+    followedOrganizationSlugs: snapshot.followedOrganizationSlugs,
+    userId,
+  });
 
   const themeValue = useMemo<ThemeContextValue>(
     () => ({
@@ -84,32 +112,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   );
 
   return (
-    <AuthContextProvider value={authValue}>
-      <ThemeContextProvider value={themeValue}>
-        <ProfileContextProvider value={profileValue}>
-          <OpportunitiesContextProvider value={opportunitiesValue}>{children}</OpportunitiesContextProvider>
-        </ProfileContextProvider>
-      </ThemeContextProvider>
-    </AuthContextProvider>
+    <ThemeContextProvider value={themeValue}>
+      <ProfileContextProvider value={profileValue}>
+        <OpportunitiesContextProvider value={opportunitiesValue}>{children}</OpportunitiesContextProvider>
+      </ProfileContextProvider>
+    </ThemeContextProvider>
   );
 }
-
-export function useAppData() {
-  const auth = useAuthContext();
-  const theme = useThemeContext();
-  const profile = useProfileContext();
-  const opportunities = useOpportunitiesContext();
-
-  return {
-    ...auth,
-    ...theme,
-    ...profile,
-    ...opportunities,
-  };
-}
-
-export function useApp() {
-  return useAppData();
-}
-
-export type { ResumeTemplateId };

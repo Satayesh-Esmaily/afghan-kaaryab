@@ -9,10 +9,6 @@ export function useProfileState(initialProfile: JobSeekerProfile, userId: string
   const profileSaveTimerRef = useRef<number | null>(null);
 
   useEffect(() => {
-    setProfile(initialProfile);
-  }, [initialProfile]);
-
-  useEffect(() => {
     if (!hydrated || !userId) {
       return;
     }

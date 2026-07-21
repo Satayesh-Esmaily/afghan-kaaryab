@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { EmptyState } from "@/components/ui";
@@ -140,9 +141,16 @@ export default function ProfileView() {
       <section className="rounded-[1.75rem] panel p-6 sm:p-8">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex items-center gap-4 sm:gap-5">
-            <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-full border-4 border-[color:var(--accent-soft)] bg-[color:var(--surface-soft)] text-2xl font-semibold text-[color:var(--foreground-strong)] shadow-sm sm:h-20 sm:w-20 sm:text-3xl">
+            <div className="relative flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-full border-4 border-[color:var(--accent-soft)] bg-[color:var(--surface-soft)] text-2xl font-semibold text-[color:var(--foreground-strong)] shadow-sm sm:h-20 sm:w-20 sm:text-3xl">
               {profile.avatarUrl ? (
-                <img src={profile.avatarUrl} alt={profile.fullName || "Profile photo"} className="h-full w-full object-cover" />
+                <Image
+                  src={profile.avatarUrl}
+                  alt={profile.fullName || "Profile photo"}
+                  fill
+                  unoptimized
+                  sizes="80px"
+                  className="object-cover"
+                />
               ) : (
                 initials
               )}
@@ -285,63 +293,73 @@ export default function ProfileView() {
         </form>
       )}
 
-      <ExperienceEntryDialog
-        open={editingExperienceIndex !== null}
-        initialValues={
-          editingExperienceIndex === null || editingExperienceIndex < 0
-            ? null
-            : mapExperienceEntryToForm(experienceEntries[editingExperienceIndex] ?? null)
-        }
-        onClose={() => setEditingExperienceIndex(null)}
-        onSave={addExperience}
-      />
+      {editingExperienceIndex !== null ? (
+        <ExperienceEntryDialog
+          open
+          initialValues={
+            editingExperienceIndex < 0
+              ? null
+              : mapExperienceEntryToForm(experienceEntries[editingExperienceIndex] ?? null)
+          }
+          onClose={() => setEditingExperienceIndex(null)}
+          onSave={addExperience}
+        />
+      ) : null}
 
-      <EducationEntryDialog
-        open={editingEducationIndex !== null}
-        initialValues={
-          editingEducationIndex === null || editingEducationIndex < 0
-            ? null
-            : mapEducationEntryToForm(educationEntries[editingEducationIndex] ?? null)
-        }
-        onClose={() => setEditingEducationIndex(null)}
-        onSave={addEducation}
-      />
+      {editingEducationIndex !== null ? (
+        <EducationEntryDialog
+          open
+          initialValues={
+            editingEducationIndex < 0
+              ? null
+              : mapEducationEntryToForm(educationEntries[editingEducationIndex] ?? null)
+          }
+          onClose={() => setEditingEducationIndex(null)}
+          onSave={addEducation}
+        />
+      ) : null}
 
-      <CertificationEntryDialog
-        open={editingCertificationIndex !== null}
-        initialValues={
-          editingCertificationIndex === null || editingCertificationIndex < 0
-            ? null
-            : mapCertificationEntryToForm(certificationEntries[editingCertificationIndex] ?? null)
-        }
-        userId={user?.id ?? null}
-        onClose={() => setEditingCertificationIndex(null)}
-        onSave={addCertification}
-      />
+      {editingCertificationIndex !== null ? (
+        <CertificationEntryDialog
+          open
+          initialValues={
+            editingCertificationIndex < 0
+              ? null
+              : mapCertificationEntryToForm(certificationEntries[editingCertificationIndex] ?? null)
+          }
+          userId={user?.id ?? null}
+          onClose={() => setEditingCertificationIndex(null)}
+          onSave={addCertification}
+        />
+      ) : null}
 
-      <AwardEntryDialog
-        open={editingAwardIndex !== null}
-        initialValues={
-          editingAwardIndex === null || editingAwardIndex < 0
-            ? null
-            : mapAwardEntryToForm(awardEntries[editingAwardIndex] ?? null)
-        }
-        userId={user?.id ?? null}
-        onClose={() => setEditingAwardIndex(null)}
-        onSave={addAward}
-      />
+      {editingAwardIndex !== null ? (
+        <AwardEntryDialog
+          open
+          initialValues={
+            editingAwardIndex < 0
+              ? null
+              : mapAwardEntryToForm(awardEntries[editingAwardIndex] ?? null)
+          }
+          userId={user?.id ?? null}
+          onClose={() => setEditingAwardIndex(null)}
+          onSave={addAward}
+        />
+      ) : null}
 
-      <DocumentEntryDialog
-        open={editingDocumentIndex !== null}
-        initialValues={
-          editingDocumentIndex === null || editingDocumentIndex < 0
-            ? null
-            : mapDocumentEntryToForm(documentEntries[editingDocumentIndex] ?? null)
-        }
-        userId={user?.id ?? null}
-        onClose={() => setEditingDocumentIndex(null)}
-        onSave={addDocument}
-      />
+      {editingDocumentIndex !== null ? (
+        <DocumentEntryDialog
+          open
+          initialValues={
+            editingDocumentIndex < 0
+              ? null
+              : mapDocumentEntryToForm(documentEntries[editingDocumentIndex] ?? null)
+          }
+          userId={user?.id ?? null}
+          onClose={() => setEditingDocumentIndex(null)}
+          onSave={addDocument}
+        />
+      ) : null}
     </div>
   );
 }

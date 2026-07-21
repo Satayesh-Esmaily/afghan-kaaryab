@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useRef } from "react";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import FormField from "@/components/common/FormField";
 import { useAttachmentUpload } from "@/hooks/profile/useAttachmentUpload";
@@ -31,10 +31,9 @@ export function CertificationEntryDialog({
     uploadAttachment,
   } = useAttachmentUpload({ userId, folder: "certifications" });
   const {
+    control,
     register,
     handleSubmit,
-    reset,
-    watch,
     setValue,
     formState: { errors, isSubmitting },
   } = useForm<CertificationEntryFormValues>({
@@ -42,14 +41,7 @@ export function CertificationEntryDialog({
     defaultValues: initialValues ?? getDefaultCertificationEntry(),
   });
 
-  const attachmentFileName = watch("attachmentFileName");
-
-  useEffect(() => {
-    if (open) {
-      reset(initialValues ?? getDefaultCertificationEntry());
-      setAttachmentError("");
-    }
-  }, [initialValues, open, reset, setAttachmentError]);
+  const attachmentFileName = useWatch({ control, name: "attachmentFileName" });
 
   if (!open) return null;
 
