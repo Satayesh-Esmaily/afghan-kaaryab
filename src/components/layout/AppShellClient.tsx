@@ -271,7 +271,6 @@ function LocaleSwitcher({ currentLocale }: { currentLocale: string }) {
   const pathname = usePathname();
   const router = useRouter();
   const tCommon = useTranslations("common");
-  const activePath = stripLocalePrefix(pathname);
 
   return (
     <label className="inline-flex items-center">
@@ -280,7 +279,7 @@ function LocaleSwitcher({ currentLocale }: { currentLocale: string }) {
         aria-label={tCommon("language")}
         value={currentLocale}
         onChange={(event) => {
-          router.replace(activePath, { locale: event.target.value as Locale });
+          router.replace(pathname, { locale: event.target.value as Locale });
         }}
         className="h-11 rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] px-3 text-sm font-medium text-[color:var(--foreground)] outline-none transition hover:bg-[color:var(--surface-soft)]"
       >

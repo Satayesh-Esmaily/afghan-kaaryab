@@ -3,6 +3,7 @@ import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages, getTranslations } from "next-intl/server";
 import Providers from "@/components/layout/Providers";
 import AppShell from "@/components/layout/AppShell";
+import LocaleDocumentSync from "@/components/layout/LocaleDocumentSync";
 import { defaultLocale } from "@/i18n/config";
 import { getLocaleDirection } from "@/i18n/utils";
 import { loadServerBootstrap } from "@/lib/supabase/server";
@@ -82,6 +83,7 @@ export default async function RootLayout({
         className="min-h-full bg-[color:var(--background)] text-[color:var(--foreground)]"
       >
         <NextIntlClientProvider locale={locale} messages={messages}>
+          <LocaleDocumentSync />
           <Providers bootstrap={bootstrap}>
             <AppShell>{children}</AppShell>
           </Providers>
