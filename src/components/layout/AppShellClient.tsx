@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
-import { useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useAuthContext } from "@/context/auth-context";
 import { useThemeContext } from "@/context/theme-context";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
@@ -58,7 +58,7 @@ export default function AppShellClient({ children, footer }: AppShellClientProps
 
   return (
     <div className="min-h-screen bg-[color:var(--background)] text-[color:var(--foreground)]">
-      <aside className="fixed inset-y-0 left-0 hidden w-[276px] flex-col border-r border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-4 lg:flex">
+      <aside className="fixed inset-y-0 start-0 hidden w-[276px] flex-col border-e border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-4 lg:flex">
         <Link
           href="/"
           className="panel group rounded-[1.25rem] px-3.5 py-3.5 transition hover:-translate-y-0.5 hover:shadow-xl"
@@ -82,7 +82,7 @@ export default function AppShellClient({ children, footer }: AppShellClientProps
           </div>
         </Link>
 
-        <div className="mt-4 flex-1 overflow-y-auto pr-1">
+        <div className="mt-4 flex-1 overflow-y-auto pe-1">
           <nav className="space-y-1.5">
             {sidebarItems.map((item) => {
               if (item.authOnly && !authenticated) {
@@ -102,7 +102,7 @@ export default function AppShellClient({ children, footer }: AppShellClientProps
                       : "border-transparent bg-transparent text-[color:var(--foreground-muted)] hover:bg-[color:var(--surface-soft)] hover:text-[color:var(--foreground)]",
                   ].join(" ")}
                 >
-                  <div className="min-w-0 flex-1 pl-1">
+                  <div className="min-w-0 flex-1 ps-1">
                     <p className="truncate text-[14px] font-medium leading-5">{tNav(item.labelKey)}</p>
                   </div>
 
@@ -128,14 +128,14 @@ export default function AppShellClient({ children, footer }: AppShellClientProps
             onClick={() => {
               logout();
             }}
-            className="w-full rounded-[1rem] border border-[color:var(--border)] bg-[color:var(--surface)] px-3 py-2.5 text-left text-sm font-medium text-[color:var(--foreground)] transition hover:bg-[color:var(--surface-soft)]"
+            className="w-full rounded-[1rem] border border-[color:var(--border)] bg-[color:var(--surface)] px-3 py-2.5 text-start text-sm font-medium text-[color:var(--foreground)] transition hover:bg-[color:var(--surface-soft)]"
           >
             {tNav("auth.logout")}
           </button>
         </div>
       </aside>
 
-      <div className="lg:pl-[276px]">
+      <div className="lg:ps-[276px]">
         <header className="sticky top-0 z-40 bg-[color:var(--background)]">
           <div className="mx-auto flex max-w-[1600px] flex-col gap-3 px-4 py-3 sm:px-6 lg:px-8">
             <div className="inline-flex items-center gap-3 rounded-[1.35rem] border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-3 shadow-sm sm:max-w-[min(100%,22rem)]">
@@ -215,8 +215,8 @@ export default function AppShellClient({ children, footer }: AppShellClientProps
                         ? "border-transparent active-pill"
                         : "border-[color:var(--border)] bg-[color:var(--surface)] text-[color:var(--foreground)] hover:bg-[color:var(--surface-soft)]",
                     ].join(" ")}
-                  >
-                    <span className="flex-1 pl-1">{tNav(item.labelKey)}</span>
+                    >
+                    <span className="flex-1 ps-1">{tNav(item.labelKey)}</span>
                     {item.href === "/saved" ? <ShellSavedCount active={active} mobile /> : null}
                   </Link>
                 );
@@ -237,7 +237,7 @@ export default function AppShellClient({ children, footer }: AppShellClientProps
                   logout();
                   setMobileOpen(false);
                 }}
-                className="w-full rounded-[1rem] border border-[color:var(--border)] bg-[color:var(--surface)] px-3 py-2.5 text-left text-sm font-medium text-[color:var(--foreground)] transition hover:bg-[color:var(--surface-soft)]"
+                className="w-full rounded-[1rem] border border-[color:var(--border)] bg-[color:var(--surface)] px-3 py-2.5 text-start text-sm font-medium text-[color:var(--foreground)] transition hover:bg-[color:var(--surface-soft)]"
               >
                 {tNav("auth.logout")}
               </button>
@@ -271,29 +271,110 @@ function LocaleSwitcher({ currentLocale }: { currentLocale: string }) {
   const pathname = usePathname();
   const router = useRouter();
   const tCommon = useTranslations("common");
+  const normalizedPathname = stripLocalePrefix(pathname);
+  const [open, setOpen] = useState(false);
+  const rootRef = useRef<HTMLDivElement | null>(null);
+
+  const localeOptions = useMemo(
+    () =>
+      locales.map((option) => ({
+        value: option,
+        label:
+          option === "en"
+            ? tCommon("languageOptions.en")
+            : option === "fa-AF"
+              ? tCommon("languageOptions.faAF")
+              : tCommon("languageOptions.psAF"),
+      })),
+    [tCommon]
+  );
+
+  const currentOption = localeOptions.find((option) => option.value === currentLocale) ?? localeOptions[0];
+
+  useEffect(() => {
+    function handlePointerDown(event: PointerEvent) {
+      if (!rootRef.current?.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    }
+
+    function handleEscape(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setOpen(false);
+      }
+    }
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    document.addEventListener("keydown", handleEscape);
+
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, []);
 
   return (
-    <label className="inline-flex items-center">
-      <span className="sr-only">{tCommon("language")}</span>
-      <select
+    <div ref={rootRef} className="relative inline-flex">
+      <button
+        type="button"
+        onClick={() => setOpen((value) => !value)}
+        className={[
+          "inline-flex h-11 min-w-[8.75rem] items-center justify-between gap-3 rounded-full border px-3.5 text-sm font-medium transition",
+          "border-[color:var(--border)] bg-[color:var(--surface)] text-[color:var(--foreground)] hover:bg-[color:var(--surface-soft)]",
+          open ? "shadow-lg shadow-[rgba(114,93,255,0.12)] ring-4 ring-[color:var(--accent-soft)]/50" : "shadow-sm",
+        ].join(" ")}
         aria-label={tCommon("language")}
-        value={currentLocale}
-        onChange={(event) => {
-          router.replace(pathname, { locale: event.target.value as Locale });
-        }}
-        className="h-11 rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] px-3 text-sm font-medium text-[color:var(--foreground)] outline-none transition hover:bg-[color:var(--surface-soft)]"
+        aria-haspopup="menu"
+        aria-expanded={open}
       >
-        {locales.map((option) => (
-          <option key={option} value={option}>
-            {option === "en"
-              ? tCommon("languageOptions.en")
-              : option === "fa-AF"
-                ? tCommon("languageOptions.faAF")
-                : tCommon("languageOptions.psAF")}
-          </option>
-        ))}
-      </select>
-    </label>
+        <span className="inline-flex items-center gap-2">
+          <span className="grid h-7 w-7 place-items-center rounded-full bg-[linear-gradient(135deg,var(--accent-soft),var(--surface-soft))] text-[11px] font-semibold text-[color:var(--accent-strong)]">
+            {currentOption?.value === "en" ? "EN" : currentOption?.value === "fa-AF" ? "FA" : "PS"}
+          </span>
+          <span className="truncate">{currentOption?.label ?? tCommon("language")}</span>
+        </span>
+        <ChevronDownIcon className={open ? "rotate-180" : ""} />
+      </button>
+
+      {open ? (
+        <div className="absolute end-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-[1.25rem] border border-[color:var(--border)] bg-[color:var(--surface)] shadow-[0_22px_50px_rgba(15,16,19,0.16)]">
+          <div className="border-b border-[color:var(--border)] px-4 py-3">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[color:var(--foreground-muted)]">
+              {tCommon("language")}
+            </p>
+          </div>
+          <div className="p-2">
+            {localeOptions.map((option) => {
+              const active = option.value === currentLocale;
+
+              return (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => {
+                    setOpen(false);
+                    router.replace(normalizedPathname, { locale: option.value as Locale });
+                  }}
+                  className={[
+                    "flex w-full items-center justify-between gap-3 rounded-[0.95rem] px-3.5 py-3 text-start text-sm transition",
+                    active
+                      ? "bg-[color:var(--accent-soft)] text-[color:var(--accent-strong)]"
+                      : "text-[color:var(--foreground)] hover:bg-[color:var(--surface-soft)]",
+                  ].join(" ")}
+                >
+                  <span className="font-medium">{option.label}</span>
+                  {active ? (
+                    <span className="grid h-5 w-5 place-items-center rounded-full bg-[color:var(--accent)] text-[10px] font-bold text-white">
+                      ✓
+                    </span>
+                  ) : null}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      ) : null}
+    </div>
   );
 }
 
@@ -318,6 +399,20 @@ function CloseIcon() {
         stroke="currentColor"
         strokeWidth="1.8"
         strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+function ChevronDownIcon({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 20 20" className={`h-4.5 w-4.5 shrink-0 transition ${className}`} fill="none" aria-hidden="true">
+      <path
+        d="M5 7.5 10 12.5 15 7.5"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   );

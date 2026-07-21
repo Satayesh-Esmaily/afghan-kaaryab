@@ -39,9 +39,9 @@ export default function OpportunityCard({
     <article className="group overflow-hidden rounded-[1.5rem] panel-strong transition duration-200 hover:-translate-y-1 hover:shadow-2xl">
       <div className="relative overflow-hidden accent-panel p-5 sm:p-6">
         <div className="absolute inset-0 opacity-30">
-          <div className="absolute left-5 top-5 h-16 w-16 rounded-full border border-white/20" />
-          <div className="absolute right-8 top-7 h-12 w-12 rounded-full border border-white/15" />
-          <div className="absolute left-1/2 top-8 h-20 w-20 -translate-x-1/2 rounded-full border border-dashed border-white/15" />
+          <div className="absolute start-5 top-5 h-16 w-16 rounded-full border border-white/20" />
+          <div className="absolute end-8 top-7 h-12 w-12 rounded-full border border-white/15" />
+          <div className="absolute start-1/2 top-8 h-20 w-20 -translate-x-1/2 rounded-full border border-dashed border-white/15" />
         </div>
 
         <div className="relative flex min-h-[210px] flex-col justify-between gap-5">

@@ -25,7 +25,7 @@ export default function AuthPageShell({
   return (
     <div className="mx-auto w-full max-w-6xl overflow-hidden rounded-[2rem] border border-[color:var(--border)] bg-[color:var(--surface)] shadow-sm">
       <div className="grid min-h-[calc(100vh-4rem)] lg:grid-cols-[0.95fr_1.05fr]">
-        <aside className="hidden flex-col justify-between border-r border-[color:var(--border)] bg-[linear-gradient(180deg,rgba(110,91,255,0.08),rgba(81,196,255,0.08),rgba(70,208,123,0.06))] px-8 py-8 lg:flex xl:px-10">
+        <aside className="hidden flex-col justify-between border-e border-[color:var(--border)] bg-[linear-gradient(180deg,rgba(110,91,255,0.08),rgba(81,196,255,0.08),rgba(70,208,123,0.06))] px-8 py-8 lg:flex xl:px-10">
           <IntlLink href="/" className="flex items-center gap-3">
             <span className="relative flex h-11 w-11 shrink-0 overflow-hidden rounded-2xl border border-[color:var(--border)] bg-[color:var(--surface)] shadow-sm">
               <Image src={brand.logoSrc} alt={brand.logoAlt} fill sizes="44px" className="object-cover" />

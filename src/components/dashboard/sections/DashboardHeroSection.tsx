@@ -82,7 +82,7 @@ function SnapshotItem({
   };
 
   return (
-    <div className="rounded-[1.25rem] border border-[color:var(--border)] bg-[color:var(--surface-soft)] px-4 py-4 text-left">
+    <div className="rounded-[1.25rem] border border-[color:var(--border)] bg-[color:var(--surface-soft)] px-4 py-4 text-start">
       <p className={["text-[10px] font-semibold uppercase tracking-[0.22em]", labelColors[tone]].join(" ")}>
         {label}
       </p>

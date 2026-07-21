@@ -74,7 +74,7 @@ export default function DatePickerField({
         disabled={disabled}
         onClick={() => setOpen((current) => !current)}
         className={[
-          "ds-input flex min-h-[3rem] items-center justify-between gap-3 text-left transition",
+          "ds-input flex min-h-[3rem] items-center justify-between gap-3 text-start transition",
           disabled ? "cursor-not-allowed opacity-60" : "",
         ].join(" ")}
         aria-expanded={open}

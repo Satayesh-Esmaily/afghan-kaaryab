@@ -117,7 +117,7 @@ export default function ResumeBuilderView() {
                   type="button"
                   onClick={() => applyTemplate(template.id)}
                   className={[
-                    "rounded-[1.25rem] border px-4 py-4 text-left transition",
+                    "rounded-[1.25rem] border px-4 py-4 text-start transition",
                     selectedTemplate === template.id
                       ? "border-transparent active-pill"
                       : "border-[color:var(--border)] bg-[color:var(--surface)] hover:bg-[color:var(--surface-soft)]",
@@ -368,7 +368,7 @@ function ProfileLine({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-start justify-between gap-4 border-b border-black/5 pb-2.5 last:border-b-0 last:pb-0">
       <span className="text-sm text-black/55">{label}</span>
-      <span className="max-w-[60%] text-right text-sm font-medium text-black">{value}</span>
+      <span className="max-w-[60%] text-end text-sm font-medium text-black">{value}</span>
     </div>
   );
 }

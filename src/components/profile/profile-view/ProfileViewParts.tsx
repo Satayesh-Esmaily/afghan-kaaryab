@@ -106,7 +106,7 @@ export function ResumeTab({
 
         <div className="space-y-4">
           <div className="grid gap-4 rounded-[1.25rem] border border-dashed border-[color:var(--border)] bg-[color:var(--surface)] p-4 sm:grid-cols-[1fr_auto] sm:items-center">
-            <button type="button" onClick={onPickFiles} className="flex items-center gap-3 text-left">
+            <button type="button" onClick={onPickFiles} className="flex items-center gap-3 text-start">
               <span className="grid h-10 w-10 place-items-center rounded-full bg-[color:var(--surface-soft)] text-[color:var(--foreground-muted)]">
                 <PlusIcon />
               </span>
@@ -115,7 +115,7 @@ export function ResumeTab({
               </span>
             </button>
 
-            <p className="text-right text-xs font-medium leading-5 text-[color:var(--foreground-muted)]">
+            <p className="text-end text-xs font-medium leading-5 text-[color:var(--foreground-muted)]">
               PDF/ DOC/ DOCX
               <br />
               Max 5 MB

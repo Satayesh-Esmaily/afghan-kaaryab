@@ -27,12 +27,12 @@ export function DialogShell({
         <button
           type="button"
           onClick={onClose}
-          className="absolute right-4 top-4 grid h-9 w-9 place-items-center rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] text-xl text-[color:var(--foreground-muted)] transition hover:text-[color:var(--foreground)]"
+          className="absolute end-4 top-4 grid h-9 w-9 place-items-center rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] text-xl text-[color:var(--foreground-muted)] transition hover:text-[color:var(--foreground)]"
           aria-label="Close dialog"
         >
           x
         </button>
-        <div className="pr-10">
+        <div className="pe-10">
           <h3 className="text-2xl font-semibold tracking-tight text-[color:var(--foreground)]">{title}</h3>
         </div>
         <div className="mt-6">{children}</div>

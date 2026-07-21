@@ -78,7 +78,7 @@ export function AwardEntryDialog({ open, initialValues, userId, onClose, onSave 
           <button
             type="button"
             onClick={() => attachmentInputRef.current?.click()}
-            className="flex w-full items-center justify-between gap-4 rounded-[1rem] border border-dashed border-[color:var(--border)] bg-[color:var(--surface-soft)] px-4 py-3 text-left text-sm text-[color:var(--foreground-muted)]"
+            className="flex w-full items-center justify-between gap-4 rounded-[1rem] border border-dashed border-[color:var(--border)] bg-[color:var(--surface-soft)] px-4 py-3 text-start text-sm text-[color:var(--foreground-muted)]"
           >
             <span>{attachmentBusy ? "Uploading file..." : attachmentFileName || "Choose a file or drag it here to upload."}</span>
             <span className="shrink-0 text-xs font-medium uppercase tracking-[0.18em]">PDF / JPG / PNG</span>

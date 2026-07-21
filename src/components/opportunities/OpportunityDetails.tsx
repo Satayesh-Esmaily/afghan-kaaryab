@@ -244,7 +244,7 @@ function MetaRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-start justify-between gap-4 border-b border-[color:var(--border)] pb-3 last:border-b-0 last:pb-0">
       <span className="text-sm text-[color:var(--foreground-muted)]">{label}</span>
-      <span className="max-w-[65%] text-right text-sm font-semibold text-[color:var(--foreground-strong)]">
+      <span className="max-w-[65%] text-end text-sm font-semibold text-[color:var(--foreground-strong)]">
         {value}
       </span>
     </div>

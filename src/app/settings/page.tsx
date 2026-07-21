@@ -24,7 +24,7 @@ export default function SettingsPage() {
               <h2 className="ds-title mt-4 text-2xl font-semibold">{settingsCopy.preferencesTitle}</h2>
               <p className="ds-muted mt-2 max-w-2xl text-sm leading-7">{settingsCopy.preferencesBody}</p>
             </div>
-            <div className="hidden rounded-[1.25rem] bg-[linear-gradient(135deg,var(--accent-soft),var(--surface-soft))] px-4 py-3 text-right sm:block">
+            <div className="hidden rounded-[1.25rem] bg-[linear-gradient(135deg,var(--accent-soft),var(--surface-soft))] px-4 py-3 text-end sm:block">
               <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[color:var(--foreground-muted)]">
                 {settingsCopy.currentModeLabel}
               </p>

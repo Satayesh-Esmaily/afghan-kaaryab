@@ -1,9 +1,6 @@
 import type { Metadata, Viewport } from "next";
-import { NextIntlClientProvider } from "next-intl";
-import { getLocale, getMessages, getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import Providers from "@/components/layout/Providers";
-import AppShell from "@/components/layout/AppShell";
-import LocaleDocumentSync from "@/components/layout/LocaleDocumentSync";
 import { defaultLocale } from "@/i18n/config";
 import { getLocaleDirection } from "@/i18n/utils";
 import { loadServerBootstrap } from "@/lib/supabase/server";
@@ -66,7 +63,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [locale, messages, bootstrap] = await Promise.all([getLocale(), getMessages(), loadServerBootstrap()]);
+  const [locale, bootstrap] = await Promise.all([getLocale(), loadServerBootstrap()]);
   const dir = getLocaleDirection(locale);
   const theme = bootstrap.snapshot.theme;
 
@@ -82,12 +79,7 @@ export default async function RootLayout({
         suppressHydrationWarning
         className="min-h-full bg-[color:var(--background)] text-[color:var(--foreground)]"
       >
-        <NextIntlClientProvider locale={locale} messages={messages}>
-          <LocaleDocumentSync />
-          <Providers bootstrap={bootstrap}>
-            <AppShell>{children}</AppShell>
-          </Providers>
-        </NextIntlClientProvider>
+        <Providers bootstrap={bootstrap}>{children}</Providers>
       </body>
     </html>
   );

@@ -65,7 +65,7 @@ export default function SearchableSelect({
         disabled={disabled}
         onClick={() => setOpen((current) => !current)}
         className={[
-          "ds-input flex min-h-[3rem] items-center justify-between gap-3 text-left transition",
+          "ds-input flex min-h-[3rem] items-center justify-between gap-3 text-start transition",
           disabled ? "cursor-not-allowed opacity-60" : "",
         ].join(" ")}
         aria-expanded={open}
@@ -106,7 +106,7 @@ export default function SearchableSelect({
                       setQuery("");
                     }}
                     className={[
-                      "flex w-full items-center justify-between gap-3 rounded-[0.95rem] px-3 py-2.5 text-left text-sm transition",
+                      "flex w-full items-center justify-between gap-3 rounded-[0.95rem] px-3 py-2.5 text-start text-sm transition",
                       active ? "bg-[color:var(--surface-soft)] text-[color:var(--foreground-strong)]" : "text-[color:var(--foreground)] hover:bg-[color:var(--surface-soft)]",
                     ].join(" ")}
                   >

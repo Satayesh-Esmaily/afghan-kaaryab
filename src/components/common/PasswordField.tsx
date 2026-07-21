@@ -25,14 +25,14 @@ export default function PasswordField({
         <input
           {...registration}
           type={visible ? "text" : "password"}
-          className="ds-input pr-12"
+          className="ds-input pe-12"
           placeholder={placeholder}
           autoComplete={autoComplete}
         />
         <button
           type="button"
           onClick={() => setVisible((current) => !current)}
-          className="absolute inset-y-0 right-0 flex w-12 items-center justify-center text-[color:var(--foreground-muted)] transition hover:text-[color:var(--foreground)]"
+          className="absolute inset-y-0 end-0 flex w-12 items-center justify-center text-[color:var(--foreground-muted)] transition hover:text-[color:var(--foreground)]"
           aria-label={visible ? "Hide password" : "Show password"}
         >
           {visible ? <EyeIcon /> : <EyeOffIcon />}
