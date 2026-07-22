@@ -87,6 +87,89 @@
       "logout": "Sign out"
     }
   },
+  "dashboard": {
+    "welcomeBanner": {
+      "title": "Welcome back",
+      "description": "Your dashboard is ready. Continue browsing opportunities, saved items, and organizations."
+    },
+    "hero": {
+      "badge": "Your dashboard",
+      "title": "Keep your job search organized in one place",
+      "description": "Track saved opportunities, review deadlines, and follow the listings and organizations that matter to you most.",
+      "primaryAction": "Add opportunity",
+      "secondaryAction": "Discover listings",
+      "welcomeBack": "Welcome back, {name}",
+      "snapshotLabel": "Snapshot",
+      "snapshotStatus": "Live",
+      "snapshotItems": {
+        "total": "Total",
+        "remote": "Remote",
+        "soon": "Soon",
+        "saved": "Saved"
+      }
+    },
+    "opportunities": {
+      "title": "Opportunity overview",
+      "badge": "Overview",
+      "items": {
+        "total": {
+          "label": "Total opportunities",
+          "hint": "All listings"
+        },
+        "jobs": {
+          "label": "Jobs",
+          "hint": "Employment roles"
+        },
+        "scholarships": {
+          "label": "Scholarships",
+          "hint": "Education support"
+        },
+        "internships": {
+          "label": "Internships",
+          "hint": "Career starters"
+        }
+      }
+    },
+    "categories": {
+      "title": "Category breakdown",
+      "subtitle": "Live overview",
+      "badgeSuffix": "categories",
+      "labels": {
+        "job": "Job",
+        "internship": "Internship",
+        "scholarship": "Scholarship",
+        "onlineCourse": "Online course",
+        "remoteWork": "Remote work",
+        "trainingProgram": "Training program",
+        "volunteerWork": "Volunteer work"
+      }
+    },
+    "recent": {
+      "title": "Recent opportunities",
+      "moreOptionsLabel": "More options",
+      "addOpportunityLabel": "Add opportunity",
+      "deadlinePrefix": "Deadline"
+    },
+    "quickInsight": {
+      "kicker": "Quick insight",
+      "title": "Keep fresh listings at the top of the page.",
+      "body": "Update deadlines, highlight active opportunities, and keep the dashboard useful for job seekers."
+    },
+    "calendar": {
+      "subtitle": "Deadline calendar",
+      "previousMonth": "Previous month",
+      "nextMonth": "Next month",
+      "weekdays": {
+        "mo": "Mo",
+        "tu": "Tu",
+        "we": "We",
+        "th": "Th",
+        "fr": "Fr",
+        "sa": "Sa",
+        "su": "Su"
+      }
+    }
+  },
   "home": {
     "badge": "Live opportunities",
     "heroTitle": "Discover opportunities for Afghan job seekers in one clean place.",

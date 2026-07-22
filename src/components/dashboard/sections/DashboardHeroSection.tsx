@@ -1,6 +1,6 @@
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { Badge } from "@/components/ui";
-import { dashboardCopy } from "@/config/dashboard";
 
 export default function DashboardHeroSection({
   stats,
@@ -15,32 +15,32 @@ export default function DashboardHeroSection({
   savedCount: number;
   userName?: string;
 }) {
+  const t = useTranslations("dashboard.hero");
+
   return (
     <div className="rounded-[1.5rem] accent-panel p-6 sm:p-8 lg:p-10">
       <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-center">
         <div className="space-y-4">
-          <Badge tone="accent">{dashboardCopy.heroBadge}</Badge>
+          <Badge tone="accent">{t("badge")}</Badge>
           <div>
             {userName ? (
-              <p className="text-sm font-medium text-white/80 sm:text-base">Welcome back, {userName}</p>
+              <p className="text-sm font-medium text-white/80 sm:text-base">{t("welcomeBack", { name: userName })}</p>
             ) : null}
-            <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">{dashboardCopy.heroTitle}</h2>
-            <p className="mt-3 max-w-2xl text-sm leading-7 text-white/85 sm:text-base">
-              {dashboardCopy.heroDescription}
-            </p>
+            <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">{t("title")}</h2>
+            <p className="mt-3 max-w-2xl text-sm leading-7 text-white/85 sm:text-base">{t("description")}</p>
           </div>
           <div className="flex flex-wrap gap-3">
             <Link
               href="/add-opportunity"
               className="inline-flex items-center justify-center rounded-2xl bg-white px-5 py-3 text-sm font-semibold text-[color:var(--accent)] transition hover:bg-white/90"
             >
-              {dashboardCopy.heroPrimaryAction}
+              {t("primaryAction")}
             </Link>
             <Link
               href="/opportunities"
               className="inline-flex items-center justify-center rounded-2xl border border-white/15 bg-white/10 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/20"
             >
-              {dashboardCopy.heroSecondaryAction}
+              {t("secondaryAction")}
             </Link>
           </div>
         </div>
@@ -48,15 +48,15 @@ export default function DashboardHeroSection({
         <div className="hidden rounded-[1.5rem] panel p-5 text-[color:var(--foreground)] lg:block">
           <div className="flex items-center justify-between gap-3">
             <p className="text-xs uppercase tracking-[0.22em] text-[color:var(--foreground-muted)]">
-              {dashboardCopy.snapshotLabel}
+              {t("snapshotLabel")}
             </p>
-            <Badge tone="success">{dashboardCopy.snapshotStatus}</Badge>
+            <Badge tone="success">{t("snapshotStatus")}</Badge>
           </div>
           <div className="mt-4 grid grid-cols-2 gap-3">
-            <SnapshotItem label="Total" value={stats.total} tone="accent" />
-            <SnapshotItem label="Remote" value={stats.remote} tone="success" />
-            <SnapshotItem label="Soon" value={stats.expiringSoon} tone="warning" />
-            <SnapshotItem label="Saved" value={savedCount} tone="default" />
+            <SnapshotItem label={t("snapshotItems.total")} value={stats.total} tone="accent" />
+            <SnapshotItem label={t("snapshotItems.remote")} value={stats.remote} tone="success" />
+            <SnapshotItem label={t("snapshotItems.soon")} value={stats.expiringSoon} tone="warning" />
+            <SnapshotItem label={t("snapshotItems.saved")} value={savedCount} tone="default" />
           </div>
         </div>
       </div>

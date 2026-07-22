@@ -1,5 +1,5 @@
+import { useTranslations } from "next-intl";
 import { Badge } from "@/components/ui";
-import { dashboardCopy } from "@/config/dashboard";
 
 export default function DashboardOpportunityStatsSection({
   stats,
@@ -11,18 +11,30 @@ export default function DashboardOpportunityStatsSection({
     internships: number;
   };
 }) {
+  const t = useTranslations("dashboard.opportunities");
+
   return (
     <div>
       <div className="flex items-center justify-between">
-        <h3 className="text-xl font-semibold text-[color:var(--foreground)]">{dashboardCopy.opportunitiesTitle}</h3>
-        <Badge tone="info">{dashboardCopy.opportunitiesBadge}</Badge>
+        <h3 className="text-xl font-semibold text-[color:var(--foreground)]">{t("title")}</h3>
+        <Badge tone="info">{t("badge")}</Badge>
       </div>
 
       <div className="mt-4 grid gap-4 md:grid-cols-2">
-        <OpportunityStatCard label="Total opportunities" value={stats.total} hint="All listings" tone="accent" />
-        <OpportunityStatCard label="Jobs" value={stats.jobs} hint="Employment roles" tone="info" />
-        <OpportunityStatCard label="Scholarships" value={stats.scholarships} hint="Education support" tone="warning" />
-        <OpportunityStatCard label="Internships" value={stats.internships} hint="Career starters" tone="success" />
+        <OpportunityStatCard label={t("items.total.label")} value={stats.total} hint={t("items.total.hint")} tone="accent" />
+        <OpportunityStatCard label={t("items.jobs.label")} value={stats.jobs} hint={t("items.jobs.hint")} tone="info" />
+        <OpportunityStatCard
+          label={t("items.scholarships.label")}
+          value={stats.scholarships}
+          hint={t("items.scholarships.hint")}
+          tone="warning"
+        />
+        <OpportunityStatCard
+          label={t("items.internships.label")}
+          value={stats.internships}
+          hint={t("items.internships.hint")}
+          tone="success"
+        />
       </div>
     </div>
   );

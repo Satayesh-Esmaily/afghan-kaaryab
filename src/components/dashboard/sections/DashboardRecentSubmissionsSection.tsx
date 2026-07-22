@@ -1,5 +1,6 @@
+import { Link } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
 import { formatDeadline } from "@/lib/opportunities";
-import { dashboardCopy } from "@/config/dashboard";
 
 export default function DashboardRecentSubmissionsSection({
   recent,
@@ -11,20 +12,27 @@ export default function DashboardRecentSubmissionsSection({
     deadline: string;
   }>;
 }) {
+  const t = useTranslations("dashboard.recent");
+
   return (
     <div className="rounded-[1.5rem] panel p-6">
       <div className="flex items-center justify-between">
-        <h3 className="text-xl font-semibold text-[color:var(--foreground)]">{dashboardCopy.recentTitle}</h3>
-        <button className="inline-flex h-11 w-11 items-center justify-center rounded-full accent-button">
+        <h3 className="text-xl font-semibold text-[color:var(--foreground)]">{t("title")}</h3>
+        <Link
+          href="/add-opportunity"
+          className="inline-flex h-11 w-11 items-center justify-center rounded-full accent-button"
+          aria-label={t("addOpportunityLabel")}
+        >
           +
-        </button>
+        </Link>
       </div>
       <div className="mt-6 space-y-5">
         {recent.map((opportunity, index) => (
-          <div
+          <Link
             key={opportunity.id}
+            href={`/opportunities/${opportunity.id}`}
             className={[
-              "relative w-full overflow-hidden rounded-[1.4rem] border border-[color:var(--border)] px-4 py-4 shadow-sm transition sm:px-5 dark:border-white/10",
+              "relative block w-full overflow-hidden rounded-[1.4rem] border border-[color:var(--border)] px-4 py-4 shadow-sm transition sm:px-5 dark:border-white/10",
               index % 4 === 0
                 ? "bg-[linear-gradient(180deg,#fff6f1,rgba(255,246,241,0.9))] dark:bg-[linear-gradient(180deg,rgba(255,90,31,0.18),rgba(255,90,31,0.08))]"
                 : index % 4 === 1
@@ -58,18 +66,17 @@ export default function DashboardRecentSubmissionsSection({
                   {opportunity.title}
                 </p>
                 <p className="mt-2 text-sm text-[color:var(--foreground-muted)]">
-                  Deadline {formatDeadline(opportunity.deadline)}
+                  {t("deadlinePrefix")} {formatDeadline(opportunity.deadline)}
                 </p>
               </div>
-              <button
-                type="button"
+              <span
                 className="rounded-full px-1 text-lg leading-none text-[color:var(--foreground)]"
-                aria-label="More options"
+                aria-label={t("moreOptionsLabel")}
               >
                 ...
-              </button>
+              </span>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
     </div>

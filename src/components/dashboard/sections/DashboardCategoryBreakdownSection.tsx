@@ -1,27 +1,34 @@
+import { useTranslations } from "next-intl";
 import { Badge } from "@/components/ui";
-import { dashboardCopy } from "@/config/dashboard";
 
 export default function DashboardCategoryBreakdownSection({
   categories,
 }: {
   categories: Array<{ label: string; value: number }>;
 }) {
+  const t = useTranslations("dashboard.categories");
   const total = Math.max(...categories.map((item) => item.value), 1);
 
   return (
     <div className="rounded-[1.75rem] border border-[color:var(--border)] bg-[linear-gradient(180deg,var(--surface),var(--surface-soft))] p-6 shadow-sm dark:border-white/10 dark:bg-[linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.02))]">
       <div className="flex items-center justify-between gap-4">
         <div>
-          <h3 className="text-xl font-semibold text-[color:var(--foreground)]">{dashboardCopy.categoryTitle}</h3>
-          <p className="mt-1 text-sm text-[color:var(--foreground-muted)]">{dashboardCopy.categorySubtitle}</p>
+          <h3 className="text-xl font-semibold text-[color:var(--foreground)]">{t("title")}</h3>
+          <p className="mt-1 text-sm text-[color:var(--foreground-muted)]">{t("subtitle")}</p>
         </div>
         <Badge tone="info">
-          {categories.length} {dashboardCopy.categoryBadgeSuffix}
+          {categories.length} {t("badgeSuffix")}
         </Badge>
       </div>
       <div className="mt-6 space-y-4">
         {categories.map((item) => (
-          <CategoryBreakdownRow key={item.label} label={item.label} value={item.value} total={total} />
+          <CategoryBreakdownRow
+            key={item.label}
+            category={item.label}
+            label={t(`labels.${getCategoryKey(item.label)}`)}
+            value={item.value}
+            total={total}
+          />
         ))}
       </div>
     </div>
@@ -29,16 +36,18 @@ export default function DashboardCategoryBreakdownSection({
 }
 
 function CategoryBreakdownRow({
+  category,
   label,
   value,
   total,
 }: {
+  category: string;
   label: string;
   value: number;
   total: number;
 }) {
   const percent = Math.max((value / total) * 100, 10);
-  const tone = getCategoryTone(label);
+  const tone = getCategoryTone(category);
 
   return (
     <div className="rounded-[1.25rem] border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-4 shadow-sm transition dark:border-white/10 dark:bg-white/[0.03]">
@@ -109,5 +118,26 @@ function getCategoryTone(label: string) {
         badge: "bg-[color:var(--surface-soft)] text-[color:var(--foreground-muted)]",
         bar: "bg-[linear-gradient(90deg,var(--accent),#7c6bff,#67b7ff,var(--success))]",
       };
+  }
+}
+
+function getCategoryKey(label: string) {
+  switch (label) {
+    case "Job":
+      return "job";
+    case "Internship":
+      return "internship";
+    case "Scholarship":
+      return "scholarship";
+    case "Online course":
+      return "onlineCourse";
+    case "Remote work":
+      return "remoteWork";
+    case "Training program":
+      return "trainingProgram";
+    case "Volunteer work":
+      return "volunteerWork";
+    default:
+      return "job";
   }
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useAuthContext } from "@/context/auth-context";
 import { useOpportunitiesContext } from "@/context/opportunities-context";
 import { getDashboardStats } from "@/lib/opportunities";
@@ -13,6 +14,7 @@ import DashboardQuickInsightSection from "@/components/dashboard/sections/Dashbo
 
 export default function DashboardView() {
   const searchParams = useSearchParams();
+  const t = useTranslations("dashboard");
   const { user } = useAuthContext();
   const { opportunities } = useOpportunitiesContext();
   const stats = getDashboardStats(opportunities);
@@ -24,11 +26,10 @@ export default function DashboardView() {
       {showWelcome ? (
         <div className="rounded-[1.35rem] border border-[color:var(--border)] bg-[color:var(--surface)] px-5 py-4 shadow-sm sm:px-6">
           <p className="text-sm font-semibold text-[color:var(--foreground-strong)]">
-            Welcome back{user?.displayName ? `, ${user.displayName}` : ""}.
+            {t("welcomeBanner.title")}
+            {user?.displayName ? `, ${user.displayName}` : ""}.
           </p>
-          <p className="mt-1 text-sm text-[color:var(--foreground-muted)]">
-            Your dashboard is ready. Continue browsing opportunities, saved items, and organizations.
-          </p>
+          <p className="mt-1 text-sm text-[color:var(--foreground-muted)]">{t("welcomeBanner.description")}</p>
         </div>
       ) : null}
 

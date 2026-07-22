@@ -1,14 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { dashboardCopy } from "@/config/dashboard";
+import { useLocale, useTranslations } from "next-intl";
 
 export default function DashboardCalendarSection() {
   const today = new Date();
+  const locale = useLocale();
+  const t = useTranslations("dashboard.calendar");
   const [monthOffset, setMonthOffset] = useState(0);
   const displayedMonth = new Date(today.getFullYear(), today.getMonth() + monthOffset, 1);
   const calendar = buildCalendar(displayedMonth);
-  const monthLabel = new Intl.DateTimeFormat("en-US", {
+  const monthLabel = new Intl.DateTimeFormat(locale, {
     month: "long",
     year: "numeric",
   }).format(displayedMonth);
@@ -21,26 +23,34 @@ export default function DashboardCalendarSection() {
           type="button"
           onClick={() => setMonthOffset((value) => value - 1)}
           className="text-2xl text-[color:var(--foreground-muted)] transition hover:text-[color:var(--foreground)]"
-          aria-label="Previous month"
+          aria-label={t("previousMonth")}
         >
           {"<"}
         </button>
         <div className="text-center">
           <p className="text-lg font-semibold text-[color:var(--foreground-strong)]">{monthLabel}</p>
-          <p className="text-sm text-[color:var(--foreground-muted)]">{dashboardCopy.calendarSubtitle}</p>
+          <p className="text-sm text-[color:var(--foreground-muted)]">{t("subtitle")}</p>
         </div>
         <button
           type="button"
           onClick={() => setMonthOffset((value) => value + 1)}
           className="text-2xl text-[color:var(--foreground-muted)] transition hover:text-[color:var(--foreground)]"
-          aria-label="Next month"
+          aria-label={t("nextMonth")}
         >
           {">"}
         </button>
       </div>
 
       <div className="mt-5 grid grid-cols-7 gap-2 text-center text-xs font-medium text-[color:var(--foreground-muted)]">
-        {["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"].map((day) => (
+        {[
+          t("weekdays.mo"),
+          t("weekdays.tu"),
+          t("weekdays.we"),
+          t("weekdays.th"),
+          t("weekdays.fr"),
+          t("weekdays.sa"),
+          t("weekdays.su"),
+        ].map((day) => (
           <span key={day}>{day}</span>
         ))}
       </div>
