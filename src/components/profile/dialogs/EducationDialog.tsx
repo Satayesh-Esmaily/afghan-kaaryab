@@ -2,6 +2,7 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslations } from "next-intl";
 import DatePickerField from "@/components/common/DatePickerField";
 import FormField from "@/components/common/FormField";
 import { useWatch } from "react-hook-form";
@@ -16,6 +17,8 @@ type EducationDialogProps = {
 };
 
 export function EducationEntryDialog({ open, initialValues, onClose, onSave }: EducationDialogProps) {
+  const t = useTranslations("profile.dialogs.education");
+  const common = useTranslations("common");
   const {
     control,
     register,
@@ -33,7 +36,7 @@ export function EducationEntryDialog({ open, initialValues, onClose, onSave }: E
   if (!open) return null;
 
   return (
-    <DialogShell title={initialValues ? "Edit Education" : "Add Education"} onClose={onClose}>
+    <DialogShell title={initialValues ? t("editTitle") : t("addTitle")} onClose={onClose}>
       <form
         onSubmit={handleSubmit((values) => {
           onSave(values);
@@ -41,47 +44,47 @@ export function EducationEntryDialog({ open, initialValues, onClose, onSave }: E
         })}
         className="space-y-5"
       >
-        <FormField label="Degree" error={errors.degree?.message}>
-          <input {...register("degree")} className="ds-input" placeholder="Bachelor's Degree" />
+        <FormField label={t("degree")} error={errors.degree?.message}>
+          <input {...register("degree")} className="ds-input" placeholder={t("degreePlaceholder")} />
         </FormField>
 
         <div className="grid gap-5 md:grid-cols-2">
-          <FormField label="Institution" error={errors.institution?.message}>
-            <input {...register("institution")} className="ds-input" placeholder="Herat University" />
+          <FormField label={t("institution")} error={errors.institution?.message}>
+            <input {...register("institution")} className="ds-input" placeholder={t("institutionPlaceholder")} />
           </FormField>
-          <FormField label="Field of Study" error={errors.fieldOfStudy?.message}>
-            <input {...register("fieldOfStudy")} className="ds-input" placeholder="Civil Engineering" />
-          </FormField>
-        </div>
-
-        <div className="grid gap-5 md:grid-cols-2">
-          <FormField label="Country" error={errors.country?.message}>
-            <input {...register("country")} className="ds-input" placeholder="Afghanistan" />
-          </FormField>
-          <FormField label="Province" error={errors.province?.message}>
-            <input {...register("province")} className="ds-input" placeholder="Herat" />
+          <FormField label={t("fieldOfStudy")} error={errors.fieldOfStudy?.message}>
+            <input {...register("fieldOfStudy")} className="ds-input" placeholder={t("fieldOfStudyPlaceholder")} />
           </FormField>
         </div>
 
         <div className="grid gap-5 md:grid-cols-2">
-          <FormField label="Start Date" error={errors.startDate?.message}>
+          <FormField label={t("country")} error={errors.country?.message}>
+            <input {...register("country")} className="ds-input" placeholder={t("countryPlaceholder")} />
+          </FormField>
+          <FormField label={t("province")} error={errors.province?.message}>
+            <input {...register("province")} className="ds-input" placeholder={t("provincePlaceholder")} />
+          </FormField>
+        </div>
+
+        <div className="grid gap-5 md:grid-cols-2">
+          <FormField label={t("startDate")} error={errors.startDate?.message}>
             <DatePickerField
               value={startDateValue}
               onChange={(value) => setValue("startDate", value, { shouldDirty: true, shouldValidate: true })}
-              placeholder="Select date"
+              placeholder={t("selectDate")}
             />
           </FormField>
-          <FormField label="End Date" error={errors.endDate?.message}>
+          <FormField label={t("endDate")} error={errors.endDate?.message}>
             <DatePickerField
               value={endDateValue}
               onChange={(value) => setValue("endDate", value, { shouldDirty: true, shouldValidate: true })}
-              placeholder="Select date"
+              placeholder={t("selectDate")}
             />
           </FormField>
         </div>
 
-        <FormField label="Description" error={errors.description?.message} hint="Optional">
-          <textarea {...register("description")} className="ds-input min-h-36" placeholder="About your education" />
+        <FormField label={t("description")} error={errors.description?.message} hint={t("optional")}>
+          <textarea {...register("description")} className="ds-input min-h-36" placeholder={t("descriptionPlaceholder")} />
         </FormField>
 
         <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
@@ -90,14 +93,14 @@ export function EducationEntryDialog({ open, initialValues, onClose, onSave }: E
             onClick={onClose}
             className="ds-button-secondary rounded-full px-5 py-2.5 text-sm font-semibold"
           >
-            Cancel
+            {common("cancel")}
           </button>
           <button
             type="submit"
             disabled={isSubmitting}
             className="ds-button-primary rounded-full px-5 py-2.5 text-sm font-semibold disabled:opacity-70"
           >
-            Save
+            {common("save")}
           </button>
         </div>
       </form>

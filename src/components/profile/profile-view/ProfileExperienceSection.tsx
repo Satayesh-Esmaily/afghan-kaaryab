@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { EmptyListCard, EntriesHeader, ExperienceCard, ProfileSection } from "@/components/profile/profile-view/ProfileViewParts";
 import type { ExperienceEntry } from "@/lib/app-state";
 
@@ -11,9 +12,11 @@ type ProfileExperienceSectionProps = {
 };
 
 export function ProfileExperienceSection({ entries, onAdd, onEdit, onDelete }: ProfileExperienceSectionProps) {
+  const t = useTranslations("profile.experience");
+
   return (
-    <ProfileSection title="Work Experience" description="List your previous roles and responsibilities.">
-      <EntriesHeader actionLabel="Add Experience" onAction={onAdd} />
+    <ProfileSection title={t("sectionTitle")} description={t("sectionDescription")}>
+      <EntriesHeader actionLabel={t("add")} onAction={onAdd} />
 
       <div className="mt-6 grid gap-4 xl:grid-cols-2">
         {entries.length > 0 ? (
@@ -22,9 +25,9 @@ export function ProfileExperienceSection({ entries, onAdd, onEdit, onDelete }: P
           ))
         ) : (
           <EmptyListCard
-            title="No experience added yet"
-            description="Add your latest roles, companies, and responsibilities."
-            actionLabel="Add Experience"
+            title={t("emptyTitle")}
+            description={t("emptyDescription")}
+            actionLabel={t("add")}
             onAction={onAdd}
           />
         )}

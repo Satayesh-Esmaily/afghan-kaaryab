@@ -2,6 +2,7 @@
 
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslations } from "next-intl";
 import DatePickerField from "@/components/common/DatePickerField";
 import FormField from "@/components/common/FormField";
 import SearchableSelect from "@/components/common/SearchableSelect";
@@ -16,6 +17,8 @@ type ExperienceDialogProps = {
 };
 
 export function ExperienceEntryDialog({ open, initialValues, onClose, onSave }: ExperienceDialogProps) {
+  const t = useTranslations("profile.dialogs.experience");
+  const common = useTranslations("common");
   const {
     control,
     register,
@@ -36,7 +39,7 @@ export function ExperienceEntryDialog({ open, initialValues, onClose, onSave }: 
   if (!open) return null;
 
   return (
-    <DialogShell title={initialValues ? "Edit Experience" : "Add Experience"} onClose={onClose}>
+    <DialogShell title={initialValues ? t("editTitle") : t("addTitle")} onClose={onClose}>
       <form
         onSubmit={handleSubmit((values) => {
           onSave(values);
@@ -44,20 +47,21 @@ export function ExperienceEntryDialog({ open, initialValues, onClose, onSave }: 
         })}
         className="space-y-5"
       >
-        <FormField label="Position" error={errors.position?.message}>
-          <input {...register("position")} className="ds-input" placeholder="Product Designer / UIUX Designer" />
+        <FormField label={t("position")} error={errors.position?.message}>
+          <input {...register("position")} className="ds-input" placeholder={t("positionPlaceholder")} />
         </FormField>
 
         <div className="grid gap-5 md:grid-cols-2">
-          <FormField label="Organization" error={errors.organization?.message}>
-            <input {...register("organization")} className="ds-input" placeholder="Netlinks LTD" />
+          <FormField label={t("organization")} error={errors.organization?.message}>
+            <input {...register("organization")} className="ds-input" placeholder={t("organizationPlaceholder")} />
           </FormField>
-          <FormField label="Employment Type" error={errors.employmentType?.message}>
+          <FormField label={t("employmentType")} error={errors.employmentType?.message}>
             <SearchableSelect
               value={employmentTypeValue}
               options={employmentTypes.map((type) => ({ value: type, label: type }))}
-              placeholder="Select type"
-              searchPlaceholder="Search type..."
+              placeholder={t("selectType")}
+              searchPlaceholder={t("searchType")}
+              noMatchesLabel={common("noMatchesFound")}
               onChange={(value) => {
                 setValue("employmentType", value, { shouldDirty: true, shouldValidate: true });
               }}
@@ -77,45 +81,45 @@ export function ExperienceEntryDialog({ open, initialValues, onClose, onSave }: 
             }}
             className="h-4 w-4 rounded border-[color:var(--border-strong)] text-[color:var(--accent)]"
           />
-          I am currently working in this role
+          {t("currentlyWorking")}
         </label>
 
         <div className="grid gap-5 md:grid-cols-2">
-          <FormField label="Start Date" error={errors.startDate?.message}>
+          <FormField label={t("startDate")} error={errors.startDate?.message}>
             <DatePickerField
               value={startDateValue}
               onChange={(value) => setValue("startDate", value, { shouldDirty: true, shouldValidate: true })}
-              placeholder="Select date"
+              placeholder={t("selectDate")}
             />
           </FormField>
-          <FormField label="End Date" error={errors.endDate?.message}>
+          <FormField label={t("endDate")} error={errors.endDate?.message}>
             <DatePickerField
               value={endDateValue}
               onChange={(value) => setValue("endDate", value, { shouldDirty: true, shouldValidate: true })}
-              placeholder={currentlyWorking ? "Currently working" : "Select date"}
+              placeholder={currentlyWorking ? t("currentlyWorkingPlaceholder") : t("selectDate")}
               disabled={currentlyWorking}
             />
           </FormField>
         </div>
 
         <div className="grid gap-5 md:grid-cols-2">
-          <FormField label="Country" error={errors.country?.message}>
-            <input {...register("country")} className="ds-input" placeholder="Afghanistan" />
+          <FormField label={t("country")} error={errors.country?.message}>
+            <input {...register("country")} className="ds-input" placeholder={t("countryPlaceholder")} />
           </FormField>
-          <FormField label="Province" error={errors.province?.message}>
-            <input {...register("province")} className="ds-input" placeholder="Herat" />
+          <FormField label={t("province")} error={errors.province?.message}>
+            <input {...register("province")} className="ds-input" placeholder={t("provincePlaceholder")} />
           </FormField>
         </div>
 
-        <FormField label="Skills" error={errors.skills?.message} hint="Add relevant skills separated by commas">
-          <input {...register("skills")} className="ds-input" placeholder="UI design, Figma, Collaboration" />
+        <FormField label={t("skills")} error={errors.skills?.message} hint={t("skillsHint")}>
+          <input {...register("skills")} className="ds-input" placeholder={t("skillsPlaceholder")} />
         </FormField>
 
-        <FormField label="Description" error={errors.description?.message}>
+        <FormField label={t("description")} error={errors.description?.message}>
           <textarea
             {...register("description")}
             className="ds-input min-h-36"
-            placeholder="Duties and responsibilities"
+            placeholder={t("descriptionPlaceholder")}
           />
         </FormField>
 
@@ -125,14 +129,14 @@ export function ExperienceEntryDialog({ open, initialValues, onClose, onSave }: 
             onClick={onClose}
             className="ds-button-secondary rounded-full px-5 py-2.5 text-sm font-semibold"
           >
-            Cancel
+            {common("cancel")}
           </button>
           <button
             type="submit"
             disabled={isSubmitting}
             className="ds-button-primary rounded-full px-5 py-2.5 text-sm font-semibold disabled:opacity-70"
           >
-            Save
+            {common("save")}
           </button>
         </div>
       </form>

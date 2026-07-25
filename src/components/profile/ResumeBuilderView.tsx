@@ -1,29 +1,34 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import type { ReactNode } from "react";
+import { useLocale, useTranslations } from "next-intl";
 import { Badge, EmptyState, SectionHeading } from "@/components/ui";
-import { authCopy } from "@/config/auth";
 import { useAuthContext } from "@/context/auth-context";
 import { useProfileContext } from "@/context/profile-context";
 import type { ResumeTemplateId } from "@/context/app-context";
 import { getResumeAccessUrl } from "@/lib/resume-storage";
-import { getProfileCompletion, splitItems } from "@/components/profile/profile-view/profile-view-helpers";
-
-const templates: Array<{
-  id: ResumeTemplateId;
-  label: string;
-  description: string;
-}> = [
-  { id: "classic", label: "Classic", description: "Simple and formal for offices and NGOs." },
-  { id: "modern", label: "Modern", description: "Balanced layout with strong visual hierarchy." },
-  { id: "compact", label: "Compact", description: "Tighter layout for short CVs and fresh graduates." },
-];
+import { formatDateRangeLocalized, getProfileCompletion, splitItems } from "@/components/profile/profile-view/profile-view-helpers";
 
 export default function ResumeBuilderView() {
+  const t = useTranslations("resumeBuilder");
+  const common = useTranslations("profile.common");
+  const authT = useTranslations("auth");
+  const locale = useLocale();
   const { authenticated, user } = useAuthContext();
   const { profile, updateProfile } = useProfileContext();
   const [resumeActionError, setResumeActionError] = useState("");
   const [resumeActionBusy, setResumeActionBusy] = useState(false);
+
+  const templates: Array<{
+    id: ResumeTemplateId;
+    label: string;
+    description: string;
+  }> = [
+    { id: "classic", label: t("templates.classic.label"), description: t("templates.classic.description") },
+    { id: "modern", label: t("templates.modern.label"), description: t("templates.modern.description") },
+    { id: "compact", label: t("templates.compact.label"), description: t("templates.compact.description") },
+  ];
 
   const skills = useMemo(
     () =>
@@ -37,14 +42,15 @@ export default function ResumeBuilderView() {
   const documentTags = useMemo(() => splitItems(profile.documents), [profile.documents]);
   const hasUploadedResume = Boolean(profile.resumeStoragePath || profile.resumeUrl);
   const selectedTemplate: ResumeTemplateId = profile.resumeTemplate ?? "modern";
+  const selectedTemplateCopy = templates.find((template) => template.id === selectedTemplate);
 
   if (!authenticated) {
     return (
       <EmptyState
-        title="Sign in to build your resume"
-        description="Create your CV, choose a template, and export it as PDF after logging in."
+        title={t("signInTitle")}
+        description={t("signInDescription")}
         actionHref="/login"
-        actionLabel={authCopy.loginButtonLabel}
+        actionLabel={authT("loginButtonLabel")}
       />
     );
   }
@@ -60,7 +66,7 @@ export default function ResumeBuilderView() {
     const sourceUrl = profile.resumeUrl || "";
 
     if (!sourcePath && !sourceUrl) {
-      setResumeActionError("No uploaded resume found yet.");
+      setResumeActionError(t("noUploadedResume"));
       return;
     }
 
@@ -70,7 +76,7 @@ export default function ResumeBuilderView() {
     try {
       const url = sourcePath ? await getResumeAccessUrl(sourcePath) : sourceUrl;
       if (!url) {
-        setResumeActionError("We could not generate a download link.");
+        setResumeActionError(t("noDownloadLink"));
         if (previewWindow) previewWindow.close();
         return;
       }
@@ -89,11 +95,7 @@ export default function ResumeBuilderView() {
 
   return (
     <div className="resume-builder-page space-y-8">
-      <SectionHeading
-        eyebrow="Resume Builder"
-        title="Create a CV without Word"
-        description="Build your resume, choose a template, and save it as a PDF for applications."
-      />
+      <SectionHeading eyebrow={t("eyebrow")} title={t("title")} description={t("description")} />
 
       <section className="grid gap-5 xl:grid-cols-[0.95fr_1.05fr] print:block">
         <div className="resume-builder-controls space-y-5 print:hidden">
@@ -101,13 +103,11 @@ export default function ResumeBuilderView() {
             <div className="flex items-center justify-between gap-4">
               <div>
                 <p className="text-sm font-semibold uppercase tracking-[0.22em] text-[color:var(--foreground-muted)]">
-                  Choose a template
+                  {t("chooseTemplate")}
                 </p>
-                <p className="mt-2 text-sm text-[color:var(--foreground-muted)]">
-                  Pick a layout that matches the role you want to apply for.
-                </p>
+                <p className="mt-2 text-sm text-[color:var(--foreground-muted)]">{t("chooseTemplateHint")}</p>
               </div>
-              <Badge tone="info">{selectedTemplate}</Badge>
+              <Badge tone="info">{selectedTemplateCopy?.label ?? selectedTemplate}</Badge>
             </div>
 
             <div className="mt-5 grid gap-3">
@@ -128,28 +128,24 @@ export default function ResumeBuilderView() {
                       <p className="font-semibold">{template.label}</p>
                       <p className="mt-1 text-sm text-[color:var(--foreground-muted)]">{template.description}</p>
                     </div>
-                    {selectedTemplate === template.id ? <Badge tone="accent">Selected</Badge> : null}
+                    {selectedTemplate === template.id ? <Badge tone="accent">{t("selected")}</Badge> : null}
                   </div>
                 </button>
               ))}
             </div>
           </div>
 
-          <div className="rounded-[1.5rem] accent-panel p-6">
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-white/75">
-              Export
-            </p>
-            <h3 className="mt-3 text-2xl font-semibold">Save it as a PDF.</h3>
-            <p className="mt-3 text-sm leading-7 text-white/85">
-              Open the print dialog to download your resume as a PDF file.
-            </p>
+          <div className="accent-panel rounded-[1.5rem] p-6">
+            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-white/75">{t("exportEyebrow")}</p>
+            <h3 className="mt-3 text-2xl font-semibold">{t("exportTitle")}</h3>
+            <p className="mt-3 text-sm leading-7 text-white/85">{t("exportDescription")}</p>
             <div className="mt-5 flex flex-wrap gap-3">
               <button
                 type="button"
                 onClick={() => window.print()}
                 className="inline-flex rounded-full bg-white px-4 py-2.5 text-sm font-semibold text-[color:var(--accent)] transition hover:bg-white/90"
               >
-                Download PDF
+                {t("downloadPdf")}
               </button>
               <button
                 type="button"
@@ -157,7 +153,7 @@ export default function ResumeBuilderView() {
                 disabled={resumeActionBusy}
                 className="inline-flex rounded-full border border-white/20 bg-white/10 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-70"
               >
-                {resumeActionBusy ? "Opening..." : "Open uploaded CV"}
+                {resumeActionBusy ? t("opening") : t("openUploadedCv")}
               </button>
             </div>
             {resumeActionError ? <p className="mt-3 text-sm text-white/90">{resumeActionError}</p> : null}
@@ -172,31 +168,29 @@ export default function ResumeBuilderView() {
                 ? "bg-[#f7f4ef]"
                 : selectedTemplate === "compact"
                   ? "bg-[#f3f7ff]"
-              : "bg-[#f7f7fb]",
+                  : "bg-[#f7f7fb]",
             ].join(" ")}
           >
             <div className="flex items-start justify-between gap-4 border-b border-black/5 px-6 py-6">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.28em] text-black/45">
-                  KaarYab Afghanistan
-                </p>
+                <p className="text-xs font-semibold uppercase tracking-[0.28em] text-black/45">{t("brand")}</p>
                 <h2 className="mt-2 text-3xl font-semibold text-black">{profile.fullName}</h2>
                 <p className="mt-2 text-sm text-black/70">{profile.headline}</p>
                 <div className="mt-4 flex flex-wrap gap-2">
                   <span className="rounded-full bg-black/5 px-3 py-1 text-xs font-semibold text-black/70">
-                    Resume source: {hasUploadedResume ? "Uploaded CV" : "Profile text"}
+                    {t("resumeSource")}: {hasUploadedResume ? t("uploadedCv") : t("profileText")}
                   </span>
                   <span className="rounded-full bg-black/5 px-3 py-1 text-xs font-semibold text-black/70">
-                    Template: {selectedTemplate}
+                    {t("template")}: {selectedTemplate}
                   </span>
                 </div>
               </div>
-              <Badge tone="default">{user?.email ?? "Candidate profile"}</Badge>
+              <Badge tone="default">{user?.email ?? t("candidateProfile")}</Badge>
             </div>
 
             <div className="grid gap-6 px-6 py-6 lg:grid-cols-[0.92fr_1.08fr]">
               <div className="space-y-5">
-                <ResumePanel title="Profile snapshot">
+                <ResumePanel title={t("profileSnapshot")}>
                   <div className="grid gap-4 sm:grid-cols-[auto_1fr] sm:items-center">
                     <div className="flex h-16 w-16 items-center justify-center rounded-[1.25rem] bg-black/5 text-xl font-semibold text-black">
                       {getResumeInitials(profile.fullName)}
@@ -206,60 +200,60 @@ export default function ResumeBuilderView() {
                       <p className="mt-1 text-sm text-black/65">{profile.headline}</p>
                       <div className="mt-2 flex flex-wrap gap-2">
                         <span className="rounded-full bg-black/5 px-3 py-1 text-xs font-semibold text-black/70">
-                          {selectedTemplate}
+                          {selectedTemplateCopy?.label ?? selectedTemplate}
                         </span>
                         <span className="rounded-full bg-black/5 px-3 py-1 text-xs font-semibold text-black/70">
-                          {completion}% ready
+                          {completion}% {t("ready")}
                         </span>
                       </div>
                     </div>
                   </div>
                   <div className="mt-4 grid gap-2 sm:grid-cols-2">
-                    <ProfileLine label="Location" value={profile.location || "Not added"} />
+                    <ProfileLine label={t("location")} value={profile.location || common("notAdded")} />
                     <ProfileLine
-                      label="Resume source"
-                      value={hasUploadedResume ? "Uploaded CV" : "Profile text"}
+                      label={t("resumeSource")}
+                      value={hasUploadedResume ? t("uploadedCv") : t("profileText")}
                     />
                   </div>
                 </ResumePanel>
 
-                <ResumePanel title="Contact">
-                  <ProfileLine label="Location" value={profile.location} />
-                  <ProfileLine label="Phone" value={profile.phone || "Not added"} />
-                  <ProfileLine label="Email" value={user?.email ?? "Not added"} />
+                <ResumePanel title={t("contact")}>
+                  <ProfileLine label={t("location")} value={profile.location || common("notAdded")} />
+                  <ProfileLine label={t("phone")} value={profile.phone || common("notAdded")} />
+                  <ProfileLine label={t("email")} value={user?.email ?? common("notAdded")} />
                   <ProfileLine
-                    label="CV file"
+                    label={t("cvFile")}
                     value={
                       profile.resumeStoragePath
                         ? getFileNameFromPath(profile.resumeStoragePath)
                         : profile.resumeUrl
                           ? getFileNameFromUrl(profile.resumeUrl)
-                          : "Not added"
+                          : common("notAdded")
                     }
                   />
                 </ResumePanel>
 
-                <ResumePanel title="Skills">
-                  <TagWrap items={skills.length > 0 ? skills : ["Add your skills"]} />
+                <ResumePanel title={t("skills")}>
+                  <TagWrap items={skills.length > 0 ? skills : [t("addYourSkills")]} />
                 </ResumePanel>
 
-                <ResumePanel title="Languages">
-                  <p className="text-sm leading-7 text-black/75">{profile.languages}</p>
+                <ResumePanel title={t("languages")}>
+                  <p className="text-sm leading-7 text-black/75">{profile.languages || common("notAdded")}</p>
                 </ResumePanel>
 
-                <ResumePanel title="Quick links">
+                <ResumePanel title={t("quickLinks")}>
                   <div className="space-y-2">
-                    <ProfileLine label="Portfolio" value={profile.portfolioUrl || "Not added"} />
-                    <ProfileLine label="LinkedIn" value={profile.linkedinUrl || "Not added"} />
-                    <ProfileLine label="GitHub" value={profile.githubUrl || "Not added"} />
-                    <ProfileLine label="Twitter" value={profile.twitterUrl || "Not added"} />
-                    <ProfileLine label="Video intro" value={profile.introVideoUrl || "Not added"} />
+                    <ProfileLine label={t("portfolio")} value={profile.portfolioUrl || common("notAdded")} />
+                    <ProfileLine label={t("linkedin")} value={profile.linkedinUrl || common("notAdded")} />
+                    <ProfileLine label={t("github")} value={profile.githubUrl || common("notAdded")} />
+                    <ProfileLine label={t("twitter")} value={profile.twitterUrl || common("notAdded")} />
+                    <ProfileLine label={t("videoIntro")} value={profile.introVideoUrl || common("notAdded")} />
                   </div>
                 </ResumePanel>
               </div>
 
               <div className="space-y-5">
-                <ResumePanel title="Experience">
+                <ResumePanel title={t("experience")}>
                   {profile.experienceEntries.length > 0 ? (
                     <div className="space-y-3">
                       {profile.experienceEntries.map((entry) => (
@@ -267,20 +261,25 @@ export default function ResumeBuilderView() {
                           <p className="break-words text-sm font-semibold text-black">{entry.position}</p>
                           <p className="mt-1 break-words text-xs text-black/55">{entry.organization}</p>
                           <p className="mt-1 text-xs text-black/45">
-                            {formatDateRange(entry.startDate, entry.endDate, entry.currentlyWorking)}
+                            {formatDateRangeLocalized(
+                              entry.startDate,
+                              entry.endDate,
+                              entry.currentlyWorking,
+                              locale,
+                              t("present"),
+                              t("dateNotAdded")
+                            )}
                           </p>
                           <p className="mt-2 break-words text-sm leading-6 text-black/75">{entry.description}</p>
                         </div>
                       ))}
                     </div>
                   ) : (
-                    <p className="text-sm leading-7 whitespace-pre-line text-black/75">
-                      {profile.experience || "Not added"}
-                    </p>
+                    <p className="text-sm leading-7 whitespace-pre-line text-black/75">{profile.experience || common("notAdded")}</p>
                   )}
                 </ResumePanel>
 
-                <ResumePanel title="Education">
+                <ResumePanel title={t("education")}>
                   {profile.educationEntries.length > 0 ? (
                     <div className="space-y-3">
                       {profile.educationEntries.map((entry) => (
@@ -288,43 +287,35 @@ export default function ResumeBuilderView() {
                           <p className="break-words text-sm font-semibold text-black">{entry.degree}</p>
                           <p className="mt-1 break-words text-xs text-black/55">{entry.institution}</p>
                           <p className="mt-1 text-xs text-black/45">
-                            {formatDateRange(entry.startDate, entry.endDate, false)}
+                            {formatDateRangeLocalized(entry.startDate, entry.endDate, false, locale, t("present"), t("dateNotAdded"))}
                           </p>
                           <p className="mt-2 break-words text-sm leading-6 text-black/75">{entry.fieldOfStudy}</p>
                         </div>
                       ))}
                     </div>
                   ) : (
-                    <p className="text-sm leading-7 whitespace-pre-line text-black/75">
-                      {profile.education || "Not added"}
-                    </p>
+                    <p className="text-sm leading-7 whitespace-pre-line text-black/75">{profile.education || common("notAdded")}</p>
                   )}
                 </ResumePanel>
 
-                <ResumePanel title="Summary">
-                  <p className="break-words text-sm leading-7 text-black/75">{profile.bio}</p>
+                <ResumePanel title={t("summary")}>
+                  <p className="break-words text-sm leading-7 text-black/75">{profile.bio || common("notAdded")}</p>
                 </ResumePanel>
 
-                <ResumePanel title="Supporting documents">
+                <ResumePanel title={t("supportingDocuments")}>
                   <div className="space-y-3 text-sm text-black/75">
-                    <ProfileLine
-                      label="Resume"
-                      value={profile.resumeStoragePath ? getFileNameFromPath(profile.resumeStoragePath) : "Not added"}
-                    />
+                    <ProfileLine label={t("resume")} value={profile.resumeStoragePath ? getFileNameFromPath(profile.resumeStoragePath) : common("notAdded")} />
                     <div className="rounded-[1rem] border border-black/5 bg-white px-4 py-4">
-                      <p className="text-sm font-medium text-black/55">Documents</p>
+                      <p className="text-sm font-medium text-black/55">{t("documents")}</p>
                       <div className="mt-3 flex flex-wrap gap-2">
                         {documentTags.length > 0 ? (
                           documentTags.map((item) => (
-                            <span
-                              key={item}
-                              className="rounded-full bg-black/5 px-3 py-1 text-xs font-semibold text-black/75"
-                            >
+                            <span key={item} className="rounded-full bg-black/5 px-3 py-1 text-xs font-semibold text-black/75">
                               {item}
                             </span>
                           ))
                         ) : (
-                          <span className="text-sm text-black/55">Not added</span>
+                          <span className="text-sm text-black/55">{common("notAdded")}</span>
                         )}
                       </div>
                     </div>
@@ -336,10 +327,10 @@ export default function ResumeBuilderView() {
                           <p className="break-words text-sm font-semibold text-black">{entry.title}</p>
                           <p className="mt-1 text-xs text-black/55">{entry.documentType}</p>
                           <p className="mt-2 break-words text-sm leading-6 text-black/75">
-                            {entry.description || "Supporting document"}
+                            {entry.description || t("supportingDocument")}
                           </p>
                           <p className="mt-2 break-words text-xs text-black/45">
-                            {entry.attachmentFileName || "Attached file"}
+                            {entry.attachmentFileName || t("attachedFile")}
                           </p>
                         </div>
                       ))}
@@ -355,7 +346,7 @@ export default function ResumeBuilderView() {
   );
 }
 
-function ResumePanel({ title, children }: { title: string; children: React.ReactNode }) {
+function ResumePanel({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section className="rounded-[1.35rem] border border-black/5 bg-white/70 px-5 py-5 shadow-sm">
       <h3 className="text-sm font-semibold uppercase tracking-[0.22em] text-black/45">{title}</h3>
@@ -383,32 +374,6 @@ function TagWrap({ items }: { items: string[] }) {
       ))}
     </div>
   );
-}
-
-function formatDateRange(startDate: string, endDate: string, currentlyWorking: boolean) {
-  const startLabel = formatDateLabel(startDate);
-  const endLabel = currentlyWorking ? "Present" : formatDateLabel(endDate);
-
-  if (startLabel && endLabel) {
-    return `${startLabel} - ${endLabel}`;
-  }
-
-  return startLabel || endLabel || "Date not added";
-}
-
-function formatDateLabel(value: string) {
-  if (!value) return "";
-
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) {
-    return value;
-  }
-
-  return new Intl.DateTimeFormat("en", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  }).format(date);
 }
 
 function getFileNameFromPath(value: string) {

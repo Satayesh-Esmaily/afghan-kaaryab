@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useLocale } from "next-intl";
 
 type DatePickerFieldProps = {
   value: string;
@@ -14,31 +15,19 @@ type CalendarCell = {
   date: Date | null;
 };
 
-const monthLabels = [
-  "Jan",
-  "Feb",
-  "Mar",
-  "Apr",
-  "May",
-  "Jun",
-  "Jul",
-  "Aug",
-  "Sep",
-  "Oct",
-  "Nov",
-  "Dec",
-];
-
 export default function DatePickerField({
   value,
   onChange,
   placeholder = "Select date",
   disabled = false,
 }: DatePickerFieldProps) {
+  const locale = useLocale();
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement | null>(null);
   const selectedDate = useMemo(() => parseIsoDate(value), [value]);
   const [viewDate, setViewDate] = useState<Date>(() => selectedDate ?? new Date());
+  const monthFormatter = useMemo(() => new Intl.DateTimeFormat(locale, { month: "short" }), [locale]);
+  const labels = useMemo(() => getCalendarLabels(locale), [locale]);
 
   useEffect(() => {
     function handlePointerDown(event: PointerEvent) {
@@ -65,7 +54,7 @@ export default function DatePickerField({
   const calendar = useMemo(() => buildCalendar(viewDate), [viewDate]);
   const currentMonth = viewDate.getMonth();
   const currentYear = viewDate.getFullYear();
-  const selectedLabel = selectedDate ? formatDisplayDate(selectedDate) : "";
+  const selectedLabel = selectedDate ? formatDisplayDate(selectedDate, locale) : "";
 
   return (
     <div ref={rootRef} className="relative">
@@ -107,7 +96,7 @@ export default function DatePickerField({
               type="button"
               onClick={() => setViewDate((current) => addMonths(current, -1))}
               className="grid h-9 w-9 place-items-center rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] text-[color:var(--foreground)] shadow-sm transition hover:border-[color:var(--accent-soft)] hover:bg-[color:var(--surface-soft)]"
-              aria-label="Previous month"
+              aria-label={labels.previousMonth}
             >
               <ArrowIcon direction="left" />
             </button>
@@ -118,9 +107,9 @@ export default function DatePickerField({
                 onChange={(event) => setViewDate((current) => new Date(current.getFullYear(), Number(event.target.value), 1))}
                 className="appearance-none rounded-[1rem] border border-[color:var(--border)] bg-[color:var(--surface)] px-3 py-2.5 text-sm text-[color:var(--foreground)] shadow-sm outline-none transition hover:bg-[color:var(--surface-soft)] focus:border-[color:var(--accent)] focus:shadow-[0_0_0_4px_rgba(114,93,255,0.14)]"
               >
-                {monthLabels.map((label, index) => (
-                  <option key={label} value={index}>
-                    {label}
+                {Array.from({ length: 12 }, (_, index) => (
+                  <option key={index} value={index}>
+                    {monthFormatter.format(new Date(2024, index, 1))}
                   </option>
                 ))}
               </select>
@@ -141,7 +130,7 @@ export default function DatePickerField({
               type="button"
               onClick={() => setViewDate((current) => addMonths(current, 1))}
               className="grid h-9 w-9 place-items-center rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] text-[color:var(--foreground)] shadow-sm transition hover:border-[color:var(--accent-soft)] hover:bg-[color:var(--surface-soft)]"
-              aria-label="Next month"
+              aria-label={labels.nextMonth}
             >
               <ArrowIcon direction="right" />
             </button>
@@ -149,7 +138,7 @@ export default function DatePickerField({
           </div>
 
           <div className="grid grid-cols-7 border-b border-[color:var(--border)] px-3 py-2 text-center text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--foreground-muted)]">
-            {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((day) => (
+            {labels.weekdays.map((day) => (
               <div key={day} className="py-2">
                 {day}
               </div>
@@ -247,11 +236,36 @@ function toIsoDate(date: Date) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 }
 
-function formatDisplayDate(date: Date) {
-  const day = date.getDate();
-  const month = monthLabels[date.getMonth()] ?? "";
-  const year = date.getFullYear();
-  return `${day} ${month}, ${year}`;
+function formatDisplayDate(date: Date, locale: string) {
+  return new Intl.DateTimeFormat(locale, {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  }).format(date);
+}
+
+function getCalendarLabels(locale: string) {
+  if (locale.startsWith("fa")) {
+    return {
+      previousMonth: "ماه قبل",
+      nextMonth: "ماه بعد",
+      weekdays: ["ی", "د", "س", "چ", "پ", "ج", "ش"],
+    };
+  }
+
+  if (locale.startsWith("ps")) {
+    return {
+      previousMonth: "میاشت مخکۍ",
+      nextMonth: "میاشت وروسته",
+      weekdays: ["ی", "د", "س", "چ", "پ", "ج", "ش"],
+    };
+  }
+
+  return {
+    previousMonth: "Previous month",
+    nextMonth: "Next month",
+    weekdays: ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"],
+  };
 }
 
 function ChevronIcon({ className = "" }: { className?: string }) {

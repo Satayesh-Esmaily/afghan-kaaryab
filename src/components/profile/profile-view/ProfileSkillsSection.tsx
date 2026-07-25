@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import FormField from "@/components/common/FormField";
 import { ProfileSection } from "@/components/profile/profile-view/ProfileViewParts";
 import type { ProfileFormValues } from "@/lib/schemas";
@@ -22,9 +23,11 @@ export function ProfileSkillsSection({
   onRemoveSkill,
   onRemoveLanguage,
 }: ProfileSkillsSectionProps) {
+  const t = useTranslations("profile.skills");
+
   return (
     <>
-      <ProfileSection title="Skills" description="List your professional skills." badge={`${skills.length}/20`}>
+      <ProfileSection title={t("title")} description={t("description")} badge={`${skills.length}/20`}>
         <div className="rounded-[1.25rem] border border-[color:var(--border)] bg-[color:var(--surface-soft)] p-4">
           <div className="flex flex-wrap gap-2">
             {skills.length > 0 ? (
@@ -37,7 +40,7 @@ export function ProfileSkillsSection({
                     type="button"
                     onClick={() => onRemoveSkill(skill)}
                     className="grid h-4 w-4 place-items-center rounded-full bg-[color:var(--surface-soft)] text-[10px] text-[color:var(--foreground-muted)] transition hover:text-[color:var(--foreground-strong)]"
-                    aria-label={`Remove ${skill}`}
+                    aria-label={t("removeSkill", { skill })}
                   >
                     x
                   </button>
@@ -45,22 +48,18 @@ export function ProfileSkillsSection({
                 </span>
               ))
             ) : (
-              <p className="text-sm text-[color:var(--foreground-muted)]">Add your skills separated by commas.</p>
+              <p className="text-sm text-[color:var(--foreground-muted)]">{t("addSkillsHint")}</p>
             )}
           </div>
         </div>
         <div className="mt-4 grid gap-4 md:grid-cols-[1fr_auto] md:items-end">
-          <FormField label="Type a skill" error={errors.skills?.message} hint="Separate with commas">
-            <input
-              {...register("skills")}
-              className="ds-input"
-              placeholder="AutoCAD, Leadership, Project management"
-            />
+          <FormField label={t("typeSkill")} error={errors.skills?.message} hint={t("skillsHint")}>
+            <input {...register("skills")} className="ds-input" placeholder={t("skillsPlaceholder")} />
           </FormField>
         </div>
       </ProfileSection>
 
-      <ProfileSection title="Languages" description="List the languages you speak fluently." badge={`${languages.length}/20`}>
+      <ProfileSection title={t("languagesTitle")} description={t("languagesDescription")} badge={`${languages.length}/20`}>
         <div className="rounded-[1.25rem] border border-[color:var(--border)] bg-[color:var(--surface-soft)] p-4">
           <div className="flex flex-wrap gap-2">
             {languages.length > 0 ? (
@@ -73,7 +72,7 @@ export function ProfileSkillsSection({
                     type="button"
                     onClick={() => onRemoveLanguage(language)}
                     className="grid h-4 w-4 place-items-center rounded-full bg-[color:var(--surface-soft)] text-[10px] text-[color:var(--foreground-muted)] transition hover:text-[color:var(--foreground-strong)]"
-                    aria-label={`Remove ${language}`}
+                    aria-label={t("removeLanguage", { language })}
                   >
                     x
                   </button>
@@ -81,12 +80,12 @@ export function ProfileSkillsSection({
                 </span>
               ))
             ) : (
-              <p className="text-sm text-[color:var(--foreground-muted)]">Add the languages you speak.</p>
+              <p className="text-sm text-[color:var(--foreground-muted)]">{t("addLanguagesHint")}</p>
             )}
           </div>
         </div>
-        <FormField label="Languages" error={errors.languages?.message} hint="Separate with commas">
-          <input {...register("languages")} className="ds-input" placeholder="Dari, Pashto, English" />
+        <FormField label={t("languagesField")} error={errors.languages?.message} hint={t("languagesHint")}>
+          <input {...register("languages")} className="ds-input" placeholder={t("languagesPlaceholder")} />
         </FormField>
       </ProfileSection>
     </>

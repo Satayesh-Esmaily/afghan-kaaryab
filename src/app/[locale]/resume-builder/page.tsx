@@ -1,10 +1,15 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import ResumeBuilderView from "@/components/profile/ResumeBuilderView";
 
-export const metadata: Metadata = {
-  title: "Resume Builder",
-  description: "Build and export a job-ready resume on KaarYab Afghanistan.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("navigation.pages.resumeBuilder");
+
+  return {
+    title: t("title"),
+    description: t("subtitle"),
+  };
+}
 
 export default function ResumeBuilderPage() {
   return <ResumeBuilderView />;

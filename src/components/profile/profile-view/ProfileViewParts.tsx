@@ -1,11 +1,12 @@
 "use client";
 
 import type { ReactNode, RefObject } from "react";
+import { useLocale, useTranslations } from "next-intl";
 import { Badge } from "@/components/ui";
 import type { AwardEntry, CertificationEntry, DocumentEntry, EducationEntry, ExperienceEntry } from "@/lib/app-state";
 import {
   formatDateLabel,
-  formatDateRange,
+  formatDateRangeLocalized,
   getInitials,
   splitItems,
 } from "@/components/profile/profile-view/profile-view-helpers";
@@ -96,12 +97,14 @@ export function ResumeTab({
   onDeleteFile,
   onDownloadFile,
 }: ResumeTabProps) {
+  const t = useTranslations("profile.resume");
+
   return (
     <section className="rounded-[1.75rem] panel p-6 sm:p-8">
       <div className="grid gap-6 xl:grid-cols-[260px_1fr]">
         <aside className="space-y-2">
-          <h2 className="text-2xl font-semibold tracking-tight text-[color:var(--foreground)]">Resumes</h2>
-          <p className="text-sm leading-6 text-[color:var(--foreground-muted)]">Add your resume here.</p>
+          <h2 className="text-2xl font-semibold tracking-tight text-[color:var(--foreground)]">{t("title")}</h2>
+          <p className="text-sm leading-6 text-[color:var(--foreground-muted)]">{t("description")}</p>
         </aside>
 
         <div className="space-y-4">
@@ -111,14 +114,14 @@ export function ResumeTab({
                 <PlusIcon />
               </span>
               <span className="text-sm font-medium text-[color:var(--foreground)]">
-                {resumeUploadBusy ? "Uploading resume..." : "Choose file(s) or drag them here to upload."}
+                {resumeUploadBusy ? t("uploading") : t("uploadPrompt")}
               </span>
             </button>
 
             <p className="text-end text-xs font-medium leading-5 text-[color:var(--foreground-muted)]">
-              PDF/ DOC/ DOCX
+              {t("allowedTypes")}
               <br />
-              Max 5 MB
+              {t("maxSize")}
             </p>
 
             <input
@@ -158,7 +161,7 @@ export function ResumeTab({
                   <button
                     type="button"
                     className="hover:text-[color:var(--foreground)]"
-                    aria-label={`Delete ${fileName}`}
+                    aria-label={t("deleteFile", { fileName })}
                     onClick={() => void onDeleteFile()}
                   >
                     <TrashIcon />
@@ -166,7 +169,7 @@ export function ResumeTab({
                   <button
                     type="button"
                     className="hover:text-[color:var(--foreground)]"
-                    aria-label={`Download ${fileName}`}
+                    aria-label={t("downloadFile", { fileName })}
                     onClick={() => void onDownloadFile()}
                   >
                     <DownloadIcon />
@@ -208,11 +211,11 @@ export function ProfileValueBox({ label, value }: ProfileValueBoxProps) {
 }
 
 export function EntriesHeader({ actionLabel, onAction }: EntriesHeaderProps) {
+  const t = useTranslations("profile.common");
+
   return (
     <div className="flex items-center justify-between gap-4">
-      <div className="max-w-2xl text-sm text-[color:var(--foreground-muted)]">
-        Build your profile with structured cards that are easier to scan and edit.
-      </div>
+      <div className="max-w-2xl text-sm text-[color:var(--foreground-muted)]">{t("entriesHeaderHint")}</div>
       <button
         type="button"
         onClick={onAction}
@@ -243,6 +246,9 @@ export function EmptyListCard({ title, description, actionLabel, onAction }: Emp
 }
 
 export function ExperienceCard({ entry, onEdit, onDelete }: ExperienceCardProps) {
+  const t = useTranslations("profile.experience");
+  const locale = useLocale();
+
   return (
     <article className="rounded-[1.5rem] border border-[color:var(--border)] bg-[color:var(--surface)] p-4 shadow-sm">
       <div className="flex items-start justify-between gap-4">
@@ -254,7 +260,7 @@ export function ExperienceCard({ entry, onEdit, onDelete }: ExperienceCardProps)
             <p className="truncate text-base font-semibold text-[color:var(--foreground-strong)]">{entry.position}</p>
             <p className="mt-1 text-sm text-[color:var(--foreground-muted)]">{entry.organization}</p>
             <p className="mt-1 text-xs text-[color:var(--foreground-muted)]">
-              {formatDateRange(entry.startDate, entry.endDate, entry.currentlyWorking)}
+              {formatDateRangeLocalized(entry.startDate, entry.endDate, entry.currentlyWorking, locale, t("present"), t("dateNotAdded"))}
             </p>
             <p className="mt-1 text-xs text-[color:var(--foreground-muted)]">
               {entry.country}
@@ -264,10 +270,10 @@ export function ExperienceCard({ entry, onEdit, onDelete }: ExperienceCardProps)
         </div>
 
         <div className="flex items-center gap-1.5 text-[color:var(--foreground-muted)]">
-          <IconButton label="Edit experience" onClick={onEdit}>
+          <IconButton label={t("edit")} onClick={onEdit}>
             <PencilIcon />
           </IconButton>
-          <IconButton label="Delete experience" onClick={onDelete}>
+          <IconButton label={t("delete")} onClick={onDelete}>
             <TrashIcon />
           </IconButton>
         </div>
@@ -292,6 +298,9 @@ export function ExperienceCard({ entry, onEdit, onDelete }: ExperienceCardProps)
 }
 
 export function EducationCard({ entry, onEdit, onDelete }: EducationCardProps) {
+  const t = useTranslations("profile.education");
+  const locale = useLocale();
+
   return (
     <article className="rounded-[1.5rem] border border-[color:var(--border)] bg-[color:var(--surface)] p-4 shadow-sm">
       <div className="flex items-start justify-between gap-4">
@@ -303,7 +312,7 @@ export function EducationCard({ entry, onEdit, onDelete }: EducationCardProps) {
             <p className="truncate text-base font-semibold text-[color:var(--foreground-strong)]">{entry.degree}</p>
             <p className="mt-1 text-sm text-[color:var(--foreground-muted)]">{entry.institution}</p>
             <p className="mt-1 text-xs text-[color:var(--foreground-muted)]">
-              {formatDateRange(entry.startDate, entry.endDate, false)}
+              {formatDateRangeLocalized(entry.startDate, entry.endDate, false, locale, t("present"), t("dateNotAdded"))}
             </p>
             <p className="mt-1 text-xs text-[color:var(--foreground-muted)]">
               {entry.fieldOfStudy}
@@ -313,10 +322,10 @@ export function EducationCard({ entry, onEdit, onDelete }: EducationCardProps) {
         </div>
 
         <div className="flex items-center gap-1.5 text-[color:var(--foreground-muted)]">
-          <IconButton label="Edit education" onClick={onEdit}>
+          <IconButton label={t("edit")} onClick={onEdit}>
             <PencilIcon />
           </IconButton>
-          <IconButton label="Delete education" onClick={onDelete}>
+          <IconButton label={t("delete")} onClick={onDelete}>
             <TrashIcon />
           </IconButton>
         </div>
@@ -328,6 +337,9 @@ export function EducationCard({ entry, onEdit, onDelete }: EducationCardProps) {
 }
 
 export function CertificationCard({ entry, onEdit, onDelete }: CertificationCardProps) {
+  const t = useTranslations("profile.certifications");
+  const locale = useLocale();
+
   return (
     <article className="rounded-[1.5rem] border border-[color:var(--border)] bg-[color:var(--surface)] p-4 shadow-sm">
       <div className="flex items-start justify-between gap-4">
@@ -339,20 +351,22 @@ export function CertificationCard({ entry, onEdit, onDelete }: CertificationCard
             <p className="truncate text-base font-semibold text-[color:var(--foreground-strong)]">{entry.title}</p>
             <p className="mt-1 text-sm text-[color:var(--foreground-muted)]">{entry.issuingOrganization}</p>
             <p className="mt-1 text-xs text-[color:var(--foreground-muted)]">
-              Issued {formatDateLabel(entry.issueDate)}
-              {entry.expirationDate ? ` · Expires ${formatDateLabel(entry.expirationDate)}` : ""}
+              {t("issued")} {formatDateLabel(entry.issueDate, locale)}
+              {entry.expirationDate ? ` · ${t("expires")} ${formatDateLabel(entry.expirationDate, locale)}` : ""}
             </p>
             {entry.credentialId ? (
-              <p className="mt-1 text-xs text-[color:var(--foreground-muted)]">Credential ID: {entry.credentialId}</p>
+              <p className="mt-1 text-xs text-[color:var(--foreground-muted)]">
+                {t("credentialId")}: {entry.credentialId}
+              </p>
             ) : null}
           </div>
         </div>
 
         <div className="flex items-center gap-1.5 text-[color:var(--foreground-muted)]">
-          <IconButton label="Edit certification" onClick={onEdit}>
+          <IconButton label={t("edit")} onClick={onEdit}>
             <PencilIcon />
           </IconButton>
-          <IconButton label="Delete certification" onClick={onDelete}>
+          <IconButton label={t("delete")} onClick={onDelete}>
             <TrashIcon />
           </IconButton>
         </div>
@@ -362,11 +376,11 @@ export function CertificationCard({ entry, onEdit, onDelete }: CertificationCard
 
       <div className="mt-4 flex flex-wrap gap-2">
         {entry.certificationUrl ? (
-          <ActionChip label="Open link" onClick={() => window.open(entry.certificationUrl, "_blank", "noopener,noreferrer")} />
+          <ActionChip label={t("openLink")} onClick={() => window.open(entry.certificationUrl, "_blank", "noopener,noreferrer")} />
         ) : null}
         {entry.attachmentUrl ? (
           <ActionChip
-            label={entry.attachmentFileName || "Open attachment"}
+            label={entry.attachmentFileName || t("openAttachment")}
             onClick={() => window.open(entry.attachmentUrl, "_blank", "noopener,noreferrer")}
           />
         ) : null}
@@ -376,6 +390,9 @@ export function CertificationCard({ entry, onEdit, onDelete }: CertificationCard
 }
 
 export function AwardCard({ entry, onEdit, onDelete }: AwardCardProps) {
+  const t = useTranslations("profile.awards");
+  const locale = useLocale();
+
   return (
     <article className="rounded-[1.5rem] border border-[color:var(--border)] bg-[color:var(--surface)] p-4 shadow-sm">
       <div className="flex items-start justify-between gap-4">
@@ -386,15 +403,15 @@ export function AwardCard({ entry, onEdit, onDelete }: AwardCardProps) {
           <div className="min-w-0">
             <p className="truncate text-base font-semibold text-[color:var(--foreground-strong)]">{entry.title}</p>
             <p className="mt-1 text-sm text-[color:var(--foreground-muted)]">{entry.issuedBy}</p>
-            <p className="mt-1 text-xs text-[color:var(--foreground-muted)]">{formatDateLabel(entry.date)}</p>
+            <p className="mt-1 text-xs text-[color:var(--foreground-muted)]">{formatDateLabel(entry.date, locale)}</p>
           </div>
         </div>
 
         <div className="flex items-center gap-1.5 text-[color:var(--foreground-muted)]">
-          <IconButton label="Edit award" onClick={onEdit}>
+          <IconButton label={t("edit")} onClick={onEdit}>
             <PencilIcon />
           </IconButton>
-          <IconButton label="Delete award" onClick={onDelete}>
+          <IconButton label={t("delete")} onClick={onDelete}>
             <TrashIcon />
           </IconButton>
         </div>
@@ -404,11 +421,11 @@ export function AwardCard({ entry, onEdit, onDelete }: AwardCardProps) {
 
       <div className="mt-4 flex flex-wrap gap-2">
         {entry.referenceUrl ? (
-          <ActionChip label="Open link" onClick={() => window.open(entry.referenceUrl, "_blank", "noopener,noreferrer")} />
+          <ActionChip label={t("openLink")} onClick={() => window.open(entry.referenceUrl, "_blank", "noopener,noreferrer")} />
         ) : null}
         {entry.attachmentUrl ? (
           <ActionChip
-            label={entry.attachmentFileName || "Open attachment"}
+            label={entry.attachmentFileName || t("openAttachment")}
             onClick={() => window.open(entry.attachmentUrl, "_blank", "noopener,noreferrer")}
           />
         ) : null}
@@ -418,6 +435,8 @@ export function AwardCard({ entry, onEdit, onDelete }: AwardCardProps) {
 }
 
 export function DocumentCard({ entry, onEdit, onDelete }: DocumentCardProps) {
+  const t = useTranslations("profile.documents");
+
   return (
     <article className="rounded-[1.5rem] border border-[color:var(--border)] bg-[color:var(--surface)] p-4 shadow-sm">
       <div className="flex items-start justify-between gap-4">
@@ -432,10 +451,10 @@ export function DocumentCard({ entry, onEdit, onDelete }: DocumentCardProps) {
         </div>
 
         <div className="flex items-center gap-1.5 text-[color:var(--foreground-muted)]">
-          <IconButton label="Edit document" onClick={onEdit}>
+          <IconButton label={t("edit")} onClick={onEdit}>
             <PencilIcon />
           </IconButton>
-          <IconButton label="Delete document" onClick={onDelete}>
+          <IconButton label={t("delete")} onClick={onDelete}>
             <TrashIcon />
           </IconButton>
         </div>
@@ -446,7 +465,7 @@ export function DocumentCard({ entry, onEdit, onDelete }: DocumentCardProps) {
       <div className="mt-4 flex flex-wrap gap-2">
         {entry.attachmentUrl ? (
           <ActionChip
-            label={entry.attachmentFileName || "Open attachment"}
+            label={entry.attachmentFileName || t("openAttachment")}
             onClick={() => window.open(entry.attachmentUrl, "_blank", "noopener,noreferrer")}
           />
         ) : null}

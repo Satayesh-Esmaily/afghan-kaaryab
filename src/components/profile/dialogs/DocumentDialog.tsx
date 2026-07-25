@@ -3,6 +3,7 @@
 import { useRef } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslations } from "next-intl";
 import FormField from "@/components/common/FormField";
 import SearchableSelect from "@/components/common/SearchableSelect";
 import { useAttachmentUpload } from "@/hooks/profile/useAttachmentUpload";
@@ -18,6 +19,8 @@ type DocumentDialogProps = {
 };
 
 export function DocumentEntryDialog({ open, initialValues, userId, onClose, onSave }: DocumentDialogProps) {
+  const t = useTranslations("profile.dialogs.document");
+  const common = useTranslations("common");
   const attachmentInputRef = useRef<HTMLInputElement | null>(null);
   const {
     attachmentBusy,
@@ -42,7 +45,7 @@ export function DocumentEntryDialog({ open, initialValues, userId, onClose, onSa
   if (!open) return null;
 
   return (
-    <DialogShell title={initialValues ? "Edit Document" : "Add Document"} onClose={onClose}>
+    <DialogShell title={initialValues ? t("editTitle") : t("addTitle")} onClose={onClose}>
       <form
         onSubmit={handleSubmit((values) => {
           onSave(values);
@@ -50,24 +53,25 @@ export function DocumentEntryDialog({ open, initialValues, userId, onClose, onSa
         })}
         className="space-y-5"
       >
-        <FormField label="Title" error={errors.title?.message}>
-          <input {...register("title")} className="ds-input" placeholder="National ID" />
+        <FormField label={t("title")} error={errors.title?.message}>
+          <input {...register("title")} className="ds-input" placeholder={t("titlePlaceholder")} />
         </FormField>
 
-        <FormField label="Document Type" error={errors.documentType?.message}>
+        <FormField label={t("documentType")} error={errors.documentType?.message}>
           <SearchableSelect
             value={documentTypeValue}
             options={documentTypes.map((type) => ({ value: type, label: type }))}
-            placeholder="Select type"
-            searchPlaceholder="Search document type..."
+            placeholder={t("selectType")}
+            searchPlaceholder={t("searchType")}
+            noMatchesLabel={common("noMatchesFound")}
             onChange={(value) => {
               setValue("documentType", value, { shouldDirty: true, shouldValidate: true });
             }}
           />
         </FormField>
 
-        <FormField label="Description" error={errors.description?.message} hint="Optional">
-          <textarea {...register("description")} className="ds-input min-h-28" placeholder="Add notes about this document." />
+        <FormField label={t("description")} error={errors.description?.message} hint={t("optional")}>
+          <textarea {...register("description")} className="ds-input min-h-28" placeholder={t("descriptionPlaceholder")} />
         </FormField>
 
         <input {...register("attachmentUrl")} type="hidden" />
@@ -75,14 +79,14 @@ export function DocumentEntryDialog({ open, initialValues, userId, onClose, onSa
         <input {...register("attachmentFileName")} type="hidden" />
 
         <div className="space-y-2">
-          <p className="text-sm font-medium text-[color:var(--foreground-strong)]">Attachment</p>
+          <p className="text-sm font-medium text-[color:var(--foreground-strong)]">{t("attachment")}</p>
           <button
             type="button"
             onClick={() => attachmentInputRef.current?.click()}
             className="flex w-full items-center justify-between gap-4 rounded-[1rem] border border-dashed border-[color:var(--border)] bg-[color:var(--surface-soft)] px-4 py-3 text-start text-sm text-[color:var(--foreground-muted)]"
           >
-            <span>{attachmentBusy ? "Uploading file..." : attachmentFileName || "Choose a file or drag it here to upload."}</span>
-            <span className="shrink-0 text-xs font-medium uppercase tracking-[0.18em]">PDF / JPG / PNG / DOC</span>
+            <span>{attachmentBusy ? t("uploading") : attachmentFileName || t("chooseFile")}</span>
+            <span className="shrink-0 text-xs font-medium uppercase tracking-[0.18em]">{t("allowedTypes")}</span>
           </button>
           <input
             ref={attachmentInputRef}
@@ -99,7 +103,7 @@ export function DocumentEntryDialog({ open, initialValues, userId, onClose, onSa
               void uploadAttachment(file)
                 .then((result) => {
                   if (!result) {
-                    setAttachmentError("We could not upload the file. Please try again.");
+                    setAttachmentError(t("uploadError"));
                     return;
                   }
 
@@ -121,14 +125,14 @@ export function DocumentEntryDialog({ open, initialValues, userId, onClose, onSa
             onClick={onClose}
             className="ds-button-secondary rounded-full px-5 py-2.5 text-sm font-semibold"
           >
-            Cancel
+            {common("cancel")}
           </button>
           <button
             type="submit"
             disabled={isSubmitting || attachmentBusy}
             className="ds-button-primary rounded-full px-5 py-2.5 text-sm font-semibold disabled:opacity-70"
           >
-            Save
+            {common("save")}
           </button>
         </div>
       </form>

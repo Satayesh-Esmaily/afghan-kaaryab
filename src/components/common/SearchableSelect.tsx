@@ -8,6 +8,7 @@ type SearchableSelectProps = {
   options: SelectOption[];
   placeholder?: string;
   searchPlaceholder?: string;
+  noMatchesLabel?: string;
   disabled?: boolean;
   onChange: (value: string) => void;
 };
@@ -17,6 +18,7 @@ export default function SearchableSelect({
   options,
   placeholder = "Select an option",
   searchPlaceholder = "Search...",
+  noMatchesLabel = "No matches found.",
   disabled = false,
   onChange,
 }: SearchableSelectProps) {
@@ -143,7 +145,7 @@ export default function SearchableSelect({
                 );
               })
             ) : (
-              <p className="px-4 py-6 text-sm text-[color:var(--foreground-muted)]">No matches found.</p>
+              <p className="px-4 py-6 text-sm text-[color:var(--foreground-muted)]">{noMatchesLabel}</p>
             )}
           </div>
         </div>

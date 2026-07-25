@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { EmptyListCard, EntriesHeader, DocumentCard, ProfileSection } from "@/components/profile/profile-view/ProfileViewParts";
 import type { DocumentEntry } from "@/lib/app-state";
 import type { UseFormRegister } from "react-hook-form";
@@ -14,9 +15,11 @@ type ProfileDocumentsSectionProps = {
 };
 
 export function ProfileDocumentsSection({ entries, onAdd, onEdit, onDelete, register }: ProfileDocumentsSectionProps) {
+  const t = useTranslations("profile.documents");
+
   return (
-    <ProfileSection title="Supporting Documents" description="Keep your documents ready for applications.">
-      <EntriesHeader actionLabel="Add Document" onAction={onAdd} />
+    <ProfileSection title={t("sectionTitle")} description={t("sectionDescription")}>
+      <EntriesHeader actionLabel={t("add")} onAction={onAdd} />
 
       <input {...register("documents")} type="hidden" />
 
@@ -27,9 +30,9 @@ export function ProfileDocumentsSection({ entries, onAdd, onEdit, onDelete, regi
           ))
         ) : (
           <EmptyListCard
-            title="No documents added yet"
-            description="Upload CVs, IDs, passports, transcripts, or other supporting files."
-            actionLabel="Add Document"
+            title={t("emptyTitle")}
+            description={t("emptyDescription")}
+            actionLabel={t("add")}
             onAction={onAdd}
           />
         )}

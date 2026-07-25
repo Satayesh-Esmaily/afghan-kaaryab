@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import type { RefObject } from "react";
 import DatePickerField from "@/components/common/DatePickerField";
 import FormField from "@/components/common/FormField";
@@ -26,6 +27,7 @@ type ProfilePersonalDetailsSectionProps = {
   countryOptions: SelectOption[];
   nationalityOptions: SelectOption[];
   genderOptions: SelectOption[];
+  noMatchesLabel: string;
   onPickAvatar: () => void;
   onAvatarFileChange: (file: File | null) => void;
 };
@@ -46,23 +48,31 @@ export function ProfilePersonalDetailsSection({
   countryOptions,
   nationalityOptions,
   genderOptions,
+  noMatchesLabel,
   onPickAvatar,
   onAvatarFileChange,
 }: ProfilePersonalDetailsSectionProps) {
+  const t = useTranslations("profile.personal");
+  const common = useTranslations("profile.common");
+
   return (
-    <ProfileSection title="Personal Details" description="Share your expertise and complete your profile.">
+    <ProfileSection title={t("title")} description={t("description")}>
       <div className="grid gap-8 xl:grid-cols-[260px_1fr]">
         <aside className="space-y-5">
           <div className="flex items-center gap-4">
             <div className="relative flex h-20 w-20 items-center justify-center overflow-hidden rounded-full bg-[color:var(--surface-soft)] text-3xl font-semibold text-[color:var(--foreground-strong)]">
               {avatarUrl ? (
-                <Image src={avatarUrl} alt="Profile photo" fill unoptimized sizes="80px" className="object-cover" />
+                <Image src={avatarUrl} alt={t("profilePhotoAlt")} fill unoptimized sizes="80px" className="object-cover" />
               ) : (
                 initials
               )}
             </div>
-            <button type="button" onClick={onPickAvatar} className="ds-button-secondary rounded-full px-4 py-2.5 text-sm font-semibold">
-              Upload Photo
+            <button
+              type="button"
+              onClick={onPickAvatar}
+              className="ds-button-secondary rounded-full px-4 py-2.5 text-sm font-semibold"
+            >
+              {t("uploadPhoto")}
             </button>
           </div>
           <input
@@ -77,34 +87,31 @@ export function ProfilePersonalDetailsSection({
           />
 
           <div className="rounded-[1.25rem] border border-[color:var(--border)] bg-[color:var(--surface-soft)] p-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[color:var(--foreground-muted)]">
-              Profile completion
-            </p>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[color:var(--foreground-muted)]">{t("completionLabel")}</p>
             <p className="mt-2 text-2xl font-semibold text-[color:var(--foreground-strong)]">{completion}%</p>
-            <p className="mt-2 text-sm leading-6 text-[color:var(--foreground-muted)]">
-              Fill the sections below to make your profile stronger for employers.
-            </p>
+            <p className="mt-2 text-sm leading-6 text-[color:var(--foreground-muted)]">{t("completionHint")}</p>
           </div>
         </aside>
 
         <div className="space-y-5">
           <div className="grid gap-5 md:grid-cols-2">
-            <FormField label="Full Name" error={errors.fullName?.message}>
+            <FormField label={t("fullName")} error={errors.fullName?.message}>
               <input {...register("fullName")} className="ds-input" />
             </FormField>
-            <FormField label="Professional Expertise" error={errors.headline?.message}>
+            <FormField label={t("professionalExpertise")} error={errors.headline?.message}>
               <input {...register("headline")} className="ds-input" />
             </FormField>
-            <FormField label="Contact Number" error={errors.phone?.message}>
-              <input {...register("phone")} className="ds-input" placeholder="+93 79 123 4567" />
+            <FormField label={t("contactNumber")} error={errors.phone?.message}>
+              <input {...register("phone")} className="ds-input" placeholder={t("phonePlaceholder")} />
             </FormField>
-            <ProfileValueBox label="Email Address" value={userEmail || "Not available"} />
-            <FormField label="Country" error={errors.country?.message}>
+            <ProfileValueBox label={t("emailAddress")} value={userEmail || common("notAvailable")} />
+            <FormField label={t("country")} error={errors.country?.message}>
               <SearchableSelect
                 value={selectedCountry}
                 options={countryOptions}
-                placeholder="Select country"
-                searchPlaceholder="Search country..."
+                placeholder={t("selectCountry")}
+                searchPlaceholder={t("searchCountry")}
+                noMatchesLabel={noMatchesLabel}
                 onChange={(value) =>
                   setValue("country", value, {
                     shouldDirty: true,
@@ -113,15 +120,16 @@ export function ProfilePersonalDetailsSection({
                 }
               />
             </FormField>
-            <FormField label="Province" error={errors.province?.message}>
+            <FormField label={t("province")} error={errors.province?.message}>
               <input {...register("province")} className="ds-input" />
             </FormField>
-            <FormField label="Nationality" error={errors.nationality?.message}>
+            <FormField label={t("nationality")} error={errors.nationality?.message}>
               <SearchableSelect
                 value={selectedNationality}
                 options={nationalityOptions}
-                placeholder="Select nationality"
-                searchPlaceholder="Search nationality..."
+                placeholder={t("selectNationality")}
+                searchPlaceholder={t("searchNationality")}
+                noMatchesLabel={noMatchesLabel}
                 onChange={(value) =>
                   setValue("nationality", value, {
                     shouldDirty: true,
@@ -130,12 +138,12 @@ export function ProfilePersonalDetailsSection({
                 }
               />
             </FormField>
-            <FormField label="Date of Birth" error={errors.dateOfBirth?.message}>
-            <DatePickerField
-              key={selectedDateOfBirth || "empty-date-of-birth"}
-              value={selectedDateOfBirth}
-              placeholder="Select date"
-              onChange={(value) =>
+            <FormField label={t("dateOfBirth")} error={errors.dateOfBirth?.message}>
+              <DatePickerField
+                key={selectedDateOfBirth || "empty-date-of-birth"}
+                value={selectedDateOfBirth}
+                placeholder={t("datePlaceholder")}
+                onChange={(value) =>
                   setValue("dateOfBirth", value, {
                     shouldDirty: true,
                     shouldValidate: true,
@@ -143,11 +151,12 @@ export function ProfilePersonalDetailsSection({
                 }
               />
             </FormField>
-            <FormField label="Gender" error={errors.gender?.message}>
+            <FormField label={t("gender")} error={errors.gender?.message}>
               <SearchableSelect
                 value={selectedGender}
                 options={genderOptions}
-                placeholder="Select gender"
+                placeholder={t("selectGender")}
+                noMatchesLabel={noMatchesLabel}
                 onChange={(value) =>
                   setValue("gender", value, {
                     shouldDirty: true,
@@ -156,22 +165,22 @@ export function ProfilePersonalDetailsSection({
                 }
               />
             </FormField>
-            <FormField label="Current Address" error={errors.address?.message}>
-              <input {...register("address")} className="ds-input" placeholder="Taimani, Kabul, Afghanistan" />
+            <FormField label={t("currentAddress")} error={errors.address?.message}>
+              <input {...register("address")} className="ds-input" placeholder={t("addressPlaceholder")} />
             </FormField>
-            <FormField label="Location" error={errors.location?.message}>
-              <input {...register("location")} className="ds-input" placeholder="Kabul" />
+            <FormField label={t("location")} error={errors.location?.message}>
+              <input {...register("location")} className="ds-input" placeholder={t("locationPlaceholder")} />
             </FormField>
-            <FormField label="Avatar URL" error={errors.avatarUrl?.message}>
-              <input {...register("avatarUrl")} className="ds-input" placeholder="https://..." />
+            <FormField label={t("avatarUrl")} error={errors.avatarUrl?.message}>
+              <input {...register("avatarUrl")} className="ds-input" placeholder={t("avatarPlaceholder")} />
             </FormField>
           </div>
 
-          <FormField label="Professional Summary" error={errors.summary?.message}>
+          <FormField label={t("summary")} error={errors.summary?.message}>
             <textarea
               {...register("summary")}
               className="ds-input min-h-32"
-              placeholder="Introduce your background, experience, and strengths."
+              placeholder={t("summaryPlaceholder")}
             />
           </FormField>
         </div>

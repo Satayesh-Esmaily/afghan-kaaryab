@@ -3,8 +3,8 @@
 import Image from "next/image";
 import { useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
 import { EmptyState } from "@/components/ui";
-import { authCopy } from "@/config/auth";
 import { useAuthContext } from "@/context/auth-context";
 import { useProfileContext } from "@/context/profile-context";
 import {
@@ -37,21 +37,15 @@ import {
 import { useProfileActions } from "@/hooks/profile/useProfileActions";
 import { useProfileForm } from "@/hooks/profile/useProfileForm";
 import { useProfileUpload } from "@/hooks/profile/useProfileUpload";
-import { countryOptions, genderOptions, nationalityOptions } from "@/data/profile-options";
+import { createLocalizedCountryOptions, createLocalizedGenderOptions, nationalityOptions } from "@/data/profile-options";
 
 type ProfileTabId = "information" | "resume" | "interview";
 
-const profileTabs: Array<{
-  id: ProfileTabId;
-  label: string;
-  disabled?: boolean;
-}> = [
-  { id: "information", label: "Profile Information" },
-  { id: "resume", label: "Resume" },
-  { id: "interview", label: "AI Interview (Coming Soon)", disabled: true },
-];
-
 export default function ProfileView() {
+  const t = useTranslations("profile");
+  const authT = useTranslations("auth");
+  const commonT = useTranslations("common");
+  const locale = useLocale();
   const searchParams = useSearchParams();
   const { authenticated, user } = useAuthContext();
   const { profile } = useProfileContext();
@@ -117,14 +111,34 @@ export default function ProfileView() {
   const selectedNationality = watch("nationality");
   const selectedGender = watch("gender");
   const selectedDateOfBirth = watch("dateOfBirth");
+  const countryOptions = useMemo(() => createLocalizedCountryOptions(locale), [locale]);
+  const genderOptions = useMemo(
+    () =>
+      createLocalizedGenderOptions((key) => {
+        if (key === "female") return t("personal.genderOptions.female");
+        if (key === "male") return t("personal.genderOptions.male");
+        return t("personal.genderOptions.preferNotToSay");
+      }),
+    [t]
+  );
+
+  const profileTabs: Array<{
+    id: ProfileTabId;
+    label: string;
+    disabled?: boolean;
+  }> = [
+    { id: "information", label: t("tabs.information") },
+    { id: "resume", label: t("tabs.resume") },
+    { id: "interview", label: t("tabs.interview"), disabled: true },
+  ];
 
   if (!authenticated) {
     return (
       <EmptyState
-        title="Sign in to view your profile"
-        description="Your resume, skills, and job-seeking details are available after login."
+        title={t("signInTitle")}
+        description={t("signInDescription")}
         actionHref="/login"
-        actionLabel={authCopy.loginButtonLabel}
+        actionLabel={authT("loginButtonLabel")}
       />
     );
   }
@@ -133,9 +147,9 @@ export default function ProfileView() {
     <div className="space-y-6">
       <ProfileHeader
         showWelcome={showWelcome}
-        signupSuccessTitle={authCopy.signupSuccessTitle}
-        signupSuccessMessage={authCopy.signupSuccessMessage}
-        title="Profile"
+        signupSuccessTitle={authT("signupSuccessTitle")}
+        signupSuccessMessage={authT("signupSuccessMessage")}
+        title={t("pageTitle")}
       />
 
       <section className="rounded-[1.75rem] panel p-6 sm:p-8">
@@ -145,7 +159,7 @@ export default function ProfileView() {
               {profile.avatarUrl ? (
                 <Image
                   src={profile.avatarUrl}
-                  alt={profile.fullName || "Profile photo"}
+                  alt={profile.fullName || t("profilePhotoAlt")}
                   fill
                   unoptimized
                   sizes="80px"
@@ -157,11 +171,9 @@ export default function ProfileView() {
             </div>
             <div>
               <p className="text-base font-medium leading-7 text-[color:var(--foreground)] sm:text-lg">
-                Complete your profile to build a resume that stands out to employers
+                {t("completeProfileTitle")}
               </p>
-              <p className="mt-2 text-sm text-[color:var(--foreground-muted)]">
-                Keep your personal details, experience, and links up to date for better matches.
-              </p>
+              <p className="mt-2 text-sm text-[color:var(--foreground-muted)]">{t("completeProfileDescription")}</p>
             </div>
           </div>
 
@@ -226,6 +238,7 @@ export default function ProfileView() {
             countryOptions={countryOptions}
             nationalityOptions={nationalityOptions}
             genderOptions={genderOptions}
+            noMatchesLabel={commonT("noMatchesFound")}
             onPickAvatar={() => {
               avatarInputRef.current?.click();
             }}
@@ -287,7 +300,7 @@ export default function ProfileView() {
               disabled={isSubmitting}
               className="ds-button-primary inline-flex rounded-full px-6 py-3 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-70"
             >
-              Save
+              {t("save")}
             </button>
           </div>
         </form>

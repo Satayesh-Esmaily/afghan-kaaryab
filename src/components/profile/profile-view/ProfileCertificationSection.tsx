@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { EmptyListCard, EntriesHeader, CertificationCard, ProfileSection } from "@/components/profile/profile-view/ProfileViewParts";
 import type { CertificationEntry } from "@/lib/app-state";
 
@@ -16,12 +17,11 @@ export function ProfileCertificationSection({
   onEdit,
   onDelete,
 }: ProfileCertificationSectionProps) {
+  const t = useTranslations("profile.certifications");
+
   return (
-    <ProfileSection
-      title="Certifications"
-      description="Showcase certificates and credentials that strengthen your profile."
-    >
-      <EntriesHeader actionLabel="Add Certification" onAction={onAdd} />
+    <ProfileSection title={t("sectionTitle")} description={t("sectionDescription")}>
+      <EntriesHeader actionLabel={t("add")} onAction={onAdd} />
 
       <div className="mt-6 grid gap-4 xl:grid-cols-2">
         {entries.length > 0 ? (
@@ -35,9 +35,9 @@ export function ProfileCertificationSection({
           ))
         ) : (
           <EmptyListCard
-            title="No certifications added yet"
-            description="Add certificates, credential IDs, and attachments."
-            actionLabel="Add Certification"
+            title={t("emptyTitle")}
+            description={t("emptyDescription")}
+            actionLabel={t("add")}
             onAction={onAdd}
           />
         )}

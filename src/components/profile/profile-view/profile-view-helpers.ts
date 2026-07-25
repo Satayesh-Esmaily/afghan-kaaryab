@@ -313,17 +313,28 @@ export function createEntryId() {
 }
 
 export function formatDateRange(startDate: string, endDate: string, currentlyWorking: boolean) {
-  const startLabel = formatDateLabel(startDate);
-  const endLabel = currentlyWorking ? "Present" : formatDateLabel(endDate);
+  return formatDateRangeLocalized(startDate, endDate, currentlyWorking, "en", "Present", "Date not added");
+}
+
+export function formatDateRangeLocalized(
+  startDate: string,
+  endDate: string,
+  currentlyWorking: boolean,
+  locale: string,
+  presentLabel: string,
+  missingLabel: string
+) {
+  const startLabel = formatDateLabel(startDate, locale);
+  const endLabel = currentlyWorking ? presentLabel : formatDateLabel(endDate, locale);
 
   if (startLabel && endLabel) {
     return `${startLabel} - ${endLabel}`;
   }
 
-  return startLabel || endLabel || "Date not added";
+  return startLabel || endLabel || missingLabel;
 }
 
-export function formatDateLabel(value: string) {
+export function formatDateLabel(value: string, locale = "en") {
   if (!value) return "";
 
   const date = new Date(value);
@@ -331,7 +342,7 @@ export function formatDateLabel(value: string) {
     return value;
   }
 
-  return new Intl.DateTimeFormat("en", {
+  return new Intl.DateTimeFormat(locale, {
     month: "short",
     day: "numeric",
     year: "numeric",
