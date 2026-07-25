@@ -21,12 +21,12 @@ export function useAppBootstrap(
   user: AuthUser | null,
   authReady: boolean,
   initialSnapshot: LoadedAppStore | null,
-  useServerBootstrap: boolean
+  useServerBootstrap: boolean,
+  prefetchedSnapshot: boolean
 ) {
   const [snapshot, setSnapshot] = useState<LoadedAppStore>(() => initialSnapshot ?? fallbackSnapshot(user));
-  const [hydrated, setHydrated] = useState(() => Boolean(useServerBootstrap && initialSnapshot));
   const [revision, setRevision] = useState(0);
-  const skipInitialLoadRef = useRef(Boolean(useServerBootstrap && initialSnapshot));
+  const skipInitialLoadRef = useRef(Boolean(useServerBootstrap && prefetchedSnapshot));
   const lastUserIdRef = useRef<string | null>(user?.id ?? null);
 
   useEffect(() => {
@@ -35,6 +35,11 @@ export function useAppBootstrap(
     }
 
     const currentUserId = user?.id ?? null;
+
+    if (!currentUserId) {
+      lastUserIdRef.current = null;
+      return;
+    }
 
     if (skipInitialLoadRef.current && lastUserIdRef.current === currentUserId) {
       skipInitialLoadRef.current = false;
@@ -49,13 +54,11 @@ export function useAppBootstrap(
       .then((next) => {
         if (cancelled) return;
         setSnapshot(next);
-        setHydrated(true);
         setRevision((current) => current + 1);
       })
       .catch(() => {
         if (cancelled) return;
         setSnapshot(fallbackSnapshot(user));
-        setHydrated(true);
         setRevision((current) => current + 1);
       });
 
@@ -67,9 +70,9 @@ export function useAppBootstrap(
   return useMemo(
     () => ({
       snapshot,
-      hydrated,
+      hydrated: Boolean(prefetchedSnapshot || !user?.id || revision > 0),
       revision,
     }),
-    [hydrated, revision, snapshot]
+    [prefetchedSnapshot, revision, snapshot, user?.id]
   );
 }

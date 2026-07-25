@@ -4,7 +4,6 @@ import { cookies } from "next/headers";
 import { createServerClient } from "@supabase/ssr";
 import { createDefaultAppState } from "@/lib/app-state";
 import { mapSessionUserToAuthUser } from "@/lib/auth";
-import { loadAppStoreFromSupabase } from "@/lib/supabase-app-store";
 import type { ServerBootstrapState } from "@/lib/bootstrap";
 
 export async function getSupabaseServerClient() {
@@ -49,6 +48,7 @@ export async function loadServerBootstrap(): Promise<ServerBootstrapState> {
         theme: fallback.theme,
       },
       source: "fallback",
+      prefetchedSnapshot: true,
     };
   }
 
@@ -58,13 +58,38 @@ export async function loadServerBootstrap(): Promise<ServerBootstrapState> {
     } = await supabase.auth.getUser();
 
     const user = sessionUser?.email ? mapSessionUserToAuthUser(sessionUser) : null;
-    const snapshot = await loadAppStoreFromSupabase(supabase, user);
+    const defaultState = createDefaultAppState(user);
+    let theme = defaultState.theme;
+
+    if (user?.id) {
+      const { data: profileRow } = await supabase
+        .from("profiles")
+        .select("theme_mode")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      if (profileRow && typeof profileRow.theme_mode === "string") {
+        theme = profileRow.theme_mode === "dark" ? "dark" : "light";
+      }
+    }
+
+    const snapshot = {
+      opportunities: defaultState.opportunities,
+      savedIds: defaultState.savedIds,
+      followedOrganizationSlugs: defaultState.followedOrganizationSlugs,
+      profile: {
+        ...defaultState.profile,
+        resumeTemplate: defaultState.profile.resumeTemplate,
+      },
+      theme,
+    };
 
     return {
       user,
       authReady: true,
       snapshot,
       source: "server",
+      prefetchedSnapshot: Boolean(!user?.id),
     };
   } catch {
     const fallback = createDefaultAppState(null);
@@ -80,6 +105,7 @@ export async function loadServerBootstrap(): Promise<ServerBootstrapState> {
         theme: fallback.theme,
       },
       source: "fallback",
+      prefetchedSnapshot: true,
     };
   }
 }

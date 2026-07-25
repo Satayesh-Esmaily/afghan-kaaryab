@@ -6,4 +6,5 @@ export type ServerBootstrapState = {
   authReady: boolean;
   snapshot: LoadedAppStore;
   source: "server" | "fallback";
+  prefetchedSnapshot: boolean;
 };

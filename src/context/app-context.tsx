@@ -27,7 +27,8 @@ export function AppProvider({
     auth.user,
     auth.authReady,
     bootstrap.snapshot,
-    useServerBootstrap
+    useServerBootstrap,
+    bootstrap.prefetchedSnapshot
   );
 
   return (
