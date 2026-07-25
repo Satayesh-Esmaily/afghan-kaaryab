@@ -419,10 +419,6 @@ The UI uses a compact design system with shared visual tokens and repeated compo
 
 ![Opportunity Details Screenshot](./public/screenshots/opportunity-details.png)
 
-### Dashboard Page
-
-![Dashboard Screenshot](./public/screenshots/dashboard.png)
-
 ### Add Opportunity Page
 
 ![Add Opportunity Screenshot](./public/screenshots/add-opportunity.png)
@@ -457,7 +453,6 @@ The UI uses a compact design system with shared visual tokens and repeated compo
 
 ![KaarYab Logo](./public/logos/kaaryab-logo.png)
 
-![App Icon](./public/icon.png)
 
 ![PWA Icon](./public/pwa-icon.svg)
 
@@ -581,18 +576,7 @@ This project goes beyond a normal student final project because it includes:
 
 ---
 
-## Presentation Summary
 
-If you need to present the project, explain it like this:
-
-1. KaarYab helps Afghan users discover opportunities in one platform.
-2. It supports jobs, internships, scholarships, remote work, and training.
-3. Users can browse, search, save, follow, and manage opportunities.
-4. Registered users can edit a profile, upload files, and manage their resume.
-5. The app supports English, Dari, and Pashto.
-6. Data is stored with Supabase and the app is installable as a PWA.
-
----
 
 ## License
 
