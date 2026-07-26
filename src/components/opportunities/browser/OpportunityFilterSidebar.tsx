@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
+import { useTranslations } from "next-intl";
 import { Badge } from "@/components/ui";
 import DatePickerField from "@/components/common/DatePickerField";
 import SearchableSelect from "@/components/common/SearchableSelect";
@@ -32,14 +33,6 @@ type OpportunityFilterSidebarProps = {
   onClearFilters: () => void;
 };
 
-const deadlineOptions: Array<{ value: DeadlineFilter; label: string }> = [
-  { value: "all", label: "Any" },
-  { value: "7", label: "7 days" },
-  { value: "14", label: "14 days" },
-  { value: "30", label: "30 days" },
-  { value: "expired", label: "Expired" },
-];
-
 export function OpportunityFilterSidebar({
   query,
   onQueryChange,
@@ -62,88 +55,93 @@ export function OpportunityFilterSidebar({
   companyOptions,
   onClearFilters,
 }: OpportunityFilterSidebarProps) {
+  const t = useTranslations("opportunities.browser");
+  const deadlineOptions: Array<{ value: DeadlineFilter; label: string }> = [
+    { value: "all", label: t("any") },
+    { value: "7", label: t("deadlineOptions.7") },
+    { value: "14", label: t("deadlineOptions.14") },
+    { value: "30", label: t("deadlineOptions.30") },
+    { value: "expired", label: t("deadlineOptions.expired") },
+  ];
+
   return (
     <aside className="space-y-5 rounded-[1.5rem] panel p-5 sm:p-6 xl:sticky xl:top-24 xl:h-fit">
       <div className="space-y-2">
-        <Badge tone="default">Search filters</Badge>
-        <h2 className="text-2xl font-semibold tracking-tight text-[color:var(--foreground-strong)]">
-          Find the right job faster
-        </h2>
-        <p className="text-sm leading-7 text-[color:var(--foreground-muted)]">
-          Search by title, province, company, contract type, publication date, gender, and level.
-        </p>
+        <Badge tone="default">{t("eyebrow")}</Badge>
+        <h2 className="text-2xl font-semibold tracking-tight text-[color:var(--foreground-strong)]">{t("title")}</h2>
+        <p className="text-sm leading-7 text-[color:var(--foreground-muted)]">{t("description")}</p>
       </div>
 
       <div className="grid gap-4">
-        <FilterSelect label="Search title">
+        <FilterSelect label={t("searchTitle")}>
           <input
             value={query}
             onChange={(event) => onQueryChange(event.target.value)}
-            placeholder="Search opportunities..."
+            placeholder={t("searchPlaceholder")}
             className="ds-input"
           />
         </FilterSelect>
 
-        <FilterSelect label="Province">
+        <FilterSelect label={t("province")}>
           <SearchableSelect
             value={location}
             options={locationOptions.map((item) => ({ value: item, label: item }))}
-            placeholder="All"
-            searchPlaceholder="Search province..."
+            placeholder={t("any")}
+            searchPlaceholder={t("searchProvince")}
             onChange={onLocationChange}
           />
         </FilterSelect>
 
-        <FilterSelect label="Company">
+        <FilterSelect label={t("company")}>
           <SearchableSelect
             value={company}
             options={companyOptions.map((item) => ({ value: item, label: item }))}
-            placeholder="All"
-            searchPlaceholder="Search company..."
+            placeholder={t("any")}
+            searchPlaceholder={t("searchCompany")}
             onChange={onCompanyChange}
           />
         </FilterSelect>
 
-        <FilterSelect label="Contract type">
+        <FilterSelect label={t("contractType")}>
           <SearchableSelect
             value={type}
-            options={[{ value: "All", label: "All" }, ...opportunityTypes.map((item) => ({ value: item, label: item }))]}
-            placeholder="All"
-            searchPlaceholder="Search type..."
+            options={[{ value: "All", label: t("any") }, ...opportunityTypes.map((item) => ({ value: item, label: item }))]}
+            placeholder={t("any")}
+            searchPlaceholder={t("searchType")}
             onChange={(value) => onTypeChange(value as (typeof opportunityTypes)[number] | "All")}
           />
         </FilterSelect>
 
-        <FilterSelect label="Published after">
+        <FilterSelect label={t("publishedAfter")}>
           <DatePickerField
             key={publishedAfter || "empty-published-after"}
             value={publishedAfter}
             onChange={onPublishedAfterChange}
-            placeholder="Any date"
+            placeholder={t("anyDate")}
           />
         </FilterSelect>
 
-        <FilterSelect label="Gender">
+        <FilterSelect label={t("gender")}>
           <SearchableSelect
             value={gender}
             options={[
-              { value: "Any", label: "Any" },
-              { value: "Open to all", label: "Open to all" },
-              { value: "Female", label: "Female" },
-              { value: "Male", label: "Male" },
+              { value: "Any", label: t("any") },
+              { value: "Open to all", label: t("openToAll") },
+              { value: "Female", label: t("female") },
+              { value: "Male", label: t("male") },
             ]}
-            placeholder="Any"
-            searchPlaceholder="Search gender..."
+            placeholder={t("any")}
+            searchPlaceholder={t("searchGender")}
             onChange={(value) => onGenderChange(value as GenderFilter)}
           />
         </FilterSelect>
 
-        <FilterSelect label="Job level">
+        <FilterSelect label={t("jobLevel")}>
           <SearchableSelect
             value={level}
-            options={[{ value: "Any", label: "Any" }, ...opportunityLevels.map((item) => ({ value: item, label: item }))]}
-            placeholder="Any"
-            searchPlaceholder="Search level..."
+            options={[{ value: "Any", label: t("any") }, ...opportunityLevels.map((item) => ({ value: item, label: item }))]}
+            placeholder={t("any")}
+            searchPlaceholder={t("searchLevel")}
             onChange={(value) => onLevelChange(value as LevelFilter)}
           />
         </FilterSelect>
@@ -151,8 +149,8 @@ export function OpportunityFilterSidebar({
 
       <div className="space-y-4 border-t border-[color:var(--border)] pt-4">
         <div className="flex items-center justify-between gap-3 text-sm">
-          <span className="font-semibold text-[color:var(--foreground-muted)]">Deadline</span>
-          <Badge tone="info">{resultCount} results</Badge>
+          <span className="font-semibold text-[color:var(--foreground-muted)]">{t("deadline")}</span>
+          <Badge tone="info">{t("results", { count: resultCount })}</Badge>
         </div>
         <div className="flex flex-wrap gap-2">
           {deadlineOptions.map((item) => (
@@ -174,7 +172,7 @@ export function OpportunityFilterSidebar({
           onClick={onClearFilters}
           className="w-full rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-3 text-sm font-semibold text-[color:var(--foreground)] transition hover:bg-[color:var(--surface-soft)]"
         >
-          Clear filters
+          {t("clearFilters")}
         </button>
       </div>
     </aside>

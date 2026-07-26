@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import OrganizationDetailsView from "@/components/network/OrganizationDetailsView";
 import { demoOpportunities } from "@/data/opportunities";
 import { getOrganizationProfile } from "@/lib/network";
@@ -11,16 +12,17 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const organization = getOrganizationProfile(demoOpportunities, slug);
+  const t = await getTranslations("network.detail");
 
   if (!organization) {
     return {
-      title: "Organization not found",
+      title: t("organizationNotFound"),
     };
   }
 
   return {
     title: organization.name,
-    description: `Explore ${organization.name} and its related opportunities.`,
+    description: t("description", { name: organization.name }),
   };
 }
 

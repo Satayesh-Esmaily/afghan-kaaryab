@@ -672,6 +672,123 @@
       "downloadFile": "دانلود {fileName}"
     }
   },
+  "opportunities": {
+    "page": {
+      "title": "فرصت‌ها",
+      "description": "فرصت‌های کاری KaarYab Afghanistan را مرور، جستجو و فیلتر کنید."
+    },
+    "browser": {
+      "eyebrow": "فیلترهای جستجو",
+      "title": "فرصت مناسب را سریع‌تر پیدا کنید",
+      "description": "بر اساس عنوان، ولایت، شرکت، نوع قرارداد، تاریخ نشر، جنسیت و سطح جستجو کنید.",
+      "searchTitle": "جستجوی عنوان",
+      "searchPlaceholder": "جستجوی فرصت‌ها...",
+      "province": "ولایت",
+      "searchProvince": "جستجوی ولایت...",
+      "company": "شرکت",
+      "searchCompany": "جستجوی شرکت...",
+      "contractType": "نوع قرارداد",
+      "searchType": "جستجوی نوع...",
+      "publishedAfter": "نشر شده بعد از",
+      "anyDate": "هر تاریخ",
+      "gender": "جنسیت",
+      "searchGender": "جستجوی جنسیت...",
+      "jobLevel": "سطح شغلی",
+      "searchLevel": "جستجوی سطح...",
+      "deadline": "مهلت",
+      "results": "{count} نتیجه",
+      "clearFilters": "پاک کردن فیلترها",
+      "any": "همه",
+      "deadlineOptions": {
+        "7": "۷ روز",
+        "14": "۱۴ روز",
+        "30": "۳۰ روز",
+        "expired": "منقضی شده"
+      },
+      "openToAll": "مناسب همه",
+      "female": "زن",
+      "male": "مرد",
+      "noResultsTitle": "هیچ فرصتی با فیلترهای شما مطابقت ندارد",
+      "noResultsDescription": "یک شرکت دیگر را امتحان کنید، بازه زمانی را گسترده‌تر کنید یا فیلترها را پاک کنید تا نتیجه‌های بیشتری ببینید.",
+      "submitOpportunity": "ارسال فرصت جدید"
+    },
+    "results": {
+      "eyebrow": "جستجوی فرصت‌ها",
+      "title": "{count} فرصت",
+      "description": "جدیدترین آگهی‌ها را با یک چیدمان ساده و فیلترهای مفید مرور کنید.",
+      "saved": "{count} ذخیره‌شده",
+      "total": "{count} مجموع"
+    },
+    "card": {
+      "save": "ذخیره",
+      "saved": "ذخیره شد",
+      "removeFromSaved": "حذف از ذخیره‌ها",
+      "company": "شرکت",
+      "location": "موقعیت",
+      "published": "نشر شده",
+      "deadline": "مهلت",
+      "expiringSoon": "به‌زودی منقضی می‌شود",
+      "remote": "دورکاری",
+      "viewDetails": "جزئیات",
+      "applyNow": "همین حالا درخواست بده"
+    },
+    "details": {
+      "notFoundTitle": "فرصت پیدا نشد",
+      "notFoundDescription": "ممکن است این فرصت حذف شده باشد یا لینک آن قدیمی شده باشد.",
+      "backToOpportunities": "بازگشت به فرصت‌ها",
+      "deadlineSoon": "مهلت نزدیک است",
+      "openPosition": "موقعیت باز",
+      "saveOpportunity": "ذخیره فرصت",
+      "removeSaved": "حذف ذخیره‌شده",
+      "apply": "درخواست",
+      "edit": "ویرایش",
+      "delete": "حذف",
+      "description": "توضیحات",
+      "responsibilities": "مسئولیت‌ها",
+      "responsibilityReview": "بررسی آگهی کامل شغل",
+      "responsibilityTailored": "آماده‌سازی درخواست متناسب",
+      "responsibilityInstructions": "پیروی از دستورالعمل‌های کارفرما",
+      "requirements": "شرایط",
+      "skills": "مهارت‌ها",
+      "documentsRequired": "اسناد مورد نیاز",
+      "documentCv": "CV یا رزومه",
+      "documentCoverLetter": "نامه معرفی",
+      "documentCertificates": "سرتیفیکیت‌ها یا نمونه‌کار مرتبط",
+      "companyInfo": "اطلاعات شرکت",
+      "companySummaryFallback": "این سازمان در KaarYab فهرست شده است تا کارجویان فرصت‌های فعلی را پیدا کنند و پیش از درخواست بیشتر بدانند.",
+      "location": "موقعیت",
+      "contract": "قرارداد",
+      "level": "سطح",
+      "gender": "جنسیت",
+      "notSpecified": "مشخص نشده",
+      "openToAll": "مناسب همه",
+      "organizationPage": "صفحه سازمان",
+      "viewOrganization": "مشاهده سازمان",
+      "applicationNote": "یادداشت درخواست",
+      "applicationNoteTitle": "بدون ترک صفحه درخواست بده.",
+      "applicationNoteDescription": "وقتی آماده شدید از دکمه درخواست استفاده کنید و سپس آگهی را ذخیره کنید تا بعداً برگردید.",
+      "deleteTitle": "این فرصت حذف شود؟",
+      "deleteDescription": "این کار فرصت را برای همیشه از فهرست و از ذخیره‌شده‌ها حذف می‌کند.",
+      "deleteConfirm": "حذف"
+    },
+    "saved": {
+      "eyebrow": "ذخیره‌شده‌ها",
+      "title": "فرصت‌های ذخیره‌شده شما",
+      "description": "بهترین فرصت‌ها را در یک‌جا نگه دارید تا بعداً دوباره به آن‌ها برگردید.",
+      "savedItems": "موارد ذخیره‌شده",
+      "availableOpportunities": "فرصت‌های موجود",
+      "quickAction": "اقدام سریع",
+      "saveMore": "بیشتر ذخیره کنید",
+      "tapStar": "روی ستاره هر کارت بزنید.",
+      "clearSaved": "پاک‌کردن ذخیره‌ها",
+      "removeItemsHint": "می‌توانید موارد را از اینجا یا از صفحه جزئیات فرصت حذف کنید.",
+      "nothingSaved": "هنوز چیزی ذخیره نشده است",
+      "exploreOpportunities": "صفحه فرصت‌ها را مرور کنید و با دکمه ستاره موارد دلخواه را ذخیره کنید.",
+      "explore": "دیدن فرصت‌ها",
+      "needFreshStart": "یک شروع تازه می‌خواهید؟ همیشه می‌توانید به",
+      "fullOpportunityList": "فهرست کامل فرصت‌ها"
+    }
+  },
   "resumeBuilder": {
     "signInTitle": "برای ساخت رزومه وارد شوید",
     "signInDescription": "پس از ورود، رزومه خود را ایجاد کنید، قالب دلخواه را انتخاب کنید و آن را به صورت PDF دانلود کنید.",
@@ -732,6 +849,144 @@
         "label": "فشرده",
         "description": "چیدمانی جمع‌وجور برای رزومه‌های کوتاه و فارغ‌التحصیلان تازه‌کار."
       }
+    }
+  },
+  "network": {
+    "page": {
+      "eyebrow": "دایرکتوری",
+      "title": "سازمان‌ها، کشورها و مؤسسات",
+      "description": "سازمان‌ها، کشورها و مؤسساتی را که پشت تازه‌ترین فرصت‌های KaarYab قرار دارند، بررسی کنید."
+    },
+    "stats": {
+      "organizations": "سازمان‌ها",
+      "countries": "کشورها",
+      "institutions": "مؤسسات"
+    },
+    "organizations": {
+      "badge": "شبکه زنده",
+      "title": "سازمان‌ها",
+      "description": "سازمان‌هایی که در حال حاضر در پلتفرم فعال هستند و با آگهی‌های موجود ارتباط دارند.",
+      "followingCount": "{count} سازمان دنبال می‌شود"
+    },
+    "countries": {
+      "badge": "پوشش خدمات",
+      "title": "کشورها و گستره",
+      "description": "اولویت با فرصت‌های افغان است، همراه با نقش‌های ریموت و دسترسی منطقه‌ای در صورت موجود بودن."
+    },
+    "institutions": {
+      "badge": "بر اساس نوع منبع",
+      "title": "مؤسسات",
+      "description": "بر اساس نوع مؤسسه‌ای که پشت هر آگهی قرار دارد گروه‌بندی شده‌اند."
+    },
+    "card": {
+      "openOrganization": "باز کردن {title}",
+      "follow": "دنبال‌کردن",
+      "following": "دنبال می‌شود"
+    },
+    "detail": {
+      "eyebrow": "سازمان",
+      "description": "{name} و فرصت‌های مرتبط با آن را بررسی کنید.",
+      "organizationNotFound": "سازمان پیدا نشد",
+      "profileBadge": "پروفایل سازمان",
+      "categories": "دسته‌ها",
+      "follow": "دنبال‌کردن",
+      "following": "دنبال می‌شود",
+      "summary": {
+        "listings": "آگهی‌ها",
+        "locations": "مکان‌ها",
+        "featured": "ویژه"
+      },
+      "primaryLocations": "مکان‌های اصلی",
+      "organizationSlug": "شناسه سازمان",
+      "aboutTitle": "درباره این سازمان",
+      "aboutBody": "این پروفایل به جویندگان کار کمک می‌کند پیش از درخواست، بیشتر درباره سازمان بدانند.",
+      "relatedTitle": "فرصت‌های مرتبط",
+      "footprintTitle": "حضور فعلی",
+      "active": "فعال",
+      "quickAction": "اقدام سریع",
+      "quickActionTitle": "این سازمان را زیر نظر داشته باشید.",
+      "quickActionBody": "دنبال‌کردن سازمان باعث می‌شود هنگام انتشار فرصت‌های جدید، بازگشت به آن آسان باشد.",
+      "backToDirectory": "بازگشت به دایرکتوری",
+      "deadline": "مهلت",
+      "openOpportunity": "باز کردن"
+    }
+  },
+  "addOpportunity": {
+    "page": {
+      "eyebrow": "ارسال",
+      "title": "افزودن فرصت جدید",
+      "description": "کارها، انترنشیپ‌ها، بورس‌ها، برنامه‌های آموزشی و نقش‌های دورکاری را با جویندگان کار افغان شریک کنید.",
+      "submitLabel": "انتشار فرصت"
+    },
+    "form": {
+      "title": "عنوان",
+      "titlePlaceholder": "کارآموز توسعه‌دهنده فرانت‌اند",
+      "organization": "سازمان",
+      "organizationPlaceholder": "انجمن تکنالوژی کابل",
+      "category": "دسته",
+      "selectCategory": "دسته را انتخاب کنید",
+      "searchCategory": "جستجوی دسته...",
+      "opportunityType": "نوع فرصت",
+      "selectType": "نوع را انتخاب کنید",
+      "searchType": "جستجوی نوع...",
+      "location": "موقعیت",
+      "locationPlaceholder": "کابل",
+      "deadline": "مهلت",
+      "selectDate": "تاریخ را انتخاب کنید",
+      "description": "توضیحات",
+      "descriptionPlaceholder": "فرصت، مخاطب و ارزش اصلی آن را توضیح دهید.",
+      "requirements": "شرایط",
+      "requirementsPlaceholder": "React پایه\nHTML/CSS\nGitHub",
+      "requirementsHint": "هر شرط را در یک خط بنویسید یا با ویرگول جدا کنید.",
+      "applyLink": "لینک درخواست",
+      "applyLinkPlaceholder": "https://example.com/apply",
+      "tags": "برچسب‌ها",
+      "tagsPlaceholder": "React، دورکاری، انترنشیپ",
+      "tagsHint": "با ویرگول جدا کنید، مثل React، دورکاری، انترنشیپ.",
+      "featured": "به‌عنوان ویژه علامت‌گذاری شود",
+      "saving": "در حال ذخیره...",
+      "categories": {
+        "job": "کار",
+        "internship": "انترنشیپ",
+        "scholarship": "بورس",
+        "onlineCourse": "دوره آنلاین",
+        "remoteWork": "کار از راه دور",
+        "trainingProgram": "برنامه آموزشی",
+        "volunteerWork": "کار داوطلبانه"
+      },
+      "types": {
+        "remote": "دورکاری",
+        "onSite": "حضوری",
+        "hybrid": "ترکیبی",
+        "online": "آنلاین"
+      }
+    }
+  },
+  "about": {
+    "page": {
+      "title": "درباره",
+      "description": "ببینید KaarYab افغانستان چیست و چرا ساخته شده است."
+    },
+    "eyebrow": "درباره",
+    "title": "چرا KaarYab افغانستان ایجاد شد",
+    "description": "KaarYab به جویندگان کار افغان کمک می‌کند تا فرصت‌های معتبر را در یک پلتفرم منظم پیدا کنند.",
+    "cards": {
+      "problem": {
+        "title": "مشکل",
+        "body": "فرصت‌ها اغلب در شبکه‌های اجتماعی، گروه‌ها و وب‌سایت‌های مختلف پراکنده‌اند."
+      },
+      "solution": {
+        "title": "راه‌حل",
+        "body": "KaarYab فرصت‌ها را با جستجو، فیلترها، موارد ذخیره‌شده و صفحات سازمانی یک‌جا جمع می‌کند."
+      },
+      "audience": {
+        "title": "مخاطب",
+        "body": "دانشجویان، فارغان، جویندگان کار، زنان جویای کار از راه دور و سازمان‌هایی که آگهی شریک می‌کنند."
+      }
+    },
+    "summary": {
+      "title": "ساخته‌شده به‌عنوان یک پلتفرم عملی کاریابی",
+      "body": "این اپلیکیشن شامل چیدمان‌های پاسخ‌گو، مسیرهای داینامیک، فرصت‌های ذخیره‌شده، پروفایل سازمان‌ها، جریان کامل افزودن/ویرایش/حذف، حالت تیره و کامپوننت‌های قابل استفادهٔ مجدد است تا برای استفادهٔ روزمره آماده باشد."
     }
   }
 }

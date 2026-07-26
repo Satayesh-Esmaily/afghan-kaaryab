@@ -1,26 +1,27 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import OpportunityForm from "@/components/opportunities/OpportunityForm";
 import { SectionHeading } from "@/components/ui";
 import { useOpportunitiesContext } from "@/context/opportunities-context";
-import { opportunityPageCopy } from "@/config/opportunities";
 
 export default function AddOpportunityView() {
+  const t = useTranslations("addOpportunity");
   const router = useRouter();
   const { addOpportunity } = useOpportunitiesContext();
 
   return (
     <div className="space-y-8">
       <SectionHeading
-        eyebrow={opportunityPageCopy.addEyebrow}
-        title={opportunityPageCopy.addTitle}
-        description={opportunityPageCopy.addDescription}
+        eyebrow={t("page.eyebrow")}
+        title={t("page.title")}
+        description={t("page.description")}
       />
 
       <OpportunityForm
         key="add-opportunity-form"
-        submitLabel={opportunityPageCopy.addSubmitLabel}
+        submitLabel={t("page.submitLabel")}
         onSubmit={(values) => {
           const created = addOpportunity(values);
           router.push(`/opportunities/${created.id}`);

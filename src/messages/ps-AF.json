@@ -696,6 +696,123 @@
     "downloadFile": "{fileName} ډاونلوډ کړئ"
   }
 },
+  "opportunities": {
+    "page": {
+      "title": "فرصتونه",
+      "description": "د KaarYab Afghanistan فرصتونه وګورئ، ولټوئ او فلټر یې کړئ."
+    },
+    "browser": {
+      "eyebrow": "د لټون فلټرونه",
+      "title": "مناسب فرصت ژر ومومئ",
+      "description": "د عنوان، ولایت، شرکت، د قرارداد ډول، د خپرېدو نېټه، جنسیت او کچې له مخې ولټوئ.",
+      "searchTitle": "عنوان ولټوئ",
+      "searchPlaceholder": "فرصتونه ولټوئ...",
+      "province": "ولایت",
+      "searchProvince": "ولایت ولټوئ...",
+      "company": "شرکت",
+      "searchCompany": "شرکت ولټوئ...",
+      "contractType": "د قرارداد ډول",
+      "searchType": "ډول ولټوئ...",
+      "publishedAfter": "خپور شوی وروسته له",
+      "anyDate": "هره نېټه",
+      "gender": "جنسیت",
+      "searchGender": "جنسیت ولټوئ...",
+      "jobLevel": "د دندې کچه",
+      "searchLevel": "کچه ولټوئ...",
+      "deadline": "وروستۍ نېټه",
+      "results": "{count} پایلې",
+      "clearFilters": "فلټرونه پاک کړئ",
+      "any": "ټول",
+      "deadlineOptions": {
+        "7": "۷ ورځې",
+        "14": "۱۴ ورځې",
+        "30": "۳۰ ورځې",
+        "expired": "موده تېره"
+      },
+      "openToAll": "د ټولو لپاره",
+      "female": "ښځه",
+      "male": "نارینه",
+      "noResultsTitle": "د فلټرونو سره هیڅ فرصت برابر نه شو",
+      "noResultsDescription": "بل شرکت وازموئ، د نېټې موده پراخه کړئ، یا فلټرونه پاک کړئ ترڅو نورې پایلې ووینئ.",
+      "submitOpportunity": "نوی فرصت ولېږئ"
+    },
+    "results": {
+      "eyebrow": "د فرصتونو لټون",
+      "title": "{count} فرصتونه",
+      "description": "وروستي اعلانونه د ساده بڼې او ګټورو فلټرونو سره ولولئ.",
+      "saved": "{count} خوندي شوي",
+      "total": "{count} ټول"
+    },
+    "card": {
+      "save": "خوندي کول",
+      "saved": "خوندي شو",
+      "removeFromSaved": "له خوندي شوو څخه لرې کړئ",
+      "company": "شرکت",
+      "location": "ځای",
+      "published": "خپور شوی",
+      "deadline": "وروستۍ نېټه",
+      "expiringSoon": "ژر پای ته رسېږي",
+      "remote": "له لرې",
+      "viewDetails": "جزیات",
+      "applyNow": "اوس غوښتنه وکړئ"
+    },
+    "details": {
+      "notFoundTitle": "فرصت پیدا نه شو",
+      "notFoundDescription": "کېدای شي دا فرصت لرې شوی وي یا لینک یې زوړ وي.",
+      "backToOpportunities": "فرصتونو ته ستنېدل",
+      "deadlineSoon": "وروستۍ نېټه نږدې ده",
+      "openPosition": "خلاص موقعیت",
+      "saveOpportunity": "فرصت خوندي کړئ",
+      "removeSaved": "خوندي شوی لرې کړئ",
+      "apply": "غوښتنه",
+      "edit": "سمول",
+      "delete": "حذف",
+      "description": "تشریح",
+      "responsibilities": "مسؤولیتونه",
+      "responsibilityReview": "د دندې بشپړ اعلان ولولئ",
+      "responsibilityTailored": "مناسبه غوښتنه چمتو کړئ",
+      "responsibilityInstructions": "د کار ورکوونکي لارښوونې تعقیب کړئ",
+      "requirements": "شرایط",
+      "skills": "مهارتونه",
+      "documentsRequired": "اړین اسناد",
+      "documentCv": "CV یا رزومه",
+      "documentCoverLetter": "تعریفي لیک",
+      "documentCertificates": "اړوند سرتیفیکيټونه یا نمونې",
+      "companyInfo": "د شرکت معلومات",
+      "companySummaryFallback": "دا اداره په KaarYab کې ثبت شوې څو کار لټونکي وروستۍ فرصتونه ومومي او له غوښتنې مخکې نور معلومات ترلاسه کړي.",
+      "location": "ځای",
+      "contract": "قرارداد",
+      "level": "کچه",
+      "gender": "جنسیت",
+      "notSpecified": "نه دی مشخص",
+      "openToAll": "د ټولو لپاره",
+      "organizationPage": "د سازمان پاڼه",
+      "viewOrganization": "سازمان وګورئ",
+      "applicationNote": "د غوښتنې یادښت",
+      "applicationNoteTitle": "له پاڼې وتلو پرته غوښتنه وکړئ.",
+      "applicationNoteDescription": "کله چې تیار شئ د غوښتنې تڼۍ وکاروئ، بیا اعلان خوندي کړئ څو وروسته ورته بېرته راشئ.",
+      "deleteTitle": "دا فرصت حذف شي؟",
+      "deleteDescription": "دا به فرصت د فهرست او خوندي شوو توکو څخه دایمي لرې کړي.",
+      "deleteConfirm": "حذف"
+    },
+    "saved": {
+      "eyebrow": "خوندي شوي",
+      "title": "ستاسو خوندي شوي فرصتونه",
+      "description": "غوره فرصتونه په یو ځای کې وساتئ څو وروسته ورته بېرته ورشئ.",
+      "savedItems": "خوندي شوي توکي",
+      "availableOpportunities": "شتون لرونکي فرصتونه",
+      "quickAction": "چټک اقدام",
+      "saveMore": "نور خوندي کړئ",
+      "tapStar": "د هر کارت په ستوري ټک وکړئ.",
+      "clearSaved": "خوندي شوي پاک کړئ",
+      "removeItemsHint": "تاسو کولای شئ توکي له دې ځایه یا د فرصت له جزیاتو پاڼې لرې کړئ.",
+      "nothingSaved": "تر اوسه څه نه دي خوندي شوي",
+      "exploreOpportunities": "د فرصتونو پاڼه وګورئ او د ستوري تڼۍ وکاروئ څو وروسته لپاره یې خوندي کړئ.",
+      "explore": "فرصتونه وګورئ",
+      "needFreshStart": "نوې پیل غواړئ؟ تل کولای شئ بېرته",
+      "fullOpportunityList": "د فرصتونو بشپړ فهرست"
+    }
+  },
 
   "resumeBuilder": {
     "signInTitle": "د خپل ریزومې جوړولو لپاره ننوتل وکړئ",
@@ -757,6 +874,144 @@
         "label": "لنډ",
         "description": "لنډ او منظم ډیزاین، د لنډو ریزومو او تازه فارغانو لپاره مناسب."
       }
+    }
+  },
+  "network": {
+    "page": {
+      "eyebrow": "لارښود",
+      "title": "سازمانونه، هېوادونه او مؤسسې",
+      "description": "هغه سازمانونه، هېوادونه او مؤسسې وګورئ چې د KaarYab تر ټولو نويو فرصتونو تر شا دي."
+    },
+    "stats": {
+      "organizations": "سازمانونه",
+      "countries": "هېوادونه",
+      "institutions": "مؤسسې"
+    },
+    "organizations": {
+      "badge": "ژوندۍ شبکه",
+      "title": "سازمانونه",
+      "description": "هغه سازمانونه چې اوس په پلېټفارم کې فعال دي او له شته اعلانونو سره تړلي دي.",
+      "followingCount": "{count} سازمانونه تعقیب شوي"
+    },
+    "countries": {
+      "badge": "د رسولو پوښښ",
+      "title": "هېوادونه او لاسرسی",
+      "description": "لومړيتوب افغان فرصتونو ته دی، او که موجود وي ریموټ رولونه او سیمه‌ییز لاسرسی هم شته."
+    },
+    "institutions": {
+      "badge": "د سرچینې د ډول له مخې",
+      "title": "مؤسسې",
+      "description": "د هغه مؤسسې د ډول له مخې ډله‌بندي شوې چې د هر اعلان تر شا ولاړه ده."
+    },
+    "card": {
+      "openOrganization": "{title} پرانستل",
+      "follow": "تعقیبول",
+      "following": "تعقیب شوی"
+    },
+    "detail": {
+      "eyebrow": "سازمان",
+      "description": "{name} او د هغې اړوند فرصتونه وڅېړئ.",
+      "organizationNotFound": "سازمان ونه موندل شو",
+      "profileBadge": "د سازمان پروفایل",
+      "categories": "کټګورۍ",
+      "follow": "تعقیبول",
+      "following": "تعقیب شوی",
+      "summary": {
+        "listings": "اعلانونه",
+        "locations": "ځایونه",
+        "featured": "ځانګړي"
+      },
+      "primaryLocations": "اصلي ځایونه",
+      "organizationSlug": "د سازمان سلیګ",
+      "aboutTitle": "د دې سازمان په اړه",
+      "aboutBody": "دا پروفایل دندې لټوونکو ته مرسته کوي چې له غوښتنې وړاندې د سازمان په اړه ډېر معلومات ترلاسه کړي.",
+      "relatedTitle": "اړوند فرصتونه",
+      "footprintTitle": "اوسنی حضور",
+      "active": "فعال",
+      "quickAction": "چټک اقدام",
+      "quickActionTitle": "دا سازمان د نظر لاندې وساتئ.",
+      "quickActionBody": "د سازمان تعقیبول دا اسانه کوي چې کله نوي فرصتونه خپاره شي، بېرته ور وګرځئ.",
+      "backToDirectory": "لارښود ته بېرته",
+      "deadline": "وروستۍ نېټه",
+      "openOpportunity": "پرانستل"
+    }
+  },
+  "addOpportunity": {
+    "page": {
+      "eyebrow": "سپارل",
+      "title": "نوی فرصت اضافه کړئ",
+      "description": "کارونه، انټرنشیپونه، بورسونه، روزنیز پروګرامونه او له لرې د کار رولونه د افغان دندې لټوونکو سره شریک کړئ.",
+      "submitLabel": "فرصت خپور کړئ"
+    },
+    "form": {
+      "title": "سرلیک",
+      "titlePlaceholder": "د فرانت‌اند انټرن د پراختیا کوونکی",
+      "organization": "اداره",
+      "organizationPlaceholder": "د کابل ټیک ټولنه",
+      "category": "کټګوري",
+      "selectCategory": "کټګوري وټاکئ",
+      "searchCategory": "کټګوري ولټوئ...",
+      "opportunityType": "د فرصت ډول",
+      "selectType": "ډول وټاکئ",
+      "searchType": "ډول ولټوئ...",
+      "location": "ځای",
+      "locationPlaceholder": "کابل",
+      "deadline": "وروستۍ نېټه",
+      "selectDate": "نېټه وټاکئ",
+      "description": "تشریح",
+      "descriptionPlaceholder": "فرصت، مخاطب او اصلي ارزښت یې تشریح کړئ.",
+      "requirements": "شرایط",
+      "requirementsPlaceholder": "بنسټیز React\nHTML/CSS\nGitHub",
+      "requirementsHint": "هر شرط په جلا کرښه ولیکئ یا یې په کامه جلا کړئ.",
+      "applyLink": "د غوښتنلیک لینک",
+      "applyLinkPlaceholder": "https://example.com/apply",
+      "tags": "ټګونه",
+      "tagsPlaceholder": "React، له لرې کار، انټرنشیپ",
+      "tagsHint": "په کامه یې جلا کړئ، لکه React، له لرې کار، انټرنشیپ.",
+      "featured": "د ځانګړي په توګه نښه شي",
+      "saving": "د خوندي کولو په حال کې...",
+      "categories": {
+        "job": "کار",
+        "internship": "انټرنشیپ",
+        "scholarship": "بورس",
+        "onlineCourse": "آنلاین کورس",
+        "remoteWork": "له لرې کار",
+        "trainingProgram": "روزنیز پروګرام",
+        "volunteerWork": "داوطلبانه کار"
+      },
+      "types": {
+        "remote": "له لرې",
+        "onSite": "حضوري",
+        "hybrid": "ترکیبي",
+        "online": "آنلاین"
+      }
+    }
+  },
+  "about": {
+    "page": {
+      "title": "په اړه",
+      "description": "وګورئ چې KaarYab افغانستان څه شی دی او ولې جوړ شوی دی."
+    },
+    "eyebrow": "په اړه",
+    "title": "ولې KaarYab افغانستان رامنځته شو",
+    "description": "KaarYab د افغان کار لټوونکو سره مرسته کوي چې معتبر فرصتونه په یوه منظم پلیټفارم کې ومومي.",
+    "cards": {
+      "problem": {
+        "title": "ستونزه",
+        "body": "فرصتونه اکثره په ټولنیزو شبکو، ګروپونو او بېلابېلو وېب‌سایټونو کې خپاره وي."
+      },
+      "solution": {
+        "title": "حل",
+        "body": "KaarYab فرصتونه د لټون، فلټرونو، خوندي شوو توکو او د سازمان پاڼو سره یوځای کوي."
+      },
+      "audience": {
+        "title": "مخاطبین",
+        "body": "محصلان، فارغان، دندې لټوونکي، هغه ښځې چې له لرې کار لټوي، او هغه سازمانونه چې اعلانونه شریکوي."
+      }
+    },
+    "summary": {
+      "title": "د عملي دندې پلتفارم په توګه جوړ شوی",
+      "body": "دا اپلیکیشن ځواب‌ورکوونکي چیدمانونه، ډینامیک لارې، خوندي شوي فرصتونه، د سازمان پروفایلونه، د اضافه/سمول/حذف بشپړ جریان، تیاره حالت، او بیا کارېدونکي کمپوننټونه لري تر څو د ورځني کار لپاره چمتو وي."
     }
   }
 }

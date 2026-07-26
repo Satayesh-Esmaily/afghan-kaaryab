@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 import OpportunityCard from "@/components/opportunities/OpportunityCard";
 import { EmptyState } from "@/components/ui";
 import { useAuthContext } from "@/context/auth-context";
@@ -21,6 +22,7 @@ import {
 import { OpportunityResultsHeader } from "@/components/opportunities/browser/OpportunityResultsHeader";
 
 export default function OpportunityBrowser({ opportunities }: { opportunities: Opportunity[] }) {
+  const t = useTranslations("opportunities.browser");
   const { hydrated } = useAuthContext();
   const { savedIds, opportunities: storedOpportunities } = useOpportunitiesContext();
   const activeOpportunities = hydrated ? storedOpportunities : opportunities;
@@ -135,10 +137,10 @@ export default function OpportunityBrowser({ opportunities }: { opportunities: O
           </div>
         ) : (
           <EmptyState
-            title="No opportunities match your filters"
-            description="Try a different company, widen the date range, or clear the filters to see more results."
+            title={t("noResultsTitle")}
+            description={t("noResultsDescription")}
             actionHref="/add-opportunity"
-            actionLabel="Submit a new opportunity"
+            actionLabel={t("submitOpportunity")}
           />
         )}
       </section>

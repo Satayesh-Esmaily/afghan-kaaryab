@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
 import { useOpportunitiesContext } from "@/context/opportunities-context";
 import { Badge, ConfirmDialog, EmptyState, SectionHeading } from "@/components/ui";
@@ -14,6 +15,7 @@ import {
 import { slugifyOrganizationName } from "@/lib/network";
 
 export default function OpportunityDetails() {
+  const t = useTranslations("opportunities.details");
   const params = useParams<{ id: string | string[] }>();
   const id = Array.isArray(params.id) ? params.id[0] : params.id;
   const router = useRouter();
@@ -25,10 +27,10 @@ export default function OpportunityDetails() {
   if (!opportunity) {
     return (
       <EmptyState
-        title="Opportunity not found"
-        description="This opportunity may have been removed or the link may be outdated."
+        title={t("notFoundTitle")}
+        description={t("notFoundDescription")}
         actionHref="/opportunities"
-        actionLabel="Back to opportunities"
+        actionLabel={t("backToOpportunities")}
       />
     );
   }
@@ -42,7 +44,7 @@ export default function OpportunityDetails() {
         <div className="flex flex-wrap gap-2">
           <Badge tone="info">{opportunity.category}</Badge>
           <Badge tone={isExpiringSoon(opportunity.deadline) ? "warning" : "default"}>
-            {isExpiringSoon(opportunity.deadline) ? "Deadline soon" : "Open position"}
+            {isExpiringSoon(opportunity.deadline) ? t("deadlineSoon") : t("openPosition")}
           </Badge>
           <Badge tone={opportunity.type === "Remote" ? "success" : "default"}>{opportunity.type}</Badge>
           {opportunity.level ? <Badge tone="accent">{opportunity.level}</Badge> : null}
@@ -68,7 +70,7 @@ export default function OpportunityDetails() {
               onClick={() => toggleSaved(opportunity.id)}
               className="ds-button-secondary rounded-full px-5 py-3 text-sm font-semibold transition"
             >
-              {saved ? "Remove saved" : "Save opportunity"}
+              {saved ? t("removeSaved") : t("saveOpportunity")}
             </button>
             <a
               href={opportunity.applyLink}
@@ -76,20 +78,20 @@ export default function OpportunityDetails() {
               rel="noreferrer"
               className="ds-button-primary rounded-full px-5 py-3 text-sm font-semibold transition"
             >
-              Apply
+              {t("apply")}
             </a>
             <Link
               href={`/opportunities/${opportunity.id}/edit`}
               className="rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] px-5 py-3 text-sm font-semibold text-[color:var(--foreground)] transition hover:bg-[color:var(--surface-soft)]"
             >
-              Edit
+              {t("edit")}
             </Link>
             <button
               type="button"
               onClick={() => setDeleteOpen(true)}
               className="rounded-full border border-transparent bg-[color:var(--danger-soft)] px-5 py-3 text-sm font-semibold text-[color:var(--danger)] transition hover:opacity-90"
             >
-              Delete
+              {t("delete")}
             </button>
           </div>
         </div>
@@ -97,37 +99,37 @@ export default function OpportunityDetails() {
 
       <section className="grid gap-5 xl:grid-cols-[1.15fr_0.85fr]">
         <div className="space-y-5">
-          <DetailPanel title="Description">
+          <DetailPanel title={t("description")}>
             <p className="ds-muted text-sm leading-7">{opportunity.description}</p>
           </DetailPanel>
 
-          <DetailPanel title="Responsibilities">
+          <DetailPanel title={t("responsibilities")}>
             <DetailList
               items={
                 opportunity.responsibilities ?? [
-                  "Review the full job posting",
-                  "Prepare a tailored application",
-                  "Follow the employer's instructions",
+                  t("responsibilityReview"),
+                  t("responsibilityTailored"),
+                  t("responsibilityInstructions"),
                 ]
               }
             />
           </DetailPanel>
 
-          <DetailPanel title="Requirements">
+          <DetailPanel title={t("requirements")}>
             <DetailList items={opportunity.requirements} />
           </DetailPanel>
 
-          <DetailPanel title="Skills">
+          <DetailPanel title={t("skills")}>
             <TagList items={opportunity.skills ?? opportunity.tags} />
           </DetailPanel>
 
-          <DetailPanel title="Documents required">
+          <DetailPanel title={t("documentsRequired")}>
             <DetailList
               items={
                 opportunity.documentsRequired ?? [
-                  "CV or resume",
-                  "Cover letter",
-                  "Relevant certificates or portfolio",
+                  t("documentCv"),
+                  t("documentCoverLetter"),
+                  t("documentCertificates"),
                 ]
               }
             />
@@ -137,49 +139,46 @@ export default function OpportunityDetails() {
         <div className="space-y-5">
           <div className="rounded-[1.5rem] panel p-6">
             <p className="text-sm font-semibold uppercase tracking-[0.22em] text-[color:var(--foreground-muted)]">
-              Company info
+              {t("companyInfo")}
             </p>
             <h2 className="mt-3 text-2xl font-semibold text-[color:var(--foreground-strong)]">
               {opportunity.organization}
             </h2>
             <p className="mt-3 text-sm leading-7 text-[color:var(--foreground-muted)]">
-              {opportunity.companySummary ??
-                "This organization is listed on KaarYab to help job seekers discover current opportunities and learn more before applying."}
+              {opportunity.companySummary ?? t("companySummaryFallback")}
             </p>
 
             <div className="mt-5 space-y-3">
-              <MetaRow label="Location" value={opportunity.location} />
-              <MetaRow label="Contract" value={opportunity.type} />
-              <MetaRow label="Level" value={opportunity.level ?? "Not specified"} />
-              <MetaRow label="Gender" value={opportunity.gender ?? "Open to all"} />
-              <MetaRow label="Organization page" value={organizationSlug} />
+              <MetaRow label={t("location")} value={opportunity.location} />
+              <MetaRow label={t("contract")} value={opportunity.type} />
+              <MetaRow label={t("level")} value={opportunity.level ?? t("notSpecified")} />
+              <MetaRow label={t("gender")} value={opportunity.gender ?? t("openToAll")} />
+              <MetaRow label={t("organizationPage")} value={organizationSlug} />
             </div>
 
             <Link
               href={`/organizations/${organizationSlug}`}
               className="mt-5 inline-flex rounded-full bg-[color:var(--accent-soft)] px-4 py-2.5 text-sm font-semibold text-[color:var(--accent-strong)] transition hover:bg-[color:var(--accent-soft)]/80"
             >
-              View organization
+              {t("viewOrganization")}
             </Link>
           </div>
 
           <div className="rounded-[1.5rem] accent-panel p-6">
             <p className="text-sm font-semibold uppercase tracking-[0.2em] text-white/75">
-              Application note
+              {t("applicationNote")}
             </p>
-            <h3 className="mt-3 text-2xl font-semibold">Apply without leaving the page context.</h3>
-            <p className="mt-3 text-sm leading-7 text-white/85">
-              Use the Apply button when you are ready, then save the listing to revisit it later.
-            </p>
+            <h3 className="mt-3 text-2xl font-semibold">{t("applicationNoteTitle")}</h3>
+            <p className="mt-3 text-sm leading-7 text-white/85">{t("applicationNoteDescription")}</p>
           </div>
         </div>
       </section>
 
       <ConfirmDialog
         open={deleteOpen}
-        title="Delete this opportunity?"
-        description="This will permanently remove the opportunity from the list and from any saved items."
-        confirmLabel="Delete"
+        title={t("deleteTitle")}
+        description={t("deleteDescription")}
+        confirmLabel={t("deleteConfirm")}
         danger
         onCancel={() => setDeleteOpen(false)}
         onConfirm={() => {

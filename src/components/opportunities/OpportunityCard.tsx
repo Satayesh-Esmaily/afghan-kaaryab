@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { useOpportunitiesContext } from "@/context/opportunities-context";
 import { Badge } from "@/components/ui";
 import {
@@ -32,6 +33,7 @@ export default function OpportunityCard({
   opportunity: Opportunity;
   compact?: boolean;
 }) {
+  const t = useTranslations("opportunities.card");
   const { isSaved, toggleSaved } = useOpportunitiesContext();
   const saved = isSaved(opportunity.id);
 
@@ -54,11 +56,11 @@ export default function OpportunityCard({
                 "inline-flex h-9 items-center justify-center rounded-full border px-3 text-[11px] font-semibold transition",
                 saved
                   ? "border-white/20 bg-white text-[color:var(--accent)] shadow-lg"
-                  : "border-white/15 bg-white/10 text-white hover:bg-white/20",
+              : "border-white/15 bg-white/10 text-white hover:bg-white/20",
               ].join(" ")}
-              aria-label={saved ? "Remove from saved" : "Save opportunity"}
+              aria-label={saved ? t("removeFromSaved") : t("save")}
             >
-              {saved ? "Saved" : "Save"}
+              {saved ? t("saved") : t("save")}
             </button>
           </div>
 
@@ -73,10 +75,10 @@ export default function OpportunityCard({
           </div>
 
           <div className="grid grid-cols-2 gap-2.5 text-center text-white sm:grid-cols-4">
-            <Metric label="Company" value={opportunity.organization} />
-            <Metric label="Location" value={opportunity.location} />
-            <Metric label="Published" value={formatPublishedDate(opportunity.publishedAt ?? opportunity.submittedAt)} />
-            <Metric label="Deadline" value={formatDeadline(opportunity.deadline)} />
+            <Metric label={t("company")} value={opportunity.organization} />
+            <Metric label={t("location")} value={opportunity.location} />
+            <Metric label={t("published")} value={formatPublishedDate(opportunity.publishedAt ?? opportunity.submittedAt)} />
+            <Metric label={t("deadline")} value={formatDeadline(opportunity.deadline)} />
           </div>
         </div>
       </div>
@@ -96,8 +98,8 @@ export default function OpportunityCard({
         />
 
         <div className="flex flex-wrap items-center gap-2">
-          {isExpiringSoon(opportunity.deadline) ? <Badge tone="warning">Expiring soon</Badge> : null}
-          {opportunity.type === "Remote" ? <Badge tone="success">Remote</Badge> : null}
+          {isExpiringSoon(opportunity.deadline) ? <Badge tone="warning">{t("expiringSoon")}</Badge> : null}
+          {opportunity.type === "Remote" ? <Badge tone="success">{t("remote")}</Badge> : null}
           {opportunity.level ? <Badge tone="info">{opportunity.level}</Badge> : null}
           {opportunity.gender ? <Badge tone="default">{opportunity.gender}</Badge> : null}
         </div>
@@ -118,7 +120,7 @@ export default function OpportunityCard({
             href={`/opportunities/${opportunity.id}`}
             className="ds-button-primary inline-flex items-center justify-center rounded-2xl px-4 py-3 text-sm font-semibold transition"
           >
-            View details
+            {t("viewDetails")}
           </Link>
           <a
             href={opportunity.applyLink}
@@ -126,7 +128,7 @@ export default function OpportunityCard({
             rel="noreferrer"
             className="ds-button-secondary inline-flex items-center justify-center rounded-2xl px-4 py-3 text-sm font-semibold transition"
           >
-            Apply now
+            {t("applyNow")}
           </a>
         </div>
       </div>

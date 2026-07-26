@@ -2,6 +2,7 @@
 
 import { useForm, useWatch, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslations } from "next-intl";
 import FormField from "@/components/common/FormField";
 import DatePickerField from "@/components/common/DatePickerField";
 import SearchableSelect from "@/components/common/SearchableSelect";
@@ -12,7 +13,6 @@ import {
   type Opportunity,
   type OpportunityInput,
 } from "@/lib/opportunities";
-import { opportunityFormCopy } from "@/config/opportunities";
 
 type FormSubmitValue = OpportunityInput;
 
@@ -32,6 +32,7 @@ export default function OpportunityForm({
   onSubmit: (values: FormSubmitValue) => void;
   submitLabel: string;
 }) {
+  const t = useTranslations("addOpportunity.form");
   const resolver: Resolver<OpportunityFormValues> =
     zodResolver(opportunityFormSchema) as Resolver<OpportunityFormValues>;
 
@@ -62,6 +63,21 @@ export default function OpportunityForm({
   const categoryValue = useWatch({ control, name: "category" });
   const typeValue = useWatch({ control, name: "type" });
   const deadlineValue = useWatch({ control, name: "deadline" });
+  const categoryOptions = {
+    Job: t("categories.job"),
+    Internship: t("categories.internship"),
+    Scholarship: t("categories.scholarship"),
+    "Online course": t("categories.onlineCourse"),
+    "Remote work": t("categories.remoteWork"),
+    "Training program": t("categories.trainingProgram"),
+    "Volunteer work": t("categories.volunteerWork"),
+  } as const;
+  const typeOptions = {
+    Remote: t("types.remote"),
+    "On-site": t("types.onSite"),
+    Hybrid: t("types.hybrid"),
+    Online: t("types.online"),
+  } as const;
 
   return (
     <form
@@ -83,22 +99,25 @@ export default function OpportunityForm({
       className="ds-card rounded-[1.5rem] p-6 sm:p-8"
     >
       <div className="grid gap-5 md:grid-cols-2">
-        <FormField label="Title" error={errors.title?.message}>
-          <input {...register("title")} className="ds-input" placeholder={opportunityFormCopy.titlePlaceholder} />
+        <FormField label={t("title")} error={errors.title?.message}>
+          <input {...register("title")} className="ds-input" placeholder={t("titlePlaceholder")} />
         </FormField>
-        <FormField label="Organization" error={errors.organization?.message}>
+        <FormField label={t("organization")} error={errors.organization?.message}>
           <input
             {...register("organization")}
             className="ds-input"
-            placeholder={opportunityFormCopy.organizationPlaceholder}
+            placeholder={t("organizationPlaceholder")}
           />
         </FormField>
-        <FormField label="Category" error={errors.category?.message}>
+        <FormField label={t("category")} error={errors.category?.message}>
           <SearchableSelect
             value={categoryValue}
-            options={opportunityCategories.map((category) => ({ value: category, label: category }))}
-            placeholder="Select category"
-            searchPlaceholder="Search category..."
+            options={opportunityCategories.map((category) => ({
+              value: category,
+              label: categoryOptions[category],
+            }))}
+            placeholder={t("selectCategory")}
+            searchPlaceholder={t("searchCategory")}
             onChange={(value) =>
               setValue("category", value as OpportunityFormValues["category"], {
                 shouldDirty: true,
@@ -107,12 +126,12 @@ export default function OpportunityForm({
             }
           />
         </FormField>
-        <FormField label="Opportunity type" error={errors.type?.message}>
+        <FormField label={t("opportunityType")} error={errors.type?.message}>
           <SearchableSelect
             value={typeValue}
-            options={opportunityTypes.map((type) => ({ value: type, label: type }))}
-            placeholder="Select type"
-            searchPlaceholder="Search type..."
+            options={opportunityTypes.map((type) => ({ value: type, label: typeOptions[type] }))}
+            placeholder={t("selectType")}
+            searchPlaceholder={t("searchType")}
             onChange={(value) =>
               setValue("type", value as OpportunityFormValues["type"], {
                 shouldDirty: true,
@@ -121,14 +140,14 @@ export default function OpportunityForm({
             }
           />
         </FormField>
-        <FormField label="Location" error={errors.location?.message}>
-          <input {...register("location")} className="ds-input" placeholder={opportunityFormCopy.locationPlaceholder} />
+        <FormField label={t("location")} error={errors.location?.message}>
+          <input {...register("location")} className="ds-input" placeholder={t("locationPlaceholder")} />
         </FormField>
-        <FormField label="Deadline" error={errors.deadline?.message}>
+        <FormField label={t("deadline")} error={errors.deadline?.message}>
           <DatePickerField
             key={deadlineValue || "empty-deadline"}
             value={deadlineValue}
-            placeholder="Select date"
+            placeholder={t("selectDate")}
             onChange={(value) =>
               setValue("deadline", value, {
                 shouldDirty: true,
@@ -140,33 +159,29 @@ export default function OpportunityForm({
       </div>
 
       <div className="mt-5 grid gap-5">
-        <FormField label="Description" error={errors.description?.message}>
+        <FormField label={t("description")} error={errors.description?.message}>
           <textarea
             {...register("description")}
             className="ds-input min-h-32"
-            placeholder={opportunityFormCopy.descriptionPlaceholder}
+            placeholder={t("descriptionPlaceholder")}
           />
         </FormField>
         <FormField
-          label="Requirements"
-          hint={opportunityFormCopy.requirementsHint}
+          label={t("requirements")}
+          hint={t("requirementsHint")}
           error={errors.requirementsText?.message}
         >
           <textarea
             {...register("requirementsText")}
             className="ds-input min-h-28"
-            placeholder={opportunityFormCopy.requirementsPlaceholder}
+            placeholder={t("requirementsPlaceholder")}
           />
         </FormField>
-        <FormField label="Apply link" error={errors.applyLink?.message}>
-          <input
-            {...register("applyLink")}
-            className="ds-input"
-            placeholder={opportunityFormCopy.applyLinkPlaceholder}
-          />
+        <FormField label={t("applyLink")} error={errors.applyLink?.message}>
+          <input {...register("applyLink")} className="ds-input" placeholder={t("applyLinkPlaceholder")} />
         </FormField>
-        <FormField label="Tags" hint={opportunityFormCopy.tagsHint} error={errors.tagsText?.message}>
-          <input {...register("tagsText")} className="ds-input" placeholder={opportunityFormCopy.tagsPlaceholder} />
+        <FormField label={t("tags")} hint={t("tagsHint")} error={errors.tagsText?.message}>
+          <input {...register("tagsText")} className="ds-input" placeholder={t("tagsPlaceholder")} />
         </FormField>
       </div>
 
@@ -176,7 +191,7 @@ export default function OpportunityForm({
           {...register("featured")}
           className="h-4 w-4 rounded border-[color:var(--border-strong)] text-[color:var(--accent)] focus:ring-[color:var(--accent)]"
         />
-        {opportunityFormCopy.featuredLabel}
+        {t("featured")}
       </label>
 
       <button
@@ -184,7 +199,7 @@ export default function OpportunityForm({
         disabled={isSubmitting}
         className="ds-button-primary mt-6 inline-flex w-full items-center justify-center rounded-full px-5 py-3.5 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-70"
       >
-        {isSubmitting ? opportunityFormCopy.savingLabel : submitLabel}
+        {isSubmitting ? t("saving") : submitLabel}
       </button>
     </form>
   );

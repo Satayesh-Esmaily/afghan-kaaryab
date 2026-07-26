@@ -1,11 +1,15 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import OpportunityBrowser from "@/components/opportunities/OpportunityBrowser";
 import { demoOpportunities } from "@/data/opportunities";
 
-export const metadata: Metadata = {
-  title: "Opportunities",
-  description: "Browse, search, and filter all opportunities listed on KaarYab Afghanistan.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("opportunities.page");
+  return {
+    title: t("title"),
+    description: t("description"),
+  };
+}
 
 export default function OpportunitiesPage() {
   return <OpportunityBrowser opportunities={demoOpportunities} />;

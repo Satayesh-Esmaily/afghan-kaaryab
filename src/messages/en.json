@@ -449,6 +449,123 @@
       "downloadFile": "Download {fileName}"
     }
   },
+  "opportunities": {
+    "page": {
+      "title": "Opportunities",
+      "description": "Browse, search, and filter opportunities listed on KaarYab Afghanistan."
+    },
+    "browser": {
+      "eyebrow": "Search filters",
+      "title": "Find the right opportunity faster",
+      "description": "Search by title, province, company, contract type, publication date, gender, and level.",
+      "searchTitle": "Search title",
+      "searchPlaceholder": "Search opportunities...",
+      "province": "Province",
+      "searchProvince": "Search province...",
+      "company": "Company",
+      "searchCompany": "Search company...",
+      "contractType": "Contract type",
+      "searchType": "Search type...",
+      "publishedAfter": "Published after",
+      "anyDate": "Any date",
+      "gender": "Gender",
+      "searchGender": "Search gender...",
+      "jobLevel": "Job level",
+      "searchLevel": "Search level...",
+      "deadline": "Deadline",
+      "results": "{count} results",
+      "clearFilters": "Clear filters",
+      "any": "Any",
+      "deadlineOptions": {
+        "7": "7 days",
+        "14": "14 days",
+        "30": "30 days",
+        "expired": "Expired"
+      },
+      "openToAll": "Open to all",
+      "female": "Female",
+      "male": "Male",
+      "noResultsTitle": "No opportunities match your filters",
+      "noResultsDescription": "Try a different company, widen the date range, or clear the filters to see more results.",
+      "submitOpportunity": "Submit a new opportunity"
+    },
+    "results": {
+      "eyebrow": "Opportunity search",
+      "title": "{count} opportunities",
+      "description": "Browse the latest listings with a clean layout and useful filters.",
+      "saved": "{count} saved",
+      "total": "{count} total"
+    },
+    "card": {
+      "save": "Save",
+      "saved": "Saved",
+      "removeFromSaved": "Remove from saved",
+      "company": "Company",
+      "location": "Location",
+      "published": "Published",
+      "deadline": "Deadline",
+      "expiringSoon": "Expiring soon",
+      "remote": "Remote",
+      "viewDetails": "View details",
+      "applyNow": "Apply now"
+    },
+    "details": {
+      "notFoundTitle": "Opportunity not found",
+      "notFoundDescription": "This opportunity may have been removed or the link may be outdated.",
+      "backToOpportunities": "Back to opportunities",
+      "deadlineSoon": "Deadline soon",
+      "openPosition": "Open position",
+      "saveOpportunity": "Save opportunity",
+      "removeSaved": "Remove saved",
+      "apply": "Apply",
+      "edit": "Edit",
+      "delete": "Delete",
+      "description": "Description",
+      "responsibilities": "Responsibilities",
+      "responsibilityReview": "Review the full job posting",
+      "responsibilityTailored": "Prepare a tailored application",
+      "responsibilityInstructions": "Follow the employer's instructions",
+      "requirements": "Requirements",
+      "skills": "Skills",
+      "documentsRequired": "Documents required",
+      "documentCv": "CV or resume",
+      "documentCoverLetter": "Cover letter",
+      "documentCertificates": "Relevant certificates or portfolio",
+      "companyInfo": "Company info",
+      "companySummaryFallback": "This organization is listed on KaarYab to help job seekers discover current opportunities and learn more before applying.",
+      "location": "Location",
+      "contract": "Contract",
+      "level": "Level",
+      "gender": "Gender",
+      "notSpecified": "Not specified",
+      "openToAll": "Open to all",
+      "organizationPage": "Organization page",
+      "viewOrganization": "View organization",
+      "applicationNote": "Application note",
+      "applicationNoteTitle": "Apply without leaving the page context.",
+      "applicationNoteDescription": "Use the Apply button when you are ready, then save the listing to revisit it later.",
+      "deleteTitle": "Delete this opportunity?",
+      "deleteDescription": "This will permanently remove the opportunity from the list and from any saved items.",
+      "deleteConfirm": "Delete"
+    },
+    "saved": {
+      "eyebrow": "Saved",
+      "title": "Your saved opportunities",
+      "description": "Keep the best opportunities in one place so you can return to them later.",
+      "savedItems": "Saved items",
+      "availableOpportunities": "Available opportunities",
+      "quickAction": "Quick action",
+      "saveMore": "Save more",
+      "tapStar": "Tap the star on any card.",
+      "clearSaved": "Clear saved",
+      "removeItemsHint": "You can remove items from here or from the opportunity details page.",
+      "nothingSaved": "Nothing saved yet",
+      "exploreOpportunities": "Browse the opportunities page and use the star button to save items for later.",
+      "explore": "Explore opportunities",
+      "needFreshStart": "Need a fresh start? You can always return to the",
+      "fullOpportunityList": "full opportunity list"
+    }
+  },
   "resumeBuilder": {
     "signInTitle": "Sign in to build your resume",
     "signInDescription": "Create your CV, choose a template, and export it as PDF after logging in.",
@@ -732,6 +849,144 @@
       "submit": "Submit",
       "dashboard": "Dashboard",
       "contact": "Contact"
+    }
+  },
+  "network": {
+    "page": {
+      "eyebrow": "Directory",
+      "title": "Organizations, countries, and institutions",
+      "description": "Explore the organizations, countries, and institutions behind the latest opportunities on KaarYab."
+    },
+    "stats": {
+      "organizations": "Organizations",
+      "countries": "Countries",
+      "institutions": "Institutions"
+    },
+    "organizations": {
+      "badge": "Live network",
+      "title": "Organizations",
+      "description": "Organizations currently active on the platform and connected to available listings.",
+      "followingCount": "Following {count} organizations"
+    },
+    "countries": {
+      "badge": "Delivery coverage",
+      "title": "Countries & reach",
+      "description": "Afghan opportunities first, with remote roles and regional reach where available."
+    },
+    "institutions": {
+      "badge": "Grouped by source type",
+      "title": "Institutions",
+      "description": "Grouped by the type of institution behind each listing."
+    },
+    "card": {
+      "openOrganization": "Open {title}",
+      "follow": "Follow",
+      "following": "Following"
+    },
+    "detail": {
+      "eyebrow": "Organization",
+      "description": "Explore {name} and its related opportunities.",
+      "organizationNotFound": "Organization not found",
+      "profileBadge": "Organization profile",
+      "categories": "Categories",
+      "follow": "Follow",
+      "following": "Following",
+      "summary": {
+        "listings": "Listings",
+        "locations": "Locations",
+        "featured": "Featured"
+      },
+      "primaryLocations": "Primary locations",
+      "organizationSlug": "Organization slug",
+      "aboutTitle": "About this organization",
+      "aboutBody": "This profile helps job seekers learn more about the organization before applying.",
+      "relatedTitle": "Related opportunities",
+      "footprintTitle": "Current footprint",
+      "active": "Active",
+      "quickAction": "Quick action",
+      "quickActionTitle": "Keep this organization on your radar.",
+      "quickActionBody": "Following the organization keeps it easy to revisit when new opportunities are posted.",
+      "backToDirectory": "Back to directory",
+      "deadline": "Deadline",
+      "openOpportunity": "Open"
+    }
+  },
+  "addOpportunity": {
+    "page": {
+      "eyebrow": "Submit",
+      "title": "Add a new opportunity",
+      "description": "Share jobs, internships, scholarships, training programs, and remote roles for Afghan job seekers.",
+      "submitLabel": "Publish opportunity"
+    },
+    "form": {
+      "title": "Title",
+      "titlePlaceholder": "Frontend Developer Intern",
+      "organization": "Organization",
+      "organizationPlaceholder": "Kabul Tech Community",
+      "category": "Category",
+      "selectCategory": "Select category",
+      "searchCategory": "Search category...",
+      "opportunityType": "Opportunity type",
+      "selectType": "Select type",
+      "searchType": "Search type...",
+      "location": "Location",
+      "locationPlaceholder": "Kabul",
+      "deadline": "Deadline",
+      "selectDate": "Select date",
+      "description": "Description",
+      "descriptionPlaceholder": "Describe the opportunity, audience, and main value.",
+      "requirements": "Requirements",
+      "requirementsPlaceholder": "Basic React\nHTML/CSS\nGitHub",
+      "requirementsHint": "Use one requirement per line or separate them with commas.",
+      "applyLink": "Apply link",
+      "applyLinkPlaceholder": "https://example.com/apply",
+      "tags": "Tags",
+      "tagsPlaceholder": "React, Remote, Internship",
+      "tagsHint": "Comma separated, like React, Remote, Internship.",
+      "featured": "Mark as featured",
+      "saving": "Saving...",
+      "categories": {
+        "job": "Job",
+        "internship": "Internship",
+        "scholarship": "Scholarship",
+        "onlineCourse": "Online course",
+        "remoteWork": "Remote work",
+        "trainingProgram": "Training program",
+        "volunteerWork": "Volunteer work"
+      },
+      "types": {
+        "remote": "Remote",
+        "onSite": "On-site",
+        "hybrid": "Hybrid",
+        "online": "Online"
+      }
+    }
+  },
+  "about": {
+    "page": {
+      "title": "About",
+      "description": "Learn what KaarYab Afghanistan is and why it was built."
+    },
+    "eyebrow": "About",
+    "title": "Why KaarYab Afghanistan exists",
+    "description": "KaarYab helps Afghan job seekers find trusted opportunities in one organized platform.",
+    "cards": {
+      "problem": {
+        "title": "Problem",
+        "body": "Opportunities are often scattered across social media, groups, and different websites."
+      },
+      "solution": {
+        "title": "Solution",
+        "body": "KaarYab centralizes opportunities with search, filters, saved items, and organization pages."
+      },
+      "audience": {
+        "title": "Audience",
+        "body": "Students, graduates, job seekers, women seeking remote work, and organizations sharing listings."
+      }
+    },
+    "summary": {
+      "title": "Built as a practical job platform",
+      "body": "The application includes responsive layouts, dynamic routes, saved opportunities, organization profiles, a full add/edit/delete workflow, dark mode, and reusable components so it feels ready for everyday use."
     }
   }
 }
