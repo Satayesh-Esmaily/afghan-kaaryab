@@ -3,6 +3,8 @@
 KaarYab Afghanistan is a modern opportunity-finder platform built for Afghan job seekers, students, and organizations.
 It helps people discover and manage jobs, internships, scholarships, remote work, online courses, training programs, volunteer work, and organization profiles in one place.
 
+Live deployment: https://afghan-kaaryab.vercel.app/
+
 The project uses Supabase as its database, authentication, and storage backend, and it also supports PWA installation for a more app-like experience on supported devices.
 
 The project is built with:
@@ -395,9 +397,9 @@ The UI uses a compact design system with shared visual tokens and repeated compo
 
 ### Submission Links
 
-- Deployed App: `PUT_DEPLOYED_VERCEL_LINK_HERE`
+- Deployed App: https://afghan-kaaryab.vercel.app/
 - Demo Video: `PUT_DEMO_VIDEO_LINK_HERE`
-- GitHub Repository: `PUT_GITHUB_REPOSITORY_LINK_HERE`
+- GitHub Repository: https://github.com/Satayesh-Esmaily/afghan-kaaryab
 
 ### Screenshots
 
@@ -514,6 +516,42 @@ npm run lint
 - Open organization detail pages
 - Test the app on mobile and tablet layouts
 - Build the project with `npm run build`
+
+## Automated Tests
+
+The repository includes component and page-level smoke tests for the most important user flows:
+
+- reusable controls:
+  - `SearchableSelect`
+  - `DatePickerField`
+  - `OpportunityCard`
+  - shared UI primitives in `src/components/ui.tsx`
+- main pages and views:
+  - dashboard
+  - opportunities browser
+  - add opportunity flow
+  - saved opportunities
+  - organizations / network directory
+  - profile
+  - resume builder
+  - contact form
+
+Run them with:
+
+```bash
+npm run test
+```
+
+The project is also verified with:
+
+```bash
+npm run lint
+npm run build
+```
+
+## Submission Notes
+
+Before final submission, replace the placeholder demo video link and make sure the screenshot paths point to real exported images from the project. The README already includes the live deployment link, repository link, stack summary, Supabase notes, and main architecture overview.
 
 ---
 
