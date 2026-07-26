@@ -5,6 +5,7 @@ import { useProfileContext } from "@/context/profile-context";
 import { getAvatarAccessUrl, uploadAvatarFile } from "@/lib/avatar-storage";
 import { uploadProfileAttachment } from "@/lib/profile-attachment-storage";
 import { deleteResumeFile as deleteStoredResumeFile, getResumeAccessUrl, uploadResumeFile } from "@/lib/resume-storage";
+import type { JobSeekerProfile } from "@/lib/app-state";
 import {
   getFileNameFromPath,
   getFileNameFromUrl,
@@ -45,53 +46,23 @@ export function useProfileUpload(userId: string | null): UseProfileUploadResult 
   useEffect(() => {
     let cancelled = false;
 
-    async function refreshAvatarUrl() {
-      if (!profile.avatarStoragePath) {
-        return;
+    async function refreshProfileUrls() {
+      const updates: Partial<JobSeekerProfile> = {};
+
+      if (profile.avatarStoragePath) {
+        const nextAvatarUrl = await getAvatarAccessUrl(profile.avatarStoragePath);
+        if (!cancelled && nextAvatarUrl && nextAvatarUrl !== profile.avatarUrl) {
+          updates.avatarUrl = nextAvatarUrl;
+        }
       }
 
-      const nextUrl = await getAvatarAccessUrl(profile.avatarStoragePath);
-      if (cancelled || !nextUrl || nextUrl === profile.avatarUrl) {
-        return;
+      if (profile.resumeStoragePath) {
+        const nextResumeUrl = await getResumeAccessUrl(profile.resumeStoragePath);
+        if (!cancelled && nextResumeUrl && nextResumeUrl !== profile.resumeUrl) {
+          updates.resumeUrl = nextResumeUrl;
+        }
       }
 
-      updateProfile({ avatarUrl: nextUrl });
-    }
-
-    void refreshAvatarUrl();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [profile.avatarStoragePath, profile.avatarUrl, updateProfile]);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    async function refreshResumeUrl() {
-      if (!profile.resumeStoragePath) {
-        return;
-      }
-
-      const nextUrl = await getResumeAccessUrl(profile.resumeStoragePath);
-      if (cancelled || !nextUrl || nextUrl === profile.resumeUrl) {
-        return;
-      }
-
-      updateProfile({ resumeUrl: nextUrl });
-    }
-
-    void refreshResumeUrl();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [profile.resumeStoragePath, profile.resumeUrl, updateProfile]);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    async function refreshAttachmentUrls() {
       const [certificationEntries, awardEntries, documentEntries] = await Promise.all([
         resolveAttachmentEntryUrls(profile.certificationEntries),
         resolveAttachmentEntryUrls(profile.awardEntries),
@@ -103,33 +74,40 @@ export function useProfileUpload(userId: string | null): UseProfileUploadResult 
       }
 
       if (certificationEntries !== profile.certificationEntries) {
-        updateProfile({
-          certificationEntries,
-          certifications: serializeCertificationEntries(certificationEntries),
-        });
+        updates.certificationEntries = certificationEntries;
+        updates.certifications = serializeCertificationEntries(certificationEntries);
       }
 
       if (awardEntries !== profile.awardEntries) {
-        updateProfile({
-          awardEntries,
-          awards: serializeAwardEntries(awardEntries),
-        });
+        updates.awardEntries = awardEntries;
+        updates.awards = serializeAwardEntries(awardEntries);
       }
 
       if (documentEntries !== profile.documentEntries) {
-        updateProfile({
-          documentEntries,
-          documents: serializeDocumentEntries(documentEntries),
-        });
+        updates.documentEntries = documentEntries;
+        updates.documents = serializeDocumentEntries(documentEntries);
+      }
+
+      if (Object.keys(updates).length > 0) {
+        updateProfile(updates);
       }
     }
 
-    void refreshAttachmentUrls();
+    void refreshProfileUrls();
 
     return () => {
       cancelled = true;
     };
-  }, [profile.awardEntries, profile.certificationEntries, profile.documentEntries, updateProfile]);
+  }, [
+    profile.avatarStoragePath,
+    profile.avatarUrl,
+    profile.awardEntries,
+    profile.certificationEntries,
+    profile.documentEntries,
+    profile.resumeStoragePath,
+    profile.resumeUrl,
+    updateProfile,
+  ]);
 
   const uploadAvatar = useCallback(
     async (file: File | null) => {
@@ -161,16 +139,11 @@ export function useProfileUpload(userId: string | null): UseProfileUploadResult 
           return;
         }
 
-        const uploadedItems: Awaited<ReturnType<typeof uploadResumeFile>>[] = [];
+        const uploadedItems = (await Promise.all(files.map((file) => uploadResumeFile(file, userId)))).filter(
+          (item): item is NonNullable<typeof item> => Boolean(item)
+        );
 
-        for (const file of files) {
-          const result = await uploadResumeFile(file, userId);
-          if (result) {
-            uploadedItems.unshift(result);
-          }
-        }
-
-        const activeResume = uploadedItems[0];
+        const activeResume = uploadedItems.at(-1);
         if (activeResume) {
           updateProfile({
             resumeUrl: activeResume.url,

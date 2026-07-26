@@ -2,9 +2,10 @@ import "server-only";
 
 import { cookies } from "next/headers";
 import { createServerClient } from "@supabase/ssr";
-import { createDefaultAppState } from "@/lib/app-state";
 import { mapSessionUserToAuthUser } from "@/lib/auth";
 import type { ServerBootstrapState } from "@/lib/bootstrap";
+import { createDefaultAppState } from "@/lib/app-state";
+import { loadAppStoreFromSupabase } from "@/lib/supabase-app-store";
 
 export async function getSupabaseServerClient() {
   const cookieStore = await cookies();
@@ -58,38 +59,16 @@ export async function loadServerBootstrap(): Promise<ServerBootstrapState> {
     } = await supabase.auth.getUser();
 
     const user = sessionUser?.email ? mapSessionUserToAuthUser(sessionUser) : null;
-    const defaultState = createDefaultAppState(user);
-    let theme = defaultState.theme;
-
-    if (user?.id) {
-      const { data: profileRow } = await supabase
-        .from("profiles")
-        .select("theme_mode")
-        .eq("user_id", user.id)
-        .maybeSingle();
-
-      if (profileRow && typeof profileRow.theme_mode === "string") {
-        theme = profileRow.theme_mode === "dark" ? "dark" : "light";
-      }
-    }
-
-    const snapshot = {
-      opportunities: defaultState.opportunities,
-      savedIds: defaultState.savedIds,
-      followedOrganizationSlugs: defaultState.followedOrganizationSlugs,
-      profile: {
-        ...defaultState.profile,
-        resumeTemplate: defaultState.profile.resumeTemplate,
-      },
-      theme,
-    };
+    const snapshot = user?.id
+      ? await loadAppStoreFromSupabase(supabase, user)
+      : createDefaultAppState(null);
 
     return {
       user,
       authReady: true,
       snapshot,
       source: "server",
-      prefetchedSnapshot: Boolean(!user?.id),
+      prefetchedSnapshot: true,
     };
   } catch {
     const fallback = createDefaultAppState(null);
