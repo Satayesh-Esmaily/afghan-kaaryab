@@ -496,22 +496,50 @@
       "saved": "{count} saved",
       "total": "{count} total"
     },
-    "card": {
-      "save": "Save",
-      "saved": "Saved",
-      "removeFromSaved": "Remove from saved",
-      "company": "Company",
+      "card": {
+        "save": "Save",
+        "saved": "Saved",
+        "removeFromSaved": "Remove from saved",
+        "company": "Company",
       "location": "Location",
       "published": "Published",
       "deadline": "Deadline",
       "expiringSoon": "Expiring soon",
-      "remote": "Remote",
-      "viewDetails": "View details",
-      "applyNow": "Apply now"
-    },
-    "details": {
-      "notFoundTitle": "Opportunity not found",
-      "notFoundDescription": "This opportunity may have been removed or the link may be outdated.",
+        "remote": "Remote",
+        "viewDetails": "View details",
+        "applyNow": "Apply now"
+      },
+      "shared": {
+        "categories": {
+          "Job": "Job",
+          "Internship": "Internship",
+          "Scholarship": "Scholarship",
+          "Online course": "Online course",
+          "Remote work": "Remote work",
+          "Training program": "Training program",
+          "Volunteer work": "Volunteer work"
+        },
+        "types": {
+          "Remote": "Remote",
+          "On-site": "On-site",
+          "Hybrid": "Hybrid",
+          "Online": "Online"
+        },
+        "levels": {
+          "Entry level": "Entry level",
+          "Mid level": "Mid level",
+          "Senior level": "Senior level",
+          "Internship": "Internship"
+        },
+        "genders": {
+          "Male": "Male",
+          "Female": "Female",
+          "Open to all": "Open to all"
+        }
+      },
+      "details": {
+        "notFoundTitle": "Opportunity not found",
+        "notFoundDescription": "This opportunity may have been removed or the link may be outdated.",
       "backToOpportunities": "Back to opportunities",
       "deadlineSoon": "Deadline soon",
       "openPosition": "Open position",
@@ -532,6 +560,10 @@
       "documentCoverLetter": "Cover letter",
       "documentCertificates": "Relevant certificates or portfolio",
       "companyInfo": "Company info",
+      "organizationLabel": "Organization",
+      "provinceLabel": "Province",
+      "publishedLabel": "Published",
+      "deadlineLabel": "Deadline",
       "companySummaryFallback": "This organization is listed on KaarYab to help job seekers discover current opportunities and learn more before applying.",
       "location": "Location",
       "contract": "Contract",

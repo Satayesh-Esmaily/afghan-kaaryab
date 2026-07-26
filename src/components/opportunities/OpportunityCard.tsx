@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useOpportunitiesContext } from "@/context/opportunities-context";
 import { Badge } from "@/components/ui";
@@ -10,6 +11,12 @@ import {
   isExpiringSoon,
   type Opportunity,
 } from "@/lib/opportunities";
+import {
+  opportunityCategoryLabelKeys,
+  opportunityGenderLabelKeys,
+  opportunityLevelLabelKeys,
+  opportunityTypeLabelKeys,
+} from "@/lib/opportunity-labels";
 
 function colorForCategory(category: Opportunity["category"]) {
   switch (category) {
@@ -34,11 +41,25 @@ export default function OpportunityCard({
   compact?: boolean;
 }) {
   const t = useTranslations("opportunities.card");
+  const tShared = useTranslations("opportunities.shared");
+  const router = useRouter();
   const { isSaved, toggleSaved } = useOpportunitiesContext();
   const saved = isSaved(opportunity.id);
+  const detailsHref = `/opportunities/${opportunity.id}`;
 
   return (
-    <article className="group overflow-hidden rounded-[1.5rem] panel-strong transition duration-200 hover:-translate-y-1 hover:shadow-2xl">
+    <article
+      className="group overflow-hidden rounded-[1.5rem] panel-strong transition duration-200 hover:-translate-y-1 hover:shadow-2xl"
+      role="link"
+      tabIndex={0}
+      onClick={() => router.push(detailsHref)}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          router.push(detailsHref);
+        }
+      }}
+    >
       <div className="relative overflow-hidden accent-panel p-5 sm:p-6">
         <div className="absolute inset-0 opacity-30">
           <div className="absolute start-5 top-5 h-16 w-16 rounded-full border border-white/20" />
@@ -46,22 +67,39 @@ export default function OpportunityCard({
           <div className="absolute start-1/2 top-8 h-20 w-20 -translate-x-1/2 rounded-full border border-dashed border-white/15" />
         </div>
 
-        <div className="relative flex min-h-[210px] flex-col justify-between gap-5">
+        <div className="relative z-10 flex min-h-[210px] flex-col justify-between gap-5">
           <div className="flex items-start justify-between gap-3">
-            <Badge tone={colorForCategory(opportunity.category)}>{opportunity.category}</Badge>
-            <button
-              type="button"
-              onClick={() => toggleSaved(opportunity.id)}
-              className={[
-                "inline-flex h-9 items-center justify-center rounded-full border px-3 text-[11px] font-semibold transition",
-                saved
-                  ? "border-white/20 bg-white text-[color:var(--accent)] shadow-lg"
-              : "border-white/15 bg-white/10 text-white hover:bg-white/20",
-              ].join(" ")}
-              aria-label={saved ? t("removeFromSaved") : t("save")}
-            >
-              {saved ? t("saved") : t("save")}
-            </button>
+            <Badge tone={colorForCategory(opportunity.category)}>
+              {tShared(opportunityCategoryLabelKeys[opportunity.category])}
+            </Badge>
+            <div className="flex items-center gap-2">
+              <Link
+                href={detailsHref}
+                onClick={(event) => event.stopPropagation()}
+                className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-white/10 text-white transition hover:bg-white/20"
+                aria-label={t("viewDetails")}
+              >
+                <span aria-hidden="true" className="text-lg leading-none">
+                  ↗
+                </span>
+              </Link>
+              <button
+                type="button"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  toggleSaved(opportunity.id);
+                }}
+                className={[
+                  "inline-flex h-9 items-center justify-center rounded-full border px-3 text-[11px] font-semibold transition",
+                  saved
+                    ? "border-white/20 bg-white text-[color:var(--accent)] shadow-lg"
+                    : "border-white/15 bg-white/10 text-white hover:bg-white/20",
+                ].join(" ")}
+                aria-label={saved ? t("removeFromSaved") : t("save")}
+              >
+                {saved ? t("saved") : t("save")}
+              </button>
+            </div>
           </div>
 
           <div className="space-y-2 text-white">
@@ -97,12 +135,12 @@ export default function OpportunityCard({
           ].join(" ")}
         />
 
-        <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
           {isExpiringSoon(opportunity.deadline) ? <Badge tone="warning">{t("expiringSoon")}</Badge> : null}
-          {opportunity.type === "Remote" ? <Badge tone="success">{t("remote")}</Badge> : null}
-          {opportunity.level ? <Badge tone="info">{opportunity.level}</Badge> : null}
-          {opportunity.gender ? <Badge tone="default">{opportunity.gender}</Badge> : null}
-        </div>
+          <Badge tone="success">{tShared(opportunityTypeLabelKeys[opportunity.type])}</Badge>
+          {opportunity.level ? <Badge tone="info">{tShared(opportunityLevelLabelKeys[opportunity.level])}</Badge> : null}
+          {opportunity.gender ? <Badge tone="default">{tShared(opportunityGenderLabelKeys[opportunity.gender])}</Badge> : null}
+          </div>
 
         <div className="flex flex-wrap gap-2">
           {opportunity.tags.slice(0, compact ? 2 : 4).map((tag) => (
@@ -117,7 +155,8 @@ export default function OpportunityCard({
 
         <div className="mt-auto grid gap-3 sm:grid-cols-2">
           <Link
-            href={`/opportunities/${opportunity.id}`}
+            href={detailsHref}
+            onClick={(event) => event.stopPropagation()}
             className="ds-button-primary inline-flex items-center justify-center rounded-2xl px-4 py-3 text-sm font-semibold transition"
           >
             {t("viewDetails")}
@@ -126,6 +165,7 @@ export default function OpportunityCard({
             href={opportunity.applyLink}
             target="_blank"
             rel="noreferrer"
+            onClick={(event) => event.stopPropagation()}
             className="ds-button-secondary inline-flex items-center justify-center rounded-2xl px-4 py-3 text-sm font-semibold transition"
           >
             {t("applyNow")}
