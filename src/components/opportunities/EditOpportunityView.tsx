@@ -1,9 +1,9 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import OpportunityForm from "@/components/opportunities/OpportunityForm";
 import { EmptyState, SectionHeading } from "@/components/ui";
 import { useOpportunitiesContext } from "@/context/opportunities-context";
+import { useRouter } from "@/i18n/navigation";
 import { getOpportunityById } from "@/lib/opportunities";
 
 export default function EditOpportunityView({ id }: { id: string }) {

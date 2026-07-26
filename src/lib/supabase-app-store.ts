@@ -374,7 +374,12 @@ export async function setSavedOpportunity(userId: string, opportunityId: string,
   if (!supabase) return;
 
   if (saved) {
-    await supabase.from("saved_opportunities").upsert({ user_id: userId, opportunity_id: opportunityId });
+    await supabase
+      .from("saved_opportunities")
+      .delete()
+      .match({ user_id: userId, opportunity_id: opportunityId });
+
+    await supabase.from("saved_opportunities").insert({ user_id: userId, opportunity_id: opportunityId });
     return;
   }
 
@@ -393,7 +398,12 @@ export async function setFollowedOrganization(userId: string, organizationSlug: 
   if (!supabase) return;
 
   if (followed) {
-    await supabase.from("followed_organizations").upsert({ user_id: userId, organization_slug: organizationSlug });
+    await supabase
+      .from("followed_organizations")
+      .delete()
+      .match({ user_id: userId, organization_slug: organizationSlug });
+
+    await supabase.from("followed_organizations").insert({ user_id: userId, organization_slug: organizationSlug });
     return;
   }
 

@@ -1,10 +1,10 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import OpportunityForm from "@/components/opportunities/OpportunityForm";
 import { SectionHeading } from "@/components/ui";
 import { useOpportunitiesContext } from "@/context/opportunities-context";
+import { useRouter } from "@/i18n/navigation";
 
 export default function AddOpportunityView() {
   const t = useTranslations("addOpportunity");

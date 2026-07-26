@@ -76,10 +76,11 @@ function AppStateProviders({
   });
   const { user, authenticated, authReady, login, signup, logout } = auth;
   const { flushSave } = profile;
+  const { flushChanges } = opportunities;
   const handleLogout = useCallback(async () => {
-    await flushSave();
+    await Promise.all([flushSave(), flushChanges()]);
     await logout();
-  }, [flushSave, logout]);
+  }, [flushChanges, flushSave, logout]);
 
   const authValue = useMemo<AuthContextValue>(
     () => ({

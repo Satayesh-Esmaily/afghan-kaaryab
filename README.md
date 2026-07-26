@@ -398,7 +398,6 @@ The UI uses a compact design system with shared visual tokens and repeated compo
 ### Submission Links
 
 - Deployed App: https://afghan-kaaryab.vercel.app/
-- Demo Video: `PUT_DEMO_VIDEO_LINK_HERE`
 - GitHub Repository: https://github.com/Satayesh-Esmaily/afghan-kaaryab
 
 ### Screenshots

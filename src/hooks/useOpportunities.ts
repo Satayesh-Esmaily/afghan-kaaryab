@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createOpportunityId, type Opportunity, type OpportunityInput } from "@/lib/opportunities";
 import {
   clearSavedOpportunitiesStore,
@@ -28,6 +28,33 @@ export function useOpportunitiesState({
   const [followedOrganizationSlugs, setFollowedOrganizationSlugs] = useState<string[]>(
     initialFollowedOrganizationSlugs
   );
+  const pendingWriteRef = useRef<Promise<unknown>>(Promise.resolve());
+
+  const enqueueWrite = useCallback((task: () => Promise<unknown>) => {
+    const nextWrite = pendingWriteRef.current.then(task);
+
+    pendingWriteRef.current = nextWrite.catch((error) => {
+      console.error("Failed to persist opportunity data.", error);
+    });
+
+    return nextWrite;
+  }, []);
+
+  const flushChanges = useCallback(async () => {
+    await pendingWriteRef.current;
+  }, []);
+
+  useEffect(() => {
+    function handlePageHide() {
+      void flushChanges();
+    }
+
+    window.addEventListener("pagehide", handlePageHide);
+
+    return () => {
+      window.removeEventListener("pagehide", handlePageHide);
+    };
+  }, [flushChanges]);
 
   const addOpportunity = useCallback(
     (input: OpportunityInput) => {
@@ -40,12 +67,12 @@ export function useOpportunitiesState({
       setOpportunities((current) => [opportunity, ...current]);
 
       if (userId) {
-        void saveOpportunityStore(opportunity, userId);
+        void enqueueWrite(() => saveOpportunityStore(opportunity, userId));
       }
 
       return opportunity;
     },
-    [userId]
+    [enqueueWrite, userId]
   );
 
   const updateOpportunity = useCallback(
@@ -62,21 +89,21 @@ export function useOpportunitiesState({
 
         const updatedOpportunity = next.find((item) => item.id === id);
         if (updatedOpportunity && userId) {
-          void saveOpportunityStore(updatedOpportunity, userId);
+          void enqueueWrite(() => saveOpportunityStore(updatedOpportunity, userId));
         }
 
         return next;
       });
     },
-    [userId]
+    [enqueueWrite, userId]
   );
 
   const deleteOpportunity = useCallback((id: string) => {
     setOpportunities((current) => current.filter((opportunity) => opportunity.id !== id));
     setSavedIds((current) => current.filter((savedId) => savedId !== id));
 
-    void deleteOpportunityStore(id);
-  }, []);
+    void enqueueWrite(() => deleteOpportunityStore(id));
+  }, [enqueueWrite]);
 
   const toggleSaved = useCallback(
     (id: string) => {
@@ -84,22 +111,22 @@ export function useOpportunitiesState({
         const next = current.includes(id) ? current.filter((item) => item !== id) : [id, ...current];
 
         if (userId) {
-          void setSavedOpportunity(userId, id, next.includes(id));
+          void enqueueWrite(() => setSavedOpportunity(userId, id, next.includes(id)));
         }
 
         return next;
       });
     },
-    [userId]
+    [enqueueWrite, userId]
   );
 
   const clearSaved = useCallback(() => {
     setSavedIds([]);
 
     if (userId) {
-      void clearSavedOpportunitiesStore(userId);
+      void enqueueWrite(() => clearSavedOpportunitiesStore(userId));
     }
-  }, [userId]);
+  }, [enqueueWrite, userId]);
 
   const toggleFollowOrganization = useCallback(
     (slug: string) => {
@@ -107,13 +134,13 @@ export function useOpportunitiesState({
         const next = current.includes(slug) ? current.filter((item) => item !== slug) : [slug, ...current];
 
         if (userId) {
-          void setFollowedOrganization(userId, slug, next.includes(slug));
+          void enqueueWrite(() => setFollowedOrganization(userId, slug, next.includes(slug)));
         }
 
         return next;
       });
     },
-    [userId]
+    [enqueueWrite, userId]
   );
 
   const isSaved = useCallback((id: string) => savedIds.includes(id), [savedIds]);
@@ -132,6 +159,7 @@ export function useOpportunitiesState({
       deleteOpportunity,
       toggleSaved,
       clearSaved,
+      flushChanges,
       isSaved,
       toggleFollowOrganization,
       isFollowingOrganization,
@@ -145,6 +173,7 @@ export function useOpportunitiesState({
       isSaved,
       opportunities,
       savedIds,
+      flushChanges,
       toggleFollowOrganization,
       toggleSaved,
       updateOpportunity,
