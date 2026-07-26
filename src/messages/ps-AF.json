@@ -756,6 +756,34 @@
       "viewDetails": "جزیات",
       "applyNow": "اوس غوښتنه وکړئ"
     },
+    "shared": {
+      "categories": {
+        "Job": "کار",
+        "Internship": "انټرنشيپ",
+        "Scholarship": "بورس",
+        "Online course": "آنلاین کورس",
+        "Remote work": "له لرې کار",
+        "Training program": "روزنیز پروګرام",
+        "Volunteer work": "رضاکارانه کار"
+      },
+      "types": {
+        "Remote": "له لرې",
+        "On-site": "حضوري",
+        "Hybrid": "ترکیبي",
+        "Online": "آنلاین"
+      },
+      "levels": {
+        "Entry level": "ابتدایي کچه",
+        "Mid level": "منځنۍ کچه",
+        "Senior level": "لوړه کچه",
+        "Internship": "انټرنشيپ"
+      },
+      "genders": {
+        "Male": "نارینه",
+        "Female": "ښځینه",
+        "Open to all": "د ټولو لپاره"
+      }
+    },
     "details": {
       "notFoundTitle": "فرصت پیدا نه شو",
       "notFoundDescription": "کېدای شي دا فرصت لرې شوی وي یا لینک یې زوړ وي.",
@@ -779,6 +807,10 @@
       "documentCoverLetter": "تعریفي لیک",
       "documentCertificates": "اړوند سرتیفیکيټونه یا نمونې",
       "companyInfo": "د شرکت معلومات",
+      "organizationLabel": "سازمان",
+      "provinceLabel": "ولایت",
+      "publishedLabel": "خپور شوی",
+      "deadlineLabel": "وروستۍ نېټه",
       "companySummaryFallback": "دا اداره په KaarYab کې ثبت شوې څو کار لټونکي وروستۍ فرصتونه ومومي او له غوښتنې مخکې نور معلومات ترلاسه کړي.",
       "location": "ځای",
       "contract": "قرارداد",

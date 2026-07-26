@@ -732,6 +732,34 @@
       "viewDetails": "جزئیات",
       "applyNow": "همین حالا درخواست بده"
     },
+    "shared": {
+      "categories": {
+        "Job": "کار",
+        "Internship": "انترنشیپ",
+        "Scholarship": "بورس",
+        "Online course": "دوره آنلاین",
+        "Remote work": "کار از راه دور",
+        "Training program": "برنامه آموزشی",
+        "Volunteer work": "کار داوطلبانه"
+      },
+      "types": {
+        "Remote": "دورکاری",
+        "On-site": "حضوری",
+        "Hybrid": "ترکیبی",
+        "Online": "آنلاین"
+      },
+      "levels": {
+        "Entry level": "سطح ابتدایی",
+        "Mid level": "سطح متوسط",
+        "Senior level": "سطح ارشد",
+        "Internship": "انترنشیپ"
+      },
+      "genders": {
+        "Male": "مرد",
+        "Female": "زن",
+        "Open to all": "مناسب همه"
+      }
+    },
     "details": {
       "notFoundTitle": "فرصت پیدا نشد",
       "notFoundDescription": "ممکن است این فرصت حذف شده باشد یا لینک آن قدیمی شده باشد.",
@@ -755,6 +783,10 @@
       "documentCoverLetter": "نامه معرفی",
       "documentCertificates": "سرتیفیکیت‌ها یا نمونه‌کار مرتبط",
       "companyInfo": "اطلاعات شرکت",
+      "organizationLabel": "سازمان",
+      "provinceLabel": "ولایت",
+      "publishedLabel": "نشر شده",
+      "deadlineLabel": "مهلت",
       "companySummaryFallback": "این سازمان در KaarYab فهرست شده است تا کارجویان فرصت‌های فعلی را پیدا کنند و پیش از درخواست بیشتر بدانند.",
       "location": "موقعیت",
       "contract": "قرارداد",

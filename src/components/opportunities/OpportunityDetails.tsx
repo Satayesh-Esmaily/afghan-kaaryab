@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useParams, useRouter } from "next/navigation";
 import { useOpportunitiesContext } from "@/context/opportunities-context";
 import { Badge, ConfirmDialog, EmptyState, SectionHeading } from "@/components/ui";
@@ -12,10 +12,18 @@ import {
   getOpportunityById,
   isExpiringSoon,
 } from "@/lib/opportunities";
+import {
+  opportunityCategoryLabelKeys,
+  opportunityGenderLabelKeys,
+  opportunityLevelLabelKeys,
+  opportunityTypeLabelKeys,
+} from "@/lib/opportunity-labels";
 import { slugifyOrganizationName } from "@/lib/network";
 
 export default function OpportunityDetails() {
   const t = useTranslations("opportunities.details");
+  const tShared = useTranslations("opportunities.shared");
+  const locale = useLocale();
   const params = useParams<{ id: string | string[] }>();
   const id = Array.isArray(params.id) ? params.id[0] : params.id;
   const router = useRouter();
@@ -29,7 +37,7 @@ export default function OpportunityDetails() {
       <EmptyState
         title={t("notFoundTitle")}
         description={t("notFoundDescription")}
-        actionHref="/opportunities"
+        actionHref={`/${locale}/opportunities`}
         actionLabel={t("backToOpportunities")}
       />
     );
@@ -42,13 +50,15 @@ export default function OpportunityDetails() {
     <div className="space-y-8">
       <section className="rounded-[1.5rem] panel p-6 sm:p-8">
         <div className="flex flex-wrap gap-2">
-          <Badge tone="info">{opportunity.category}</Badge>
+          <Badge tone="info">{tShared(opportunityCategoryLabelKeys[opportunity.category])}</Badge>
           <Badge tone={isExpiringSoon(opportunity.deadline) ? "warning" : "default"}>
             {isExpiringSoon(opportunity.deadline) ? t("deadlineSoon") : t("openPosition")}
           </Badge>
-          <Badge tone={opportunity.type === "Remote" ? "success" : "default"}>{opportunity.type}</Badge>
-          {opportunity.level ? <Badge tone="accent">{opportunity.level}</Badge> : null}
-          {opportunity.gender ? <Badge tone="default">{opportunity.gender}</Badge> : null}
+          <Badge tone={opportunity.type === "Remote" ? "success" : "default"}>
+            {tShared(opportunityTypeLabelKeys[opportunity.type])}
+          </Badge>
+          {opportunity.level ? <Badge tone="accent">{tShared(opportunityLevelLabelKeys[opportunity.level])}</Badge> : null}
+          {opportunity.gender ? <Badge tone="default">{tShared(opportunityGenderLabelKeys[opportunity.gender])}</Badge> : null}
         </div>
 
         <div className="mt-5 grid gap-6 xl:grid-cols-[1.15fr_0.85fr] xl:items-start">
@@ -57,10 +67,13 @@ export default function OpportunityDetails() {
             <p className="ds-muted text-base leading-7">{opportunity.description}</p>
 
             <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-              <InfoCard label="Organization" value={opportunity.organization} />
-              <InfoCard label="Province" value={opportunity.location} />
-              <InfoCard label="Published" value={formatPublishedDate(opportunity.publishedAt ?? opportunity.submittedAt)} />
-              <InfoCard label="Deadline" value={formatDeadline(opportunity.deadline)} />
+              <InfoCard label={t("organizationLabel")} value={opportunity.organization} />
+              <InfoCard label={t("provinceLabel")} value={opportunity.location} />
+              <InfoCard
+                label={t("publishedLabel")}
+                value={formatPublishedDate(opportunity.publishedAt ?? opportunity.submittedAt)}
+              />
+              <InfoCard label={t("deadlineLabel")} value={formatDeadline(opportunity.deadline)} />
             </div>
           </div>
 
@@ -81,7 +94,7 @@ export default function OpportunityDetails() {
               {t("apply")}
             </a>
             <Link
-              href={`/opportunities/${opportunity.id}/edit`}
+              href={`/${locale}/opportunities/${opportunity.id}/edit`}
               className="rounded-full border border-[color:var(--border)] bg-[color:var(--surface)] px-5 py-3 text-sm font-semibold text-[color:var(--foreground)] transition hover:bg-[color:var(--surface-soft)]"
             >
               {t("edit")}
@@ -150,14 +163,20 @@ export default function OpportunityDetails() {
 
             <div className="mt-5 space-y-3">
               <MetaRow label={t("location")} value={opportunity.location} />
-              <MetaRow label={t("contract")} value={opportunity.type} />
-              <MetaRow label={t("level")} value={opportunity.level ?? t("notSpecified")} />
-              <MetaRow label={t("gender")} value={opportunity.gender ?? t("openToAll")} />
+              <MetaRow label={t("contract")} value={tShared(opportunityTypeLabelKeys[opportunity.type])} />
+              <MetaRow
+                label={t("level")}
+                value={opportunity.level ? tShared(opportunityLevelLabelKeys[opportunity.level]) : t("notSpecified")}
+              />
+              <MetaRow
+                label={t("gender")}
+                value={opportunity.gender ? tShared(opportunityGenderLabelKeys[opportunity.gender]) : t("openToAll")}
+              />
               <MetaRow label={t("organizationPage")} value={organizationSlug} />
             </div>
 
             <Link
-              href={`/organizations/${organizationSlug}`}
+              href={`/${locale}/organizations/${organizationSlug}`}
               className="mt-5 inline-flex rounded-full bg-[color:var(--accent-soft)] px-4 py-2.5 text-sm font-semibold text-[color:var(--accent-strong)] transition hover:bg-[color:var(--accent-soft)]/80"
             >
               {t("viewOrganization")}
@@ -184,7 +203,7 @@ export default function OpportunityDetails() {
         onConfirm={() => {
           deleteOpportunity(opportunity.id);
           setDeleteOpen(false);
-          router.push("/opportunities");
+          router.push(`/${locale}/opportunities`);
         }}
       />
     </div>

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useOpportunitiesContext } from "@/context/opportunities-context";
 import { Badge } from "@/components/ui";
 import {
@@ -42,10 +42,11 @@ export default function OpportunityCard({
 }) {
   const t = useTranslations("opportunities.card");
   const tShared = useTranslations("opportunities.shared");
+  const locale = useLocale();
   const router = useRouter();
   const { isSaved, toggleSaved } = useOpportunitiesContext();
   const saved = isSaved(opportunity.id);
-  const detailsHref = `/opportunities/${opportunity.id}`;
+  const detailsHref = `/${locale}/opportunities/${opportunity.id}`;
 
   return (
     <article
