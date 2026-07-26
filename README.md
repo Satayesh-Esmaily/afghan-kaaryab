@@ -121,7 +121,6 @@ Locale-aware routes are the primary public routes.
 - `/[locale]/organizations/[slug]` - organization detail page
 - `/[locale]/profile` - user profile and resume data
 - `/[locale]/resume-builder` - resume upload and management
-- `/[locale]/settings` - user settings
 - `/[locale]/about` - about page
 - `/[locale]/contact` - contact form
 - `/[locale]/login` - login page
@@ -164,14 +163,12 @@ The project uses the Next.js App Router with localized layout support:
 
 ### Context and State
 
-The app uses split context providers instead of one giant state container:
 
 - `AuthContext`
 - `ProfileContext`
 - `OpportunitiesContext`
 - `ThemeContext`
-
-This keeps rerenders lower and makes each concern easier to maintain.
+.
 
 ### Data and Persistence
 
@@ -228,12 +225,7 @@ The app includes PWA support through:
 - `manifest.webmanifest`
 - app icons
 - service worker registration
-- installable standalone mode
-
-Notes:
-
-- PWA installation works best on HTTPS production deployments
-- local development may not fully reflect install behavior
+- installable standalone modeL
 
 ---
 
@@ -250,86 +242,16 @@ Supabase is used for:
 - resume storage
 - profile attachment storage
 
-### Storage Buckets
-
-Recommended buckets:
-
-- `avatars`
-- `resumes`
-- `profile-attachments`
-
-### Database Tables
-
-The app syncs with tables such as:
-
-- `profiles`
-- `experience_entries`
-- `education_entries`
-- `certification_entries`
-- `award_entries`
-- `document_entries`
-- `opportunities`
-- `saved_opportunities`
-- `followed_organizations`
 
 ---
 
-## Environment Variables
-
-Create a `.env.local` file:
-
-```bash
-NEXT_PUBLIC_SUPABASE_URL=your-supabase-project-url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
-NEXT_PUBLIC_SUPABASE_AVATAR_BUCKET=avatars
-NEXT_PUBLIC_SUPABASE_AVATAR_BUCKET_PUBLIC=false
-NEXT_PUBLIC_SUPABASE_RESUME_BUCKET=resumes
-NEXT_PUBLIC_SUPABASE_RESUME_BUCKET_PUBLIC=false
-NEXT_PUBLIC_SUPABASE_PROFILE_ATTACHMENT_BUCKET=profile-attachments
-NEXT_PUBLIC_SUPABASE_PROFILE_ATTACHMENT_BUCKET_PUBLIC=false
-NEXT_PUBLIC_SITE_URL=http://localhost:3000
-RESEND_API_KEY=your_resend_api_key
-CONTACT_TO_EMAIL=your_inbox@example.com
-CONTACT_FROM_EMAIL=KaarYab Afghanistan <onboarding@resend.dev>
-```
-
-If you have verified your own Resend domain, replace `CONTACT_FROM_EMAIL` with an address from that verified domain.
-
----
-
-## Recommended Supabase Setup
+## Supabase Setup
 
 ### Authentication
 
 - Enable email/password auth
 - Configure email confirmation if needed
 
-### Storage Policies
-
-Recommended behavior:
-
-- users can upload only their own avatar files
-- users can upload only their own resume files
-- users can upload only their own certification/award/document attachments
-- users can read and delete only their own files
-
-### Profile Persistence
-
-The profile system stores:
-
-- name
-- headline
-- avatar
-- country / province / nationality
-- date of birth / gender / address
-- summary
-- skills / languages
-- experience / education
-- certifications / awards / documents
-- social links
-- resume data
-
-The app auto-saves profile changes and also flushes the latest profile state before sign out.
 
 ---
 
@@ -390,11 +312,8 @@ The UI uses a compact design system with shared visual tokens and repeated compo
 
 ---
 
-## Screenshots and Brand Assets
 
-> Replace the placeholder image paths below with your own screenshots before final submission.
-
-### Submission Links
+### Links
 
 - Deployed App: https://afghan-kaaryab.vercel.app/
 - GitHub Repository: https://github.com/Satayesh-Esmaily/afghan-kaaryab
@@ -545,30 +464,16 @@ The project is also verified with:
 ```bash
 npm run lint
 npm run build
-```
-
-## Submission Notes
-
-Before final submission, replace the placeholder demo video link and make sure the screenshot paths point to real exported images from the project. The README already includes the live deployment link, repository link, stack summary, Supabase notes, and main architecture overview.
 
 ---
 
 ## Deployment
 
-Recommended deployment target:
+deployment :
 
 - Vercel
 
-Before deployment, make sure you add all Supabase and Resend environment variables in the hosting dashboard.
 
-The app is designed to run with:
-
-- HTTPS
-- locale-aware URLs
-- manifest support
-- service worker support
-
----
 
 ## Future Improvements
 
