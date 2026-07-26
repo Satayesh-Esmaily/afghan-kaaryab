@@ -20,7 +20,6 @@ The project is built with:
 
 This is not just a landing page. It is a real production-style web application with authentication, profile management, opportunity CRUD, saved items, organization pages, resume management, contact email delivery, and a reusable design system.
 
-It was built to feel like a real product that could be used, deployed, and presented as a serious capstone project.
 
 ---
 
