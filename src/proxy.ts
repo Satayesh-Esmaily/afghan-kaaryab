@@ -10,7 +10,6 @@ const privateRoutePrefixes = [
   "/resume-builder",
   "/saved",
   "/add-opportunity",
-  "/settings",
 ];
 
 export async function proxy(request: NextRequest) {

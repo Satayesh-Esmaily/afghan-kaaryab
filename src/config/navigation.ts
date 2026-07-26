@@ -8,8 +8,7 @@ export type ShellPath =
   | "/saved"
   | "/add-opportunity"
   | "/about"
-  | "/contact"
-  | "/settings";
+  | "/contact";
 
 export type NavItem = {
   href: ShellPath;
@@ -32,7 +31,6 @@ export const sidebarItems: NavItem[] = [
   { href: "/add-opportunity", labelKey: "sidebar.addOpportunity" },
   { href: "/about", labelKey: "sidebar.about" },
   { href: "/contact", labelKey: "sidebar.contact" },
-  { href: "/settings", labelKey: "sidebar.settings" },
 ];
 
 export const pageHeaderOrder: ShellPath[] = [
@@ -46,7 +44,6 @@ export const pageHeaderOrder: ShellPath[] = [
   "/add-opportunity",
   "/about",
   "/contact",
-  "/settings",
 ];
 
 export const pageHeaders: Record<ShellPath, PageHeader> = {
@@ -60,7 +57,6 @@ export const pageHeaders: Record<ShellPath, PageHeader> = {
   "/add-opportunity": { titleKey: "pages.addOpportunity.title", subtitleKey: "pages.addOpportunity.subtitle" },
   "/about": { titleKey: "pages.about.title", subtitleKey: "pages.about.subtitle" },
   "/contact": { titleKey: "pages.contact.title", subtitleKey: "pages.contact.subtitle" },
-  "/settings": { titleKey: "pages.settings.title", subtitleKey: "pages.settings.subtitle" },
 };
 
 export const pageTones: Record<ShellPath, { dot: string; title: string }> = {
@@ -74,7 +70,6 @@ export const pageTones: Record<ShellPath, { dot: string; title: string }> = {
   "/add-opportunity": { dot: "bg-[color:var(--accent)]", title: "text-[color:var(--accent)]" },
   "/about": { dot: "bg-[color:var(--success)]", title: "text-[color:var(--success)]" },
   "/contact": { dot: "bg-[color:var(--danger)]", title: "text-[color:var(--danger)]" },
-  "/settings": { dot: "bg-[color:var(--accent-strong)]", title: "text-[color:var(--accent-strong)]" },
 };
 
 export function isShellLinkActive(pathname: string | null, href: ShellPath) {

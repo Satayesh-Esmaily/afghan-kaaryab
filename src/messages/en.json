@@ -1019,6 +1019,54 @@
     "summary": {
       "title": "Built as a practical job platform",
       "body": "The application includes responsive layouts, dynamic routes, saved opportunities, organization profiles, a full add/edit/delete workflow, dark mode, and reusable components so it feels ready for everyday use."
+    },
+    "highlights": {
+      "title": "What the platform brings together",
+      "description": "KaarYab keeps the main pieces of a job search in one place so users can move faster and stay organized.",
+      "items": {
+        "search": {
+          "title": "Search and filter",
+          "body": "Find opportunities by title, location, company, type, deadline, and more."
+        },
+        "save": {
+          "title": "Save for later",
+          "body": "Keep interesting opportunities in one place and revisit them anytime."
+        },
+        "profile": {
+          "title": "Profile and resume tools",
+          "body": "Update profile details, build a resume, and keep documents ready for applications."
+        },
+        "directory": {
+          "title": "Organizations and sources",
+          "body": "Review the organizations and institutions behind active listings."
+        }
+      }
+    },
+    "workflow": {
+      "title": "How KaarYab works",
+      "description": "The platform follows a simple workflow that keeps discovery, saving, and applying easy to follow.",
+      "steps": {
+        "one": {
+          "title": "Discover opportunities",
+          "body": "Use the public listings and filters to find opportunities that match your goals."
+        },
+        "two": {
+          "title": "Save what matters",
+          "body": "Bookmark strong matches so you can return to them when you are ready."
+        },
+        "three": {
+          "title": "Organize your profile",
+          "body": "Keep your resume, skills, experience, and supporting documents in sync."
+        },
+        "four": {
+          "title": "Apply with confidence",
+          "body": "Use the details on each listing to prepare a better application."
+        }
+      }
+    },
+    "cta": {
+      "primary": "Browse opportunities",
+      "secondary": "Contact the team"
     }
   }
 }

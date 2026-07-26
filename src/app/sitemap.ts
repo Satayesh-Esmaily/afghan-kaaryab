@@ -15,7 +15,6 @@ const routes = [
   "/profile",
   "/resume-builder",
   "/saved",
-  "/settings",
   "/signup",
 ] as const;
 
