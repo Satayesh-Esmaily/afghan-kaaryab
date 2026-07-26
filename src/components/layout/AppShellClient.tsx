@@ -31,11 +31,11 @@ export default function AppShellClient({ children, footer }: AppShellClientProps
   const tCommon = useTranslations("common");
   const normalizedPathname = stripLocalePrefix(pathname);
   const { theme, setTheme } = useThemeContext();
-  const { user, authenticated, logout, hydrated, authReady } = useAuthContext();
+  const { user, authenticated, logout, authReady } = useAuthContext();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const isAuthRoute = normalizedPathname === "/login" || normalizedPathname === "/signup";
-  const isAppReady = hydrated && authReady;
+  const isAppReady = authReady;
   const activePagePath =
     (normalizedPathname === "/" ? "/dashboard" : undefined) ??
     pageHeaderOrder.find((path) =>

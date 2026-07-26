@@ -2,10 +2,10 @@ import "server-only";
 
 import { cookies } from "next/headers";
 import { createServerClient } from "@supabase/ssr";
+import { createDefaultAppState } from "@/lib/app-state";
 import { mapSessionUserToAuthUser } from "@/lib/auth";
 import type { ServerBootstrapState } from "@/lib/bootstrap";
-import { createDefaultAppState } from "@/lib/app-state";
-import { loadAppStoreFromSupabase } from "@/lib/supabase-app-store";
+import { getServerThemeMode } from "@/lib/theme-preferences.server";
 
 export async function getSupabaseServerClient() {
   const cookieStore = await cookies();
@@ -34,6 +34,7 @@ export async function getSupabaseServerClient() {
 
 export async function loadServerBootstrap(): Promise<ServerBootstrapState> {
   const supabase = await getSupabaseServerClient();
+  const theme = await getServerThemeMode();
 
   if (!supabase) {
     const fallback = createDefaultAppState(null);
@@ -46,29 +47,35 @@ export async function loadServerBootstrap(): Promise<ServerBootstrapState> {
         savedIds: fallback.savedIds,
         followedOrganizationSlugs: fallback.followedOrganizationSlugs,
         profile: fallback.profile,
-        theme: fallback.theme,
+        theme,
       },
       source: "fallback",
-      prefetchedSnapshot: true,
+      prefetchedSnapshot: false,
     };
   }
 
   try {
     const {
-      data: { user: sessionUser },
-    } = await supabase.auth.getUser();
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    const sessionUser = session?.user;
 
     const user = sessionUser?.email ? mapSessionUserToAuthUser(sessionUser) : null;
-    const snapshot = user?.id
-      ? await loadAppStoreFromSupabase(supabase, user)
-      : createDefaultAppState(null);
+    const fallback = createDefaultAppState(user);
 
     return {
       user,
       authReady: true,
-      snapshot,
+      snapshot: {
+        opportunities: fallback.opportunities,
+        savedIds: fallback.savedIds,
+        followedOrganizationSlugs: fallback.followedOrganizationSlugs,
+        profile: fallback.profile,
+        theme,
+      },
       source: "server",
-      prefetchedSnapshot: true,
+      prefetchedSnapshot: false,
     };
   } catch {
     const fallback = createDefaultAppState(null);
@@ -81,10 +88,10 @@ export async function loadServerBootstrap(): Promise<ServerBootstrapState> {
         savedIds: fallback.savedIds,
         followedOrganizationSlugs: fallback.followedOrganizationSlugs,
         profile: fallback.profile,
-        theme: fallback.theme,
+        theme,
       },
       source: "fallback",
-      prefetchedSnapshot: true,
+      prefetchedSnapshot: false,
     };
   }
 }

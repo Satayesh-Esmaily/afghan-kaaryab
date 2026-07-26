@@ -1,10 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
-import Providers from "@/components/layout/Providers";
 import { defaultLocale } from "@/i18n/config";
 import { getLocaleDirection } from "@/i18n/utils";
-import { loadServerBootstrap } from "@/lib/supabase/server";
 import PwaRegistration from "@/components/layout/PwaRegistration";
+import { getServerThemeMode } from "@/lib/theme-preferences.server";
 import "./globals.css";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
@@ -64,9 +63,8 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [locale, bootstrap] = await Promise.all([getLocale(), loadServerBootstrap()]);
+  const [locale, theme] = await Promise.all([getLocale(), getServerThemeMode()]);
   const dir = getLocaleDirection(locale);
-  const theme = bootstrap.snapshot.theme;
 
   return (
     <html
@@ -80,7 +78,7 @@ export default async function RootLayout({
         suppressHydrationWarning
         className="min-h-full bg-[color:var(--background)] text-[color:var(--foreground)]"
       >
-        <Providers bootstrap={bootstrap}>{children}</Providers>
+        {children}
         <PwaRegistration />
       </body>
     </html>
