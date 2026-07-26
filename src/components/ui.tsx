@@ -5,9 +5,13 @@ type BadgeTone = "default" | "success" | "warning" | "info" | "accent";
 export function Badge({
   children,
   tone = "default",
+  className = "",
+  title,
 }: {
   children: React.ReactNode;
   tone?: BadgeTone;
+  className?: string;
+  title?: string;
 }) {
   const tones: Record<BadgeTone, string> = {
     default: "bg-[color:var(--surface-soft)] text-[color:var(--foreground)] border-[color:var(--border)]",
@@ -20,7 +24,10 @@ export function Badge({
   };
 
   return (
-    <span className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold ${tones[tone]}`}>
+    <span
+      title={title}
+      className={`inline-flex min-w-0 items-center rounded-full border px-3 py-1 text-xs font-semibold ${tones[tone]} ${className}`}
+    >
       {children}
     </span>
   );

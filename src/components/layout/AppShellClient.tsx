@@ -60,8 +60,8 @@ export default function AppShellClient({ children, footer }: AppShellClientProps
   }
 
   return (
-    <div className="min-h-screen bg-[color:var(--background)] text-[color:var(--foreground)]">
-      <aside className="fixed inset-y-0 start-0 hidden w-[276px] flex-col border-e border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-4 lg:flex">
+    <div className="app-shell-root min-h-screen bg-[color:var(--background)] text-[color:var(--foreground)]">
+      <aside className="app-shell-sidebar fixed inset-y-0 start-0 hidden w-[276px] flex-col border-e border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-4 lg:flex">
         <Link
           href="/"
           className="panel group rounded-[1.25rem] px-3.5 py-3.5 transition hover:-translate-y-0.5 hover:shadow-xl"
@@ -139,7 +139,7 @@ export default function AppShellClient({ children, footer }: AppShellClientProps
       </aside>
 
       <div className="lg:ps-[276px]">
-        <header className="sticky top-0 z-40 bg-[color:var(--background)]">
+        <header className="app-shell-header sticky top-0 z-40 bg-[color:var(--background)]">
           <div className="mx-auto flex max-w-[1600px] flex-col gap-3 px-4 py-3 sm:px-6 lg:px-8">
             <div className="inline-flex items-center gap-3 rounded-[1.35rem] border border-[color:var(--border)] bg-[color:var(--surface)] px-4 py-3 shadow-sm sm:max-w-[min(100%,22rem)]">
               <span className={["h-2.5 w-2.5 rounded-full", pageTone.dot].join(" ")} />
@@ -198,7 +198,7 @@ export default function AppShellClient({ children, footer }: AppShellClientProps
         </header>
 
         {mobileOpen ? (
-          <div className="mx-4 mt-3 panel rounded-[1.25rem] p-3.5 sm:mx-6 lg:hidden">
+          <div className="app-shell-mobile-nav mx-4 mt-3 panel rounded-[1.25rem] p-3.5 sm:mx-6 lg:hidden">
             <nav className="space-y-1.5">
               {sidebarItems.map((item) => {
                 if (item.authOnly && !authenticated) {
@@ -248,11 +248,11 @@ export default function AppShellClient({ children, footer }: AppShellClientProps
           </div>
         ) : null}
 
-        <main className="mx-auto w-full max-w-[1600px] px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+        <main className="app-shell-main mx-auto w-full max-w-[1600px] px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
           {children}
         </main>
 
-        {footer}
+        <div className="app-shell-footer">{footer}</div>
       </div>
     </div>
   );
