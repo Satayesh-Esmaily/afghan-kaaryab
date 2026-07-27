@@ -4,6 +4,9 @@ KaarYab Afghanistan is a modern opportunity-finder platform built for Afghan job
 It helps people discover and manage jobs, internships, scholarships, remote work, online courses, training programs, volunteer work, and organization profiles in one place.
 
 Live deployment: https://afghan-kaaryab.vercel.app/
+
+---
+
 Demo Link:
 https://youtu.be/7Ds3WxhChDc?si=tZOsMw0ayA8KklYA
 
